@@ -105,7 +105,6 @@ body {
   position: absolute;
 }
 
-
 .login-form {
   justify-content:center;
   align-items:  center;
@@ -120,7 +119,6 @@ body {
   position: relative;
 }
 
-
 .login-form-bg {width: 550px;
   height: 593px;
   left: 0px;
@@ -130,6 +128,7 @@ body {
   box-shadow: 0px 10px 75px rgba(0, 68, 204, 0.25);
   border-radius: 8px
 }
+
 .login-login-button {width: 200px;
   height: 35px;
   position: absolute;
@@ -148,6 +147,7 @@ body {
   justify-content: center;
   transition: background-color 0.4s;
 }
+
 .login-form-or {left: 269px;
   top: 489px;
   position: absolute;
@@ -157,6 +157,7 @@ body {
   font-weight: 400;
   word-wrap: break-word;
 }
+
 .login-register-button {
   width: 200px;
   height: 35px;
@@ -176,6 +177,7 @@ body {
   justify-content: center;
   transition: background-color 0.4s;
 }
+
 .login-username-id {
   width: 290px; 
   height: 35px; 
@@ -183,8 +185,7 @@ body {
   top: 342px; 
   position: absolute;
 
-
-.login-username-id-textfield{
+.login-username-id-textfield {
   width: 100%; 
   height: 100%; 
   background: white; 
@@ -1105,3 +1106,483 @@ body {
 .user-navbar-logout-buthover {
   background-color: #1d1d72; 
 }
+
+/* reporting submission */
+
+.user-reporting-submisison-title {
+  text-align: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* min-height: 10vh */
+  /* background-color: cyan; */
+  padding-top: 3vh;
+  padding-bottom: 2vh;
+  font-size: 250%;
+}
+
+.user-reporting-submisison-container {
+  text-align: center;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.user-reporting-submisison-options {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 50px;
+}
+/* Responsive Design for cards*/
+@media (max-width: 1024px) {
+  .user-reporting-submisison-options {
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+  }
+
+  .user-reporting-submisison-card {
+      width: 50%;
+      max-width: 400px;
+  }
+}
+
+.user-reporting-submisison-typing-card {
+  width: 400px;
+  height: 377px;
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-top: 26px;
+  padding-bottom: 26px;
+  background: white;
+  box-shadow: 0px 20px 75px rgba(0, 68, 204, 0.25);
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 56px;
+  display: inline-flex
+}
+
+.user-reporting-submisison-typing-card-format {
+  font-size: 20px;
+  width: 360px;
+  height: 194px;
+  text-align: justify;
+}
+
+.user-reporting-submisison-typing-card-texts {
+  width: 360px;
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  text-align: justify;
+}
+
+.user-reporting-submisison-or {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+  align-self: center;
+}
+
+.user-reporting-submisison-speech-card {
+  width: 400px;
+  height: 377px;
+  padding-left:20px;
+  padding-right: 20px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  background: white;
+  box-shadow: 0px 20px 75px rgba(0, 68, 204, 0.25);
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  display: inline-flex;
+}
+
+.user-reporting-submisison-speech-card-main-format {
+  width: 360px;
+  height: 232px;
+  position: relative;
+}
+
+.user-reporting-submisison-speech-card-red-text {
+  width: 360px;
+  left: 0px;
+  top: 205px;
+  position: absolute;
+  text-align: justify;
+  color: #FF0000;
+  font-size: 20px;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.user-reporting-submisison-speech-card-text {
+  width: 360px;
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  text-align: justify;
+}
+
+.user-reporting-submisison-speech-card-format {
+  color: black;
+  font-size: 20px;
+  font-weight: 400;
+  word-wrap: break-word
+}
+
+.user-reporting-submisison-card-btn {
+  width: 250px;
+  height: 75px;
+  position: relative;
+  background: #0044CC;
+  box-shadow: 0px 5px 50px rgba(0, 68, 204, 0.25);
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* .card-btn-logo {
+  width: 60px;
+  height: 60px;
+  background: white;
+  
+} */
+
+.user-reporting-submisison-material-symbols-outlined {
+  font-size: 72px;
+  /* color: white; */
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+}
+
+.user-reporting-submisison-talk-icon {
+  color: white;
+  font-size: 50px !important;
+}
+
+.user-reporting-submisison-type-icon {
+  font-size: 65px !important;
+  color: white;
+}
+
+/* police user management */
+
+.police-user-management-container {
+  padding-inline: 10vw;
+}
+
+.police-user-management-searchbar {
+  margin-bottom: 40px;
+  margin-top: 120px;
+  height: 2.1875rem;
+  display: flex;
+}
+
+.police-user-management-textfield-container {
+  background-color: #303091;
+  width: 88.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px 0 0 9px ;
+  box-sizing: border-box;
+  box-shadow: 0px -15px 75px rgba(0, 68, 204, 0.3)
+}
+
+.police-user-management-textfield {
+  width: 100%;
+  margin-left: -0.5px;
+  border-radius: 8px;
+  border: none;
+  height: 35px;
+  box-sizing: border-box;
+  outline: none;
+  padding: 0 10px;
+}
+
+.police-user-management-searchbar-button {
+  background: #303091;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 8px 0;
+  width: 175px;
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
+  border: none;
+  box-shadow: 0px -15px 100px rgba(0, 68, 204, 0.5)
+  
+}
+.police-user-management-searchbar-button:hover {
+  background-color: #1d1d72; 
+}
+
+
+.police-user-management-material-symbols-outlined {
+  color: white;
+}
+
+.police-user-management-overview-issues {
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 75px rgba(0, 68, 204, 0.25)
+}
+
+.police-user-management-overview-issues-header {
+  display: flex;
+  align-items: center ;
+  justify-content: space-between;
+}
+
+.police-user-management-overview-text {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+}
+
+.police-user-management-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0px -2px;
+  padding-block: -10px;
+  padding: -10px 1px 
+}
+
+.police-user-management-subtitle {
+  font-size: 14px; 
+  font-weight: normal; 
+  color: #6c757d; 
+  margin-top: -20px;
+}
+
+.police-user-management-overview-issues-dropdown {
+  width: 200px;
+  border-radius: 8px;
+  justify-self: center;
+  font-size: 1rem;
+  margin: 34px;
+  margin-right: 0;
+  background-color: #303091;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 8px
+}
+
+.police-user-management-overview-issues-graph {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 0px 50px rgba(0, 68, 204, 0.15)
+}
+
+.police-user-management-chart {
+  height: 300px;
+  justify-content: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 10px 10px;
+}
+
+.police-user-management-bar {
+  width: 6%;
+  background-color: #D9D9D9;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  border-radius: 8px;
+}
+
+.police-user-management-bar.highlighted {
+  background-color: #0044cc;
+}
+
+.police-user-management-bar span {
+  position: absolute;
+  bottom: -25px;
+  font-size: 14px;
+  color: #333;
+}
+
+.police-user-management-highlighted {
+  background-color: #0044cc;
+  color: brown;
+}
+
+.police-user-management-bottom {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15vh;
+}
+
+@media (max-width: 1024px) {
+  .police-user-management-bottom {
+      flex-direction: column;
+      
+      align-items: center;
+      }
+  }
+
+.police-user-management-user-per {
+  background-color: white;
+  border-radius: 8px;
+  width: 50%;
+  padding: 20px;
+  box-shadow: -25px 25px 75px rgba(0, 68, 204, 0.25)
+
+}
+.police-user-management-user-per-graph {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.police-user-management-user-per-bg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100wh;
+}
+
+.police-user-management-user-per-chart {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  background-color: #ffffff; 
+  border-radius: 50%;
+  box-shadow: 0px 10px 75px rgba(0, 0, 0, 0.2);
+}
+
+.police-user-management-user-per-circle {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #0044cc 0% 65%, 
+    transparent 65% 70%, 
+    #000000 70% 100% 
+  );
+}
+
+.police-user-management-user-per-inner-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px;
+  height: 160px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.police-user-management-user-per-percentage {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.police-user-management-user-per-label {
+  font-size: 12px;
+  color: #6c6c6c;
+  margin: 5px 0 0 0;
+}
+
+.police-user-management-issue-solve-per {
+  width: 50%;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 25px 25px 75px rgba(0, 68, 204, 0.25)
+}
+
+.police-user-management-issue-solve-per-graph {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.police-user-management-issue-solve-per-bg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100wh;
+}
+
+.police-user-management-issue-solve-per-chart {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  background-color: #ffffff; 
+  border-radius: 50%;
+  box-shadow: 0px 10px 75px rgba(0, 0, 0, 0.2); 
+}
+
+.police-user-management-issue-solve-per-circle {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    #0044cc 0% 45%, 
+    transparent 45% 50%, 
+    #000000 50% 100% 
+  );
+}
+
+.police-user-management-issue-solve-per-inner-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px;
+  height: 160px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.police-user-management-issue-solve-per-percentage {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.police-user-management-issue-solve-per-label {
+  font-size: 12px;
+  color: #6c6c6c;
+  margin: 5px 0 0 0;
+}
+
+
