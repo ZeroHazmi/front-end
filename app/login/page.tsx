@@ -1,7 +1,10 @@
+'use client';
+
 import React, { useState, FormEvent } from 'react';
 import '../globals.css';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 export default function LoginPage() {
@@ -50,7 +53,6 @@ export default function LoginPage() {
         }
     }
 
-    'use client';
     return (
             <div className="login-container">
                 <div className="login-logo-text">
@@ -73,7 +75,7 @@ export default function LoginPage() {
                                 Or
                             </div>
                             <button className="login-register-button">
-                                Register
+                                <Link href="/register">Register</Link>
                             </button>
                             <div className="login-username-id">
                                 <input type="text" name="username" placeholder="Username or id..." className="login-username-id-textfield" required/>

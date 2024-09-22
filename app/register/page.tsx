@@ -1,7 +1,92 @@
-import React from 'react';
-import './app/globals.css';
+'use client'
 
-const SignUpPage = () => {
+import React, { useState, FormEvent } from 'react';
+import '../globals.css';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+export default function SignUpPage(){
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+
+    async function Register(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        setIsLoading(true);
+        setError(null);
+    
+        // Directly access the form values using event.target
+        const form = event.currentTarget;
+        const password = form.password.value;
+        const repassword = form.repassword.value;
+        const email = form.email.value;
+        const reemail = form.reemail.value;
+    
+        // Perform validation checks before proceeding
+        if (password !== repassword) {
+            setIsLoading(false);
+            setError('Password does not match');
+            return; // Stop execution if passwords do not match
+        }
+    
+        if (email !== reemail) {
+            setIsLoading(false);
+            setError('Email does not match');
+            return; // Stop execution if emails do not match
+        }
+    
+        try {
+            // Create FormData only after validation passes
+            const formData = new FormData(form);
+            const registerData = {
+                username: formData.get('username') as string,
+                password: formData.get('password') as string,
+                icNumber: formData.get('icnumber') as string,
+                birthday: formData.get('birthday') as string,
+                gender: formData.get('gender') as string,
+                nationality: formData.get('nationality') as string,
+                descendants: formData.get('descendants') as string,
+                religion: formData.get('religion') as string,
+                phoneNumber: formData.get('phone') as string,
+                house_Phone_Number: formData.get('housephone') as string,
+                office_Phone_Number: formData.get('officephone') as string,
+                address: formData.get('address') as string,
+                postcode: formData.get('postcode') as string,
+                region: formData.get('region') as string,
+                state: formData.get('states') as string,
+                email: formData.get('email') as string
+            };
+    
+            const response = await fetch('http://localhost:5035/api/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registerData),
+            });
+    
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                throw new Error(errorResponse.message || 'Registration failed');
+            }
+    
+            const data = await response.json();
+            const { token, userName } = data;
+    
+            // Store token in localStorage (or cookies)
+            localStorage.setItem('token', token);
+    
+            // Redirect to another page (e.g., dashboard) after successful registration
+            router.push('/dashboard');
+        } catch (error: any) {
+            console.error('Registration error:', error);
+            setError(error.message || 'Registration failed');
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     return (
         <form action="">
             <div className="user-signup-main-container">
@@ -12,27 +97,26 @@ const SignUpPage = () => {
                     <div className="user-signup-left-form">
                         <div className="user-signup-left-form-bg"></div>
                         <div className="user-signup-username">
-                            User Name
+                            Username
                         </div>
-                        <input className="user-signup-username-textfield"></input>
+                        <input className="user-signup-username-textfield" name='username' required></input>
                         <div className="user-signup-password">
                             Password
                         </div>
-                        <input className="user-signup-password-textfield"></input>
+                        <input className="user-signup-password-textfield" name='password' required></input>
                         <div className="user-signup-repassword">
                             Re-enter Password
                         </div>
-                        <input className="user-signup-repassword-textfield"></input>
+                        <input className="user-signup-repassword-textfield" name='repassword' required></input>
                         <div className="user-signup-birthday">
                             Birthday
                         </div>
-                        <input className="user-signup-birthday-textfield-l"></input>
-                        <input className="user-signup-birthday-textfield-r"></input>
+                        <input className="user-signup-birthday-textfield-l" type='date' name='birthday' required></input>
                         <div className="user-signup-gender">
                             Gender
                         </div>
-                         <select className="user-signup-gender-dropdown">
-                            <option value="place holder">Select your Gender</option>
+                         <select className="user-signup-gender-dropdown" name='gender' required>
+                            <option value="" disabled hidden>Select your Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                             <option value="mentalillness">Other</option>
@@ -40,8 +124,8 @@ const SignUpPage = () => {
                         <div className="user-signup-nationality">
                             Nationality
                         </div>
-                        <select className="user-signup-nationality-dropdown">
-                            <option value="place holder">Select your Nationality</option>
+                        <select className="user-signup-nationality-dropdown" name='nationality' required>
+                            <option value="" disabled hidden>Select your Nationality</option>
                             <option value="malay">Malay</option>
                             <option value="chinese">Chinese</option>
                             <option value="indian">Indian</option>
@@ -50,8 +134,8 @@ const SignUpPage = () => {
                         <div className="user-signup-descendants">
                             Descendants
                         </div>
-                        <select className="user-signup-descendants-dropdown">
-                            <option value="place holder">Select your Descendants</option>
+                        <select className="user-signup-descendants-dropdown" name='descendants' required>
+                            <option value="" disabled hidden>Select your Descendants</option>
                             <option value="malay">Malay</option>
                             <option value="chinese">Chinese</option>
                             <option value="indian">Indian</option>
@@ -60,8 +144,8 @@ const SignUpPage = () => {
                         <div className="user-signup-religion">
                             Religion
                         </div>
-                        <select className="user-signup-religion-dropdown">
-                            <option value="place holder">Select your Religion</option>
+                        <select className="user-signup-religion-dropdown" name='religion' required>
+                            <option value="" disabled hidden>Select your Religion</option>
                             <option value="islam">Islam</option>
                             <option value="buddhism">Buddhism</option>
                             <option value="christianity">Christianity</option>
@@ -72,11 +156,11 @@ const SignUpPage = () => {
                         <div className="user-signup-phone-no">
                             Phone Number
                         </div>
-                        <input className="user-signup-phone-no-textfield"></input>
+                        <input className="user-signup-phone-no-textfield" type='phone' name='phone' required></input>
                         <div className="user-signup-rephone-no">
                             Re-Enter Phone Number
                         </div>
-                        <input className="user-signup-rephone-no-textfield"></input>
+                        <input className="user-signup-rephone-no-textfield" type='phone' name='housephone' required></input> 
                         <div className="user-signup-housephone-no">
                             House Phone Number
                         </div>
@@ -85,18 +169,14 @@ const SignUpPage = () => {
                         <div className="user-signup-officephone-no">
                             Office Phone Number
                         </div>
-                        <input className="user-signup-officephone-no-textfield"></input>
+                        <input className="user-signup-officephone-no-textfield" type='phone' name='officephone' required></input>
                     </div>
                     <div className="user-signup-right-form">
                         <div className="user-signup-left-form-bg"></div>
                         <div className="user-signup-address">
                             Address
                         </div>
-                        <input className="user-signup-address-textfield-1"></input>
-                        <input className="user-signup-address-textfield-2"></input>
-                        <input className="user-signup-address-textfield-3"></input>
-                        <input className="user-signup-address-textfield-4"></input>
-                        <input className="user-signup-address-textfield-5"></input>
+                        <textarea className="user-signup-address-textfield-1" name='address' rows={5} required></textarea>
                         <div className="user-signup-passcode">
                             Passcode
                         </div>
@@ -104,40 +184,40 @@ const SignUpPage = () => {
                         <div className="user-signup-state-region">
                             State and Region
                         </div>
-                        <select className="user-signup-state-region-dropdown-1">
-                            <option value="place holder">Select your Region</option>
-                            <option value="johor">Johor</option>
-                            <option value="kedah">Kedah</option>
-                            <option value="kelantan">Kelantan</option>
-                            <option value="melaka">Melaka</option>
-                            <option value="negeri_sembilan">Negeri Sembilan</option>
-                            <option value="pahang">Pahang</option>
-                            <option value="penang">Penang</option>
-                            <option value="perak">Perak</option>
-                            <option value="perlis">Perlis</option>
-                            <option value="selangor">Selangor</option>
-                            <option value="terengganu">Terengganu</option>
-                            <option value="sabah">Sabah</option>
-                            <option value="sarawak">Sarawak</option>
-                            <option value="kuala_lumpur">Kuala Lumpur</option>
-                            <option value="putrajaya">Putrajaya</option>
-                            <option value="labuan">Labuan</option>
+                        <select className="user-signup-state-region-dropdown-1" name='states' required>
+                            <option value="" disabled hidden>Select your Region</option>
+                            <option value="Johor">Johor</option>
+                            <option value="Kedah">Kedah</option>
+                            <option value="Kelantan">Kelantan</option>
+                            <option value="Melaka">Melaka</option>
+                            <option value="Negeri Sembilan">Negeri Sembilan</option>
+                            <option value="Pahang">Pahang</option>
+                            <option value="Penang">Penang</option>
+                            <option value="Perak">Perak</option>
+                            <option value="Perlis">Perlis</option>
+                            <option value="Selangor">Selangor</option>
+                            <option value="Terengganu">Terengganu</option>
+                            <option value="Sabah">Sabah</option>
+                            <option value="Sarawak">Sarawak</option>
+                            <option value="Kuala Lumpur">Kuala Lumpur</option>
+                            <option value="Putrajaya">Putrajaya</option>
+                            <option value="Labuan">Labuan</option>
                         </select>
-                        <select className="user-signup-state-region-dropdown-2">
-                            <option value="place holder">Select your States</option>
+                        <select className="user-signup-state-region-dropdown-2" name='region' required>
+                            <option value="" disabled hidden>Select your Region</option>
                             <option value="peninsular_malaysia">Peninsular Malaysia (West Malaysia)</option>
                             <option value="east_malaysia">East Malaysia (Malaysian Borneo)</option>
                         </select>
                         <div className="user-signup-email">
                             Email
                         </div>
-                        <input className="user-signup-email-textfield"></input>
+                        <input className="user-signup-email-textfield" type='email' name='email' required></input>
                         <div className="user-signup-reemail">
                             Re-Enter Email
                         </div>
-                        <input className="user-signup-reemail-textfield"></input>
+                        <input className="user-signup-reemail-textfield" type='email' name='reemail' required></input>
                         <div className="user-signup-red-text">
-                            All of above need to be filled
+                            All of above needs to be filled
                         </div>
                         <button className="user-signup-signup-button">
                             Register
@@ -187,5 +267,3 @@ const SignUpPage = () => {
         </form>
     );
 };
-
-export default SignUpPage;
