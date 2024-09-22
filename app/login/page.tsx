@@ -75,7 +75,7 @@ export default function LoginPage() {
                                 Or
                             </div>
                             <button className="login-register-button">
-                                <Link href="/register">Register</Link>
+                                Register
                             </button>
                             <div className="login-username-id">
                                 <input type="text" name="username" placeholder="Username or id..." className="login-username-id-textfield" required/>
