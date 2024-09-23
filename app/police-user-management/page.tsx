@@ -3,31 +3,12 @@
 import React from 'react';
 import '../globals.css';
 import Image from 'next/image';
+import NavBar from '../NavBar';
 
 export default function PoliceUserManagement(){
     return (
         <form action="">
-            <nav>
-                <div className="police-user-management-user-navbar-container">
-                    <div className="police-user-management-user-navbar-left">
-                        <Image src="/Images/navbarlogo.png" className="police-user-management-logo" alt="Logo" width={50} height={50}/>
-                        <div className="police-user-management-user-navbar-title">
-                            Police
-                            <div className="police-user-management-user-navbar-subtitle">
-                                Reporting AI System
-                            </div>
-                        </div>
-                    </div>
-                    <div className="police-user-management-user-navbar-links">
-                        <div className="police-user-management-user-navbar-items">Communication</div>
-                        <div className="police-user-management-user-navbar-items">FAQ</div>
-                        <div className="police-user-management-user-navbar-logout-container">
-                            <button className="police-user-management-user-navbar-logout-button">Logout</button>
-                            <Image src="https://via.placeholder.com/50x50" className="police-user-management-user-navbar-icon" alt="User" width={50} height={50}/>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <NavBar />
             
             <div className="police-user-management-container">
                 <div className="police-user-management-searchbar">
