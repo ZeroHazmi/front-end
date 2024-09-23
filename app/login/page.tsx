@@ -44,7 +44,7 @@ export default function LoginPage() {
             localStorage.setItem('token', token);
 
             // Redirect to another page (e.g., dashboard) after successful login
-            router.push('/dashboard');
+            router.push('/user-report-submission');
         } catch (error: any) {
             console.error('Login error:', error);
             setError(error.message || 'Login failed');
@@ -75,7 +75,9 @@ export default function LoginPage() {
                                 Or
                             </div>
                             <button className="login-register-button">
-                                Register
+                                <Link href="/register">
+                                    Register
+                                </Link>
                             </button>
                             <div className="login-username-id">
                                 <input type="text" name="username" placeholder="Username or id..." className="login-username-id-textfield" required/>

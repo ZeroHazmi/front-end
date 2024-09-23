@@ -1,67 +1,51 @@
+'use client'
+
 import React from 'react';
 import '../globals.css';
+import NavBar from '../NavBar';
+import { useRouter } from 'next/router';
 
-const UserReportingSubmission = () => {
+export default function UserReportingSubmission() {
+    
     return (
         <form action="">
-            <nav>
-                <div class="user-navbar-container">
-                    <div class="user-navbar-left">
-                        {/* !! gambaq dalam public/image if x muncul !! */}
-                        <img src="/Images/navbarlogo.png" class="logo" alt="Logo"/>
-                        <div class="user-navbar-title">
-                            Police
-                            <div class="user-navbar-subtitle">
-                                Reporting AI System
-                            </div>
-                        </div>
-                    </div>
-                    <div class="user-navbar-links">
-                        <div class="user-navbar-items">Communication</div>
-                        <div class="user-navbar-items">FAQ</div>
-                        <div class="user-navbar-logout-container">
-                            <button class="user-navbar-logout-button">Logout</button>
-                            <img src="https://via.placeholder.com/50x50" class="user-navbar-icon" alt="User" />
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            <div class="user-reporting-submisison-layout">
-                <div class="user-reporting-submisison-title">
+            <NavBar />
+            <div className="user-reporting-submisison-layout">
+                <div className="user-reporting-submisison-title">
                     <h1>Reporting Submission</h1>
                 </div>
-                <div class="user-reporting-submisison-container">
-                    <div class="user-reporting-submisison-options">
-                        <!-- Typing Report Card -->
-                        <div class="user-reporting-submisison-typing-card">
-                            <div class="user-reporting-submisison-typing-card-format">
-                                <span class="user-reporting-submisison-typing-card-text">
-                                    Before you continue to <b>Typing Report</b>, it's important to know that you'll have to type out your report yourself on this page. Just use your keyboard to input all the important information about the incident.
+                <div className="user-reporting-submisison-container">
+                    <div className="user-reporting-submisison-options">
+                        {/* <!-- Typing Report Card --> */}
+                        <div className="user-reporting-submisison-typing-card">
+                            <div className="user-reporting-submisison-typing-card-format">
+                                <span className="user-reporting-submisison-typing-card-text">
+                                    Before you continue to <b>Typing Report</b>, it&apos;s important to know that you&apos;ll have to type out your report yourself on this page. Just use your keyboard to input all the important information about the incident.
                                 </span>
                             </div>
-                            <button class="user-reporting-submisison-card-btn">
-                                <div class="user-reporting-submisison-card-btn-logo">
-                                    <span class="user-reporting-submisison-material-symbols-outlined type-icon">
+                            <button className="user-reporting-submisison-card-btn">
+                                <div className="user-reporting-submisison-card-btn-logo">
+                                    <span className="user-reporting-submisison-material-symbols-outlined type-icon">
                                         keyboard
                                     </span>
                                 </div>
                             </button>
                         </div>
-                        <div class="user-reporting-submisison-or">OR</div>
-                        <div class="user-reporting-submisison-speech-card">
-                            <div class="user-reporting-submisison-speech-card-main-format">
-                                <div class="user-reporting-submisison-speech-card-red-text">
+                        <div className="user-reporting-submisison-or">OR</div>
+                        <div className="user-reporting-submisison-speech-card">
+                            <div className="user-reporting-submisison-speech-card-main-format">
+                                <div className="user-reporting-submisison-speech-card-red-text">
                                     Required Microphone or Audio input
                                 </div>
-                                <div class="user-reporting-submisison-speech-card-format">
-                                    <span class="speech-card-text">
-                                        Before you continue to <b>Ai Speech to text conversation</b>, remember that you'll need to speak clearly for the AI system to understand and summarize your report correctly. Find a quiet place and make sure to pronounce your words clearly for the best outcome.
+                                <div className="user-reporting-submisison-speech-card-format">
+                                    <span className="speech-card-text">
+                                        Before you continue to <b>Ai Speech to text conversation</b>, remember that you&apos;ll need to speak clearly for the AI system to understand and summarize your report correctly. Find a quiet place and make sure to pronounce your words clearly for the best outcome.
                                     </span>
                                 </div>
                             </div>
-                            <button class="user-reporting-submisison-card-btn">
-                                <div class="user-reporting-submisison-card-btn-logo">
-                                    <span class="user-reporting-submisison-material-symbols-outlined talk-icon">
+                            <button className="user-reporting-submisison-card-btn">
+                                <div className="user-reporting-submisison-card-btn-logo">
+                                    <span className="user-reporting-submisison-material-symbols-outlined talk-icon">
                                         record_voice_over
                                     </span>
                                 </div>
@@ -73,5 +57,3 @@ const UserReportingSubmission = () => {
         </form>
     );
 };
-
-export default UserReportingSubmission;
