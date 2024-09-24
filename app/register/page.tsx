@@ -31,6 +31,22 @@ export default function SignUpPage(){
             toast({variant: 'destructive', description: 'Password does not match'});
             return; // Stop execution if passwords do not match
         }
+
+        const validatePassword = (password: string): boolean => {
+            const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{6,}$/;
+            return passwordRegex.test(password);
+          };
+          
+          // Example usage
+          if (!validatePassword(password)) {
+            setIsLoading(false);
+            toast({
+              variant: 'destructive',
+              description:
+                'Password does not meet the requirement: at least one digit, one lowercase and uppercase letter, one special character, and a minimum of 6 characters.'
+            });
+            return;
+          }
     
         if (email !== reemail) {
             setIsLoading(false);
@@ -73,7 +89,8 @@ export default function SignUpPage(){
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error('Error response:', errorResponse); // Log the full error
-                toast({variant: 'destructive', description: 'Registration failed'});
+                toast({variant: 'destructive', description: errorResponse});
+                return;
             }
     
             const data = await response.json();
