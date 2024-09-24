@@ -4,12 +4,14 @@ import React, { useState, FormEvent } from 'react';
 import '../globals.css';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SignUpPage(){
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const {toast} = useToast();
 
     async function Register(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -26,13 +28,13 @@ export default function SignUpPage(){
         // Perform validation checks before proceeding
         if (password !== repassword) {
             setIsLoading(false);
-            setError('Password does not match');
+            toast({variant: 'destructive', description: 'Password does not match'});
             return; // Stop execution if passwords do not match
         }
     
         if (email !== reemail) {
             setIsLoading(false);
-            setError('Email does not match');
+            toast({variant: 'destructive', description: 'Email does not match'});
             return; // Stop execution if emails do not match
         }
     
@@ -71,7 +73,7 @@ export default function SignUpPage(){
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error('Error response:', errorResponse); // Log the full error
-                throw new Error(errorResponse.message || 'Registration failed');
+                toast({variant: 'destructive', description: 'Registration failed'});
             }
     
             const data = await response.json();
@@ -84,7 +86,8 @@ export default function SignUpPage(){
             router.push('/login');
         } catch (error: any) {
             console.error('Registration error:', error);
-            setError(error.message || 'Registration failed');
+            toast({variant: 'destructive', description: 'Registration failed'});
+
         } finally {
             setIsLoading(false);
         }
@@ -221,8 +224,8 @@ export default function SignUpPage(){
                         <div className="user-signup-red-text">
                             All of above needs to be filled
                         </div>
-                        <button className="user-signup-signup-button" type='submit'>
-                            Register
+                        <button className="user-signup-signup-button" type='submit' disabled={isLoading}>
+                        {isLoading ? 'Registering...' : 'Register'}
                         </button>
                         <button className="user-signup-return-button" type='button'>
                             <Link href="/login">
