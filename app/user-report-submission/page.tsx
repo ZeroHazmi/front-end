@@ -2,14 +2,14 @@
 
 import React from 'react';
 import '../globals.css';
-import NavBar from '../NavBar';
+import NavBar from '../../components/NavBar';
 import { useRouter } from 'next/router';
 
 export default function UserReportingSubmission() {
     
     return (
         <form action="">
-            <NavBar />
+            <NavBar/>
             <div className="user-reporting-submisison-layout">
                 <div className="user-reporting-submisison-title">
                     <h1>Reporting Submission</h1>
