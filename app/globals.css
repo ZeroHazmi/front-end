@@ -1,4 +1,4 @@
-@tailwind base;
+ @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -16,23 +16,6 @@
 	}
 }
 
-body {
-	/* color: black; */
-	background-color: #303091;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-		sans-serif !important;
-
-	/* for signup page only */
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-		sans-serif !important;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
-}
 
 * {
 	/* margin: 0; */
@@ -77,7 +60,7 @@ body {
 	justify-content: center;
 }
 .login-font-police {
-	color: white;
+	/* color: white */
 	font-size: 100px;
 	font-weight: 700;
 	position: absolute;
@@ -85,7 +68,7 @@ body {
 	left: -4px;
 }
 .login-font-reporting {
-	color: white;
+	/* color: white; */
 	font-size: 50px;
 	font-weight: 400;
 	top: 140px;
@@ -93,7 +76,7 @@ body {
 	position: absolute;
 }
 .login-font-ai {
-	color: white;
+	/* color: white; */
 	font-size: 30px;
 	font-weight: 400;
 	top: 203px;
@@ -102,7 +85,7 @@ body {
 	white-space: nowrap;
 }
 .login-font-system {
-	color: white;
+	/* color: white; */
 	font-size: 50px;
 	font-weight: 400;
 	top: 227px;
@@ -277,6 +260,25 @@ body {
 }
 
 /* register/signup */
+
+.user-signup-body {
+	/* color: black; */
+	/* background-color: #303091; */
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+		sans-serif !important;
+
+	/* for signup page only */
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+		sans-serif !important;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+}
+
 
 .user-signup-main-container {
 	padding-left: 0px;
@@ -1116,19 +1118,9 @@ body {
 
 /* reporting submission */
 
-.user-reporting-submisison-title {
-	text-align: center;
-	padding: 20px;
-	max-width: 1200px;
-	margin: 0 auto;
-	/* min-height: 10vh */
-	/* background-color: cyan; */
-	padding-top: 3vh;
-	padding-bottom: 2vh;
-	font-size: 250%;
-}
 
 .user-reporting-submisison-container {
+	
 	text-align: center;
 	padding: 20px;
 	max-width: 1200px;
@@ -1157,7 +1149,7 @@ body {
 
 .user-reporting-submisison-typing-card {
 	width: 400px;
-	height: 377px;
+	height: 400px;
 	padding-left: 14px;
 	padding-right: 14px;
 	padding-top: 26px;
@@ -1173,17 +1165,20 @@ body {
 }
 
 .user-reporting-submisison-typing-card-format {
-	font-size: 20px;
 	width: 360px;
-	height: 194px;
-	text-align: justify;
+	height: 270px;
+	color: black;
+	font-size: 20px;
+	font-weight: 400;
+	word-wrap: break-word;
+	text-align: justify
 }
 
 .user-reporting-submisison-typing-card-texts {
 	width: 360px;
 	left: 0px;
 	top: 0px;
-	position: absolute;
+	/* position: absolute; */
 	text-align: justify;
 }
 
@@ -1196,7 +1191,7 @@ body {
 
 .user-reporting-submisison-speech-card {
 	width: 400px;
-	height: 377px;
+	height: 400px;
 	padding-left: 20px;
 	padding-right: 20px;
 	padding-top: 24px;
@@ -1211,22 +1206,20 @@ body {
 	display: inline-flex;
 }
 
-.user-reporting-submisison-speech-card-main-format {
-	width: 360px;
-	height: 232px;
-	position: relative;
-}
+
 
 .user-reporting-submisison-speech-card-red-text {
 	width: 360px;
 	left: 0px;
-	top: 205px;
+	top: 210px;
 	position: absolute;
 	text-align: justify;
 	color: #ff0000;
 	font-size: 20px;
+	align-items: center;
 	font-weight: 400;
 	word-wrap: break-word;
+	text-align: justify
 }
 
 .user-reporting-submisison-speech-card-text {
@@ -1238,10 +1231,13 @@ body {
 }
 
 .user-reporting-submisison-speech-card-format {
+	width: 360px;
+	height: 270px;
 	color: black;
 	font-size: 20px;
 	font-weight: 400;
 	word-wrap: break-word;
+	text-align: justify
 }
 
 .user-reporting-submisison-card-btn {
@@ -1267,25 +1263,25 @@ body {
 } */
 
 .user-reporting-submisison-material-symbols-outlined {
-	font-size: 72px;
-	/* color: white; */
+	/* font-size: 7px; */
+	color: white;
 	font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0;
 }
 
-.user-reporting-submisison-talk-icon {
+.user-reporting-submisison-material-symbols-outlined-type-icon {
 	color: white;
-	font-size: 50px !important;
+	font-size: 55px !important;
 }
 
-.user-reporting-submisison-type-icon {
-	font-size: 65px !important;
+.user-reporting-submisison-material-symbols-outlined-talk-icon {
+	font-size: 50px !important;
 	color: white;
 }
 
 /* police user management */
 
 .police-user-management-container {
-	padding-inline: 10vw;
+	/* padding-inline: 10vw; */
 }
 
 .police-user-management-searchbar {
@@ -1448,6 +1444,8 @@ body {
 }
 
 .police-user-management-user-per {
+	width: 547px;
+		/* height: 481px; */
 	background-color: white;
 	border-radius: 8px;
 	width: 50%;
