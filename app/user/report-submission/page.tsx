@@ -13,72 +13,85 @@ import NavBar from '@/components/NavBar';
 export default function UserReportingSubmission() {
     
     return (
-        <div className="  bg-gray-500 w-full h-full ">
-        <form action="">
-            {/* <NavBar/> */}
-            <div className=" text-center pt-3vh pb-2vh "> 
+        <div className=" min-h-screen flex items-center justify-center "> {/* PAGE BODY */}
+            <form action="">
+                <NavBar/>
+                {/* MAIN CONTAINER */}
+                <div className="flex flex-col justify-center items-center"> 
+                    {/* TITLE */}
+                    <div className=" flex justify-center items-center  font-bold text-6xl  text-center text-7 p-2  ">
+                        <h1>Reporting Submission</h1>
+                    </div>
 
-                <div className=" flex justify-center items-center  font-bold text-6xl  text-center text-7 p-20  ">
-                    <h1>Reporting Submission</h1>
-                </div>
+                    
+                    <div className="text-center py-5 max-w-[1000px] mx-auto">
+                        <div className="flex justify-center items-start gap-[20px] ">
+                        
+                        
+                            {/* SPEACH */}
 
-                <div className="text-center py-5 max-w-[1000px] mx-auto">
-                    <div className="flex justify-center items-start gap-[50px] md:gap-[20px] md:items-center">
-                        {/* SPEACH */}
-                        <div className=" w-[550px]  px-[14px] py-[26px] bg-white shadow-[0px_20px_75px_rgba(0,68,204,0.25)] rounded-lg flex flex-col justify-center items-center gap-[56px]">
-                            <div className=" text-black text-[20px] font-normal break-words text-justify">
-                                <div className=" text-justify">
-                                    <span className="text-justify">
-                                        Before you continue to <b>Ai Speech to text conversation</b>, remember that you&apos;ll need to speak clearly for the AI system to understand and summarize your report correctly. Find a quiet place and make sure to pronounce your words clearly for the best outcome.
-                                    </span>
+                            <div className='w-[550px] h-full bg-white p-4 rounded-lg'>
+                                <div className=''>
+                                    <h2 className="font-bold text-2xl mb-4">
+                                        Ai Speech to Text
+                                    </h2>
+                                    <p className='text-justify text-base mb-4'>
+                                    Before continue, remember to speak clearly for the AI system to understand and summarize the report correctly. Find a quiet place and make sure to pronounce your words clearly for the best outcome.
+                                    </p>
                                     <br />
-                                    <p className='text-red-500'>
+                                    <p className="text-red-500 text-base mb-4">
                                         Required Microphone or Audio input
                                     </p>
                                 </div>
-                            </div>
-                            <button className="w-[250px] h-[75px] relative bg-[#0044cc] shadow-custom-blue rounded-lg border-none cursor-pointer outline-none flex justify-center items-center ">
-                                <span className="text-white text-[50px]">
-                                    <FontAwesomeIcon icon={faMicrophoneLines} />
-                                </span>
-                            </button>
-                        </div>  
-                        {/* TYPING */}
-                        <div className="w-[550px] h-[400px] px-[14px] py-[26px] bg-white shadow-[0px_20px_75px_rgba(0,68,204,0.25)] rounded-lg flex flex-col justify-center items-center gap-[56px]">
-                            <div className=" text-black text-[20px] font-normal break-words text-justify">
-                                <span className="text-justify">
-                                    Before you continue to <b>Typing Report</b>, it&apos;s important to know that you&apos;ll have to type out your report yourself on this page. Just use your keyboard to input all the important information about the incident.
-                                </span>
-
-                            </div>
-                            <button className="w-[250px] h-[75px] relative bg-[#0044cc] shadow-custom-blue rounded-lg border-none cursor-pointer outline-none flex justify-center items-center ">
-                                <div className="user-reporting-submisison-card-btn-logo">
-                                    <span className="text-white text-[57px] ">
-                                        <FontAwesomeIcon icon={faKeyboard} />
+                                <button className="w-[250px] h-[75px] relative bg-[#0044cc] shadow-custom-blue rounded-lg border-none cursor-pointer outline-none  ">
+                                    <span className="text-white text-[50px]">
+                                        <FontAwesomeIcon icon={faMicrophoneLines} />
                                     </span>
-                                    
+                                </button>
+                            </div>
+
+
+
+                            
+                            {/* TYPING */}
+                            <div className="w-[550px] h-full bg-white shadow-[0px_20px_75px_rgba(0,68,204,0.25)] rounded-lg flex flex-col justify-center items-center gap-[56px] -z-0">
+                                <div className=" text-black text-[20px] font-normal break-words text-justify">
+                                    <span className="text-justify text-base">
+                                        <p className="font-bold text-2xl mb-4">Typing Report</p>
+                                        Before you continue to, it&apos;s important to know that you&apos;ll have to type out your report yourself on this page. Just use your keyboard to input all the important information about the incident.
+                                    </span>
+
                                 </div>
-                            </button>
+                                <button className="w-[250px] h-[75px] relative bg-[#0044cc] shadow-custom-blue rounded-lg border-none cursor-pointer outline-none flex justify-center items-center ">
+                                    <div className="">
+                                        <span className="text-white text-[57px] ">
+                                            <FontAwesomeIcon icon={faKeyboard} />
+                                        </span>
+                                        
+                                    </div>
+                                </button>
+                            </div> 
                         </div>
-                        
                     </div>
+                    <div className="flex justify-center items-center ">
+                        <div className="flex justify-center items-center w-[1120px] h-[50px]  bg-white shadow-bottom-custom-blue rounded-lg gap-4">
+                            <div className="flex">
+                                type of case / report type
+                            </div>
+                            <div>
+                                <select className="p-2 bg-white rounded-lg border border-[#696969] " name='nationality' required>
+                                    <option value="placeholder">Type of reports</option>
+                                    <option value="wan">1</option>
+                                    <option value="to">2</option>
+                                    <option value="tree">3</option>
+                                    <option value="for">4</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
-                <div className="flex justify-center items-center w-[550px] h-[100px]  bg-white shadow-[0px_20px_75px_rgba(0,68,204,0.25)] rounded-lg gap-4">
-                    <div className="flex">
-                        type of case / report type
-                    </div>
-                    <div>
-                        <select className="l bg-white rounded-lg border border-[#696969] " name='nationality' required>
-                            <option value="placeholder">Type of reports</option>
-                            <option value="malay">1</option>
-                            <option value="chinese">2</option>
-                            <option value="indian">3</option>
-                            <option value="other">4</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
     );
 };
