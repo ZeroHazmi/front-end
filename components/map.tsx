@@ -1,19 +1,23 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 
 //const position = [2.9332505811333025, 101.79743014583184];  Feisol Hassan-Halle Coordinate
 const position = [2.9346039872926095, 101.79966694910442]; // bilik zal
 // const position = [2.93459183339846, 101.79937183017714]; bilik ripin
 
-function ChangeView({ center }) {
-    const map = useMap();
-    useEffect(() => {
-      if (center) {
-        map.setView(center, map.getZoom());
-      }
-    }, [center, map]);
-    return null;
-  }
+interface ChangeViewProps {
+  center: [number, number];
+}
+
+function ChangeView({ center }: ChangeViewProps) {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.setView(center, map.getZoom());
+    }
+  }, [center, map]);
+  return null;
+}
   
 
 function MapComponent() {

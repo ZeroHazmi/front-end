@@ -1,16 +1,56 @@
 'use client'
 
-import React from "react";
-import NavBar from '../../components/NavBar';
+import React, {useState, useEffect} from "react";
+import NavBar from '../../../components/NavBar';
 import { useRouter } from 'next/router';
 // import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
-import MapComponent from '../../components/map';
+import MapComponent from '../../../components/map';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { ReportType } from "../../Models";
 
 export default function UserTypingReport() {
+    const [reportType, setReportType] = useState<ReportType | null>(null);
+    const [templateFields, setTemplateFields] = useState<[string, string][]>([]);
+
+    // Method to fetch report type and render the form
+    async function fetchAndRenderReport() {
+        try {
+            const res = await fetch('http://localhost:5035/api/reporttype/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const reportTypeData = await res.json();
+            setReportType(reportTypeData);
+    
+            // Parse and ensure values are strings
+            const parsedTemplate = JSON.parse(reportTypeData.TemplateStructure);
+            const fields = Object.entries(parsedTemplate).map(([key, value]) => {
+                // Ensure the value is a string, if not, convert it to a string
+                return [key, typeof value === 'string' ? value : String(value)] as [string, string];
+            });
+        } catch (error) {
+            console.error('Error fetching report types:', error);
+        }
+    }
+
+        // Fetch the report type data when the component mounts
+        useEffect(() => {
+            fetchAndRenderReport();
+        }, []);
+    
+        if (!reportType || templateFields.length === 0) {
+            return <div>Loading...</div>; // Show loading state
+        }
+    
+        // Split template fields into two columns
+        const halfLength = Math.ceil(templateFields.length / 2);
+        const firstColumn = templateFields.slice(0, halfLength);
+        const secondColumn = templateFields.slice(halfLength);
 
     return (
         <div className="flex flex-row justify-center items-center bg-[#f2f2f2]">
@@ -28,69 +68,33 @@ export default function UserTypingReport() {
                         {/* LEFT FORM */}
                         <div className="w-[550px] h-[375px] p-2 bg-white border-solid rounded-lg shadow-left-custom-blue">
                             <div className="flex flex-wrap w-[534px] h-[350px] items-center justify-center mt-1">
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    location:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Lot No. / room / Office / House / Building:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Street name:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Place name:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Postcode:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    City:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    States:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
+                                    {firstColumn.map(([key, value], index) => (
+                                        <div key={index} className="flex flex-col w-full mb-4">
+                                            <label className="w-[190px] leading-[normal]">{key}:</label>
+                                            <input 
+                                                type="text" 
+                                                name={key} 
+                                                placeholder={value} 
+                                                className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid p-2 border-[#696969]" 
+                                            />
+                                        </div>
+                                    ))}
                             </div>
                         </div>
                         {/* RIGHT FORM */}
                         <div className="w-[550px] h-[375px] p-2 bg-white border-solid rounded-lg shadow-right-custom-blue">
                             <div className="flex flex-wrap w-[534px] h-[350px] items-center justify-center mt-1">
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Date:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Lot No. / room / Office / House / Building:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Street name:
-                                </div>
-                                <input type="text" className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid  p-2 border-[#696969]" /> {/*nice*/}
-
-                                {/* system output */}
-                                <div className="w-[300px] h-5  leading-[normal] text-left">
-                                    Sending to nearest Police Stations:
-                                </div>
-                                <div className=" w-[190px] h-[35px] bg-white " /> {/* design PlaceHolder */}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    State:
-                                </div> 
-                                <div className=" w-[300px] h-[35px] bg-white rounded-lg border border-solid border-[#696969]" /> {/* PlaceHolder */}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Date:
-                                </div> 
-                                <div className=" w-[300px] h-[35px] bg-white rounded-lg border border-solid border-[#696969]" /> {/* PlaceHolder */}
-                                <div className="w-[190px] h-5  leading-[normal]">
-                                    Time: 
-                                </div> 
-                                <div className=" w-[300px] h-[35px] bg-white rounded-lg border border-solid border-[#696969]" /> {/* PlaceHolder */}
+                                {secondColumn.map(([key, value], index) => (
+                                    <div key={index} className="flex flex-col w-full mb-4">
+                                        <label className="w-[190px] leading-[normal]">{key}:</label>
+                                        <input 
+                                            type="text" 
+                                            name={key} 
+                                            placeholder={value} 
+                                            className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid p-2 border-[#696969]" 
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

@@ -33,7 +33,7 @@ export default function UserFeedbackAndRating () {
                         </div>
                         <textarea
                             className="w-full p-2 border rounded-lg mb-4"
-                            rows="3"
+                            rows={3}
                             placeholder="Type your feedback here..."
                         ></textarea>
                         <div className="flex justify-center items-center gap-10">

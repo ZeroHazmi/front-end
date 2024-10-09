@@ -36,7 +36,7 @@ export default function LoginPage() {
             if(roles === 'Police') router.push('/police-user-management');
             if(roles === 'User') router.push('/user-report-submission');
         }
-    }, [roles]);
+    }, [roles, router]);
 
     async function Login(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
