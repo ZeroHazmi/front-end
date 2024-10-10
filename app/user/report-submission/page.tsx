@@ -91,23 +91,23 @@ export default function UserReportingSubmission() {
                             Label Section
                             <div className="flex items-center space-x-4">
                             <div className="p-3 bg-police-blue rounded-full">
-                                <i class="fas fa-clipboard-list text-white text-lg"></i>
+                                <i className="fas fa-clipboard-list text-white text-lg"></i>
                             </div>
                             <div>
-                                <h2 class="text-xl font-bold text-gray-800">Select Your Report</h2>
-                                <p class="text-gray-500 text-sm">Choose the type of case or report from the dropdown below</p>
+                                <h2 className="text-xl font-bold text-gray-800">Select Your Report</h2>
+                                <p className="text-gray-500 text-sm">Choose the type of case or report from the dropdown below</p>
                             </div>
                             </div>
                             Dropdown Section
                             <div className="relative w-1/3">
-                            <select id="report-type" class="appearance-none w-full py-3 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800 shadow-sm">
+                            <select id="report-type" className="appearance-none w-full py-3 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800 shadow-sm">
                                 <option>Type of reports</option>
                                 <option>Report 1</option>
                                 <option>Report 2</option>
                                 <option>Report 3</option>
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
-                                <i class="fas fa-chevron-down"></i>
+                                <i className="fas fa-chevron-down"></i>
                             </div>
                             </div>
                         </div>

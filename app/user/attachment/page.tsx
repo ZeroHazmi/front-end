@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import NavBar from '../../components/NavBar';
+import NavBar from '@/components/NavBar';
 import { useRouter } from 'next/router';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';

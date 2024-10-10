@@ -33,8 +33,8 @@ export default function LoginPage() {
         if (roles) {
             console.log('User Role updated:', roles);
             // You can handle redirection or other logic here based on the role
-            if(roles === 'Police') router.push('/police-user-management');
-            if(roles === 'User') router.push('/user-report-submission');
+            if(roles === 'Police') router.push('/police/dashboard');
+            if(roles === 'User') router.push('/user/report-submission');
         }
     }, [roles, router]);
 

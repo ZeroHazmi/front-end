@@ -1,10 +1,10 @@
 'use client'
 
 import React from "react";
-import NavBar from '../../components/NavBar';
+import NavBar from '@/components/NavBar';
 import { useRouter } from 'next/router';
 // import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
-import MapComponent from '../../components/map';
+//import MapComponent from '@/components/map';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -23,7 +23,7 @@ export default function UserSpeechToTextConversation () {
                     </div>
                     {/* MAP CONTAINER*/}
                     <div className="w-[1120px] h-[600px]  rounded-lg shadow-top-custom-blue border-double border-2 border-sky-500 mb-[20px]">
-                        <MapComponent /> {/* need to fix map border etc */}
+                        {/* <MapComponent /> need to fix map border etc */}
                     </div>
                     {/* CHAT CONTAINER */}
                     <div className="w-[1120px] text-justify rounded-lg shadow-custom-blue p-8 bg-white mb-[20px]">

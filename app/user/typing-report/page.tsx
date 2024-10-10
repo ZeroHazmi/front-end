@@ -4,7 +4,7 @@ import React, {useState, useEffect} from "react";
 import NavBar from '../../../components/NavBar';
 import { useRouter } from 'next/router';
 // import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
-import MapComponent from '../../../components/map';
+//import MapComponent from '../../../components/map';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -62,7 +62,7 @@ export default function UserTypingReport() {
                     </div>
                     {/* MAP CONTAINER*/}
                     <div className="w-[1120px] h-[600px]  rounded-lg shadow-top-custom-blue border-double border-2 border-sky-500 ">
-                        <MapComponent /> {/* need to fix map border etc */}
+                        {/* <MapComponent /> need to fix map border etc */}
                     </div>
                     <div className="flex flex-col md:flex-row md:gap-5 justify-between m-[20px] mx-auto gap-5 items-center text-left">
                         {/* LEFT FORM */}
