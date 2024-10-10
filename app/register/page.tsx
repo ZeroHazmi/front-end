@@ -89,7 +89,13 @@ export default function SignUpPage(){
             if (!response.ok) {
                 const errorResponse = await response.json();
                 console.error('Error response:', errorResponse); // Log the full error
-                toast({variant: 'destructive', description: errorResponse});
+            
+                // Extract a meaningful message from the errorResponse object
+                const errorMessage = errorResponse.title || 'Registration failed'; // You can customize this based on the structure of the errorResponse
+            
+                // Pass the error message as a string to the toast
+                toast({ variant: 'destructive', description: errorMessage });
+                
                 return;
             }
     

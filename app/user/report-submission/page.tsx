@@ -79,7 +79,7 @@ export default function UserReportingSubmission() {
                                 type of case / report type
                             </div>
                             <div>
-                                <select className="p-2 bg-white rounded-lg border border-[#696969] " name='nationality' required>
+                                <select className="p-2 bg-white rounded-lg border border-[#696969] " name='reportype' required>
                                     <option value="placeholder">Type of reports</option>
                                     <option value="wan">1</option>
                                     <option value="to">2</option>
