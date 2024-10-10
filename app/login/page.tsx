@@ -100,11 +100,13 @@ export default function LoginPage() {
         <div className="login-container">
             <div className="login-logo-text">
                     <Image className="login-logo" src="/Images/loginlogo.png" alt="Logo" width={358} height={361}/>
-                    <div className="login-text">
-                        <div className="login-font-police">Police</div>
-                        <div className="login-font-reporting">Reporting</div>
-                        <div className="login-font-ai">Artificial Intelligence</div>
-                        <div className="login-font-system">System</div>
+                    <div>
+                        <div className="ml-[-50px] w-[344px] h-full  flex flex-col justify-center">
+                            <h1 className="text-8xl font-extrabold absolute top-[110px] ">P.R.A.S</h1>
+                            <p className="font-bold absolute top-[200px] right-[30px]">
+                                Police Reporting Artificial Intelligence
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <div className="login-form">
