@@ -14,25 +14,26 @@ export default function NavBar() {
 
   return (
         <nav>
-        <div className="user-navbar-container">
-            <div className="user-navbar-left">
-                <Image src="/Images/navbarlogo.png" className="logo" alt="Logo" height={50} width={50}/>
-                <div className="user-navbar-title">
-                    Police
-                    <div className="user-navbar-subtitle">
-                        Reporting AI System
+            <div className="fixed top-[8px] left-[8px] right-[8px] z-[1000] h-[50px] bg-[#303091] rounded-[8px] flex items-center justify-between px-[10px]">
+                <div className="flex items-center">
+                    <Image src="/Images/navbarlogo.png" className="w-[35px] h-[35px] rounded-lg mr-[10px]" alt="Logo" height={50} width={50}/>
+                    <div className="text-white text-[30px] font-bold">
+                        P.R.A.S
+                    </div>
+                </div>
+                <div className="flex gap-[50px] text-white text-[16px] font-medium items-center">
+                    <div className="cursor-pointer">Communication</div>
+                    <div className="cursor-pointer">FAQ</div>
+                    <div className="flex items-center gap-[10px]">
+                        <button className="bg-[#e7e7e7] rounded-lg text-black font-semibold px-4 h-[35px] w-[175px] cursor-pointer mr-[10px] shadow-[5px_5px_5px_rgba(0,0,0,0.25)] hover:bg-red-500 hover:text-white" type='button' onClick={logout}>Logout</button>
+                        <Image src="https://via.placeholder.com/30x30" className="w-[35px] h-[35px] rounded-lg" alt="User" height={30} width={30}/>
                     </div>
                 </div>
             </div>
-            <div className="user-navbar-links">
-                <div className="user-navbar-items">Communication</div>
-                <div className="user-navbar-items">FAQ</div>
-                <div className="user-navbar-logout-container">
-                    <button className="user-navbar-logout-button" type='button' onClick={logout}>Logout</button>
-                    <Image src="https://via.placeholder.com/50x50" className="user-navbar-icon" alt="User" height={50} width={50}/>
-                </div>
-            </div>
-        </div>
-    </nav>    
-  )
+        </nav>    
+    )
 };
+
+
+
+
