@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react';
-import "../../global.css"
 import Image from 'next/image';
 import NavBar from '@/components/NavBar';
 
