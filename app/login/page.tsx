@@ -104,7 +104,7 @@ export default function LoginPage() {
                         <div className="ml-[-50px] w-[344px] h-full  flex flex-col justify-center">
                             <h1 className="text-8xl font-extrabold absolute top-[110px] ">P.R.A.S</h1>
                             <p className="font-bold absolute top-[200px] right-[30px]">
-                                Police Reporting Artificial Intelligence
+                                Police Reporting Artificial Intelligence System
                             </p>
                         </div>
                     </div>
