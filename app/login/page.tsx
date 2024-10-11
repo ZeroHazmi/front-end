@@ -32,11 +32,12 @@ export default function LoginPage() {
     useEffect(() => {
         if (roles) {
             console.log('User Role updated:', roles);
+            toast({title: 'Login Successful'});
             // You can handle redirection or other logic here based on the role
             if(roles === 'Police') router.push('/police/dashboard');
             if(roles === 'User') router.push('/user/report-submission');
         }
-    }, [roles, router]);
+    }, [roles, router, toast]);
 
     async function Login(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();

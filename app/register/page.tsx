@@ -97,6 +97,8 @@ export default function SignUpPage(){
                 toast({ variant: 'destructive', description: errorMessage });
                 
                 return;
+            }else{
+                toast({description: 'Registration successful'});
             }
     
             const data = await response.json();
