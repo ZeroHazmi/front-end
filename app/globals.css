@@ -16,7 +16,6 @@
 	}
 }
 
-
 * {
 	/* margin: 0; */
 	padding: 0px;
@@ -31,7 +30,7 @@
 
 body {
 	background-color: #f2f2f2;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important ;
 }
 
 /* login */
@@ -80,23 +79,6 @@ body {
 	left: 0;
 	position: absolute;
 }
-.login-font-ai {
-	/* color: white; */
-	font-size: 30px;
-	font-weight: 400;
-	top: 203px;
-	left: 3px;
-	position: absolute;
-	white-space: nowrap;
-}
-.login-font-system {
-	/* color: white; */
-	font-size: 50px;
-	font-weight: 400;
-	top: 227px;
-	left: 0;
-	position: absolute;
-}
 
 .login-form {
 	justify-content: center;
@@ -112,6 +94,67 @@ body {
 	position: relative;
 }
 
+/* .login-form-bg {
+	width: 550px;
+	height: 593px;
+	left: 0px;
+	top: 0px;
+	position: absolute;
+	background: white;
+	box-shadow: 0px 10px 75px rgba(0, 70, 204, 0.5);
+	border-radius: 8px;
+	animation: shadowCircle 4s infinite ease-in-out;
+} */
+
+/* @keyframes shadowCircle {
+  0% {
+    box-shadow: 0px 10px 75px rgba(0, 70, 204, 0.3);
+  }
+  25% {
+    box-shadow: 10px 0px 75px rgba(0, 70, 204, 0.5);
+  }
+  50% {
+    box-shadow: 0px -10px 75px rgba(0, 70, 204, 0.75);
+  }
+  75% {
+    box-shadow: -10px 0px 75px rgba(0, 70, 204, 0.5);
+  }
+  100% {
+    box-shadow: 0px 10px 75px rgba(0, 70, 204, 0.3);
+  }
+} */
+
+/* 
+@keyframes shadowCircle {
+	0% {
+	  box-shadow: 0px 10px 75px rgba(0, 70, 204, 0.3); 
+	}
+	12.5% {
+	  box-shadow: 10px 0px 75px rgba(204, 0, 0, 0.5); 
+	}
+	25% {
+	  box-shadow: 10px 0px 75px rgba(0, 70, 204, 0.5); 
+	}
+	37.5% {
+	  box-shadow: 0px -10px 75px rgba(204, 0, 0, 0.75); 
+	}
+	50% {
+	  box-shadow: 0px -10px 75px rgba(0, 70, 204, 0.75); 
+	}
+	62.5% {
+	  box-shadow: -10px 0px 75px rgba(204, 0, 0, 0.5); 
+	}
+	75% {
+	  box-shadow: -10px 0px 75px rgba(0, 70, 204, 0.5); 
+	}
+	87.5% {
+	  box-shadow: 0px 10px 75px rgba(204, 0, 0, 0.3); 
+	}
+	100% {
+	  box-shadow: 0px 10px 75px rgba(0, 70, 204, 0.3); 
+	}
+} */
+
 .login-form-bg {
 	width: 550px;
 	height: 593px;
@@ -119,9 +162,46 @@ body {
 	top: 0px;
 	position: absolute;
 	background: white;
-	box-shadow: 0px 10px 75px rgba(0, 68, 204, 0.25);
 	border-radius: 8px;
+	box-shadow:
+		-20px 0px 100px rgba(204, 0, 0, 0.7),    
+		20px 0px 100px rgba(0, 70, 204, 0.7);    
+	animation: shadowCircle 3s infinite ease-in-out;
 }
+
+@keyframes shadowCircle {
+	0% {
+		box-shadow:
+			-25px 0px 125px rgba(204, 0, 0, 0.75),		/* left */
+			25px 0px 125px rgba(0, 70, 204, 0.75);		/* right */
+	}
+	25% {
+		box-shadow:
+			0px -75px 125px rgba(0, 70, 204, 0.5),    /* top */
+			0px 75px 125px rgba(204, 0, 0, 0.5);      /* bottom */
+	}
+	50% {
+		box-shadow:
+			25px 0px 125px rgba(204, 0, 0, 0.75),     /* right */
+			-25px 0px 125px rgba(0, 70, 204, 0.75);   /* left */
+	}
+	75% {
+		box-shadow:
+			0px 75px 125px rgba(0, 70, 204, 0.5),     /* bottom */
+			0px -75px 125px rgba(204, 0, 0, 0.5);     /* top */
+	}
+	100% {
+		box-shadow:
+			-25px 0px 125px rgba(204, 0, 0, 0.75),		/* left */
+			25px 0px 125px rgba(0, 70, 204, 0.75);		/* right */
+	}
+}
+
+
+
+
+
+
 .login-login-button {
 	width: 200px;
 	height: 35px;
@@ -185,7 +265,7 @@ body {
 		background: white;
 		border-radius: 8px;
 		border: 1px #696969 solid;
-		font-size: 12;
+		font-size: 1rem;
 		color: rgba(0, 0, 0, 0.5);
 		padding: 0 13px;
 		box-sizing: border-box;
@@ -206,7 +286,7 @@ body {
 	background: white;
 	border-radius: 8px;
 	border: 1px #696969 solid;
-	font-size: 12.8px;
+	font-size: 1rem;
 	color: rgba(0, 0, 0, 0.5);
 	padding: 0 13px;
 	box-sizing: border-box;
@@ -237,7 +317,7 @@ body {
 	position: absolute;
 	text-align: justify;
 	color: black;
-	font-size: 20px;
+	font-size: 1rem;
 	font-weight: 400;
 	word-wrap: break-word;
 }
