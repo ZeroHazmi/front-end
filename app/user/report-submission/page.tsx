@@ -2,12 +2,12 @@
 
 import React from 'react';
 // import '../globals.css';
-// import NavBar from '../../components/NavBar';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faKeyboard } from '@fortawesome/free-regular-svg-icons'
 import { faMicrophoneLines } from '@fortawesome/free-solid-svg-icons'
-import NavBar from '@/components/NavBar';
+import PHNavBar from '@/components/PHNavBar';
+// import NavBar from '../../components/userNavBar';
 
 
 export default function UserReportingSubmission() {
@@ -15,7 +15,7 @@ export default function UserReportingSubmission() {
     return (
         <div className=" flex items-center justify-center "> {/* PAGE BODY */}
             <form action="">
-                <NavBar/>
+                <PHNavBar/>
                 {/* TITLE (OUTSIDE) */}
                 {/* <div className="flex justify-center items-center font-bold text-6xl  text-center text-7  mt-[20vh] mb-[-20vh]">
                     <h1>Reporting Submission</h1>

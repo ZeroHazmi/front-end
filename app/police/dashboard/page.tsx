@@ -2,12 +2,12 @@
 
 import React from 'react';
 import Image from 'next/image';
-import NavBar from '@/components/NavBar';
+import PHNavBar from '@/components/PHNavBar';
 
-export default function PoliceUserManagement(){
+export default function PoliceDashboard(){
     return (
         <form action="">
-            <NavBar />
+            <PHNavBar />
             
             <div className="police-user-management-container">
                 <div className="police-user-management-searchbar">

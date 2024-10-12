@@ -282,7 +282,7 @@ export default function SignUpPage(){
                             <div className="user-signup-mustaches-left"></div>
                             {/*  chechbox&button position */}
                             <div className="user-signup-icmissing-bg">
-                                <input  className="user-signup-checkbox" type="checkbox" id="icmissing" name="icmissing" value="icmissing" />
+                                <input  className=" w-[15px] h-[15px] absolute left-[-2.3px] top-[8.5px] transform scale-[1.2] bg-white rounded-[6.68px] border-[#e0e4eb] border-[1.67px] outline-[3px] cursor-pointer" type="checkbox" id="icmissing" name="icmissing" value="icmissing" />
                                 <label>
                                 {/* onclick="document.getElementById('icmissing').checked = !document.getElementById('icmissing').checked;" */}
                                     <button  className="user-signup-checkbox-button" type="button" >

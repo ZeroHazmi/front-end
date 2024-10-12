@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import NavBar from '@/components/NavBar';
+import PHNavBar from '@/components/PHNavBar';
 import { useRouter } from 'next/router';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
@@ -13,7 +13,7 @@ export default function UserFeedbackAndRating () {
     return (
         <div className="flex justify-center items-center  bg-[#f2f2f2]">
             <form action="">
-                <NavBar />
+                <PHNavBar />
                 <div className="flex justify-center items-center min-h-screen">
                     <div className="bg-white w-[500px] p-8 rounded-lg  shadow-custom-blue">
                         <div className="text-center text-xl font-bold mb-3">

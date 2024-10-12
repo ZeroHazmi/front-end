@@ -1,7 +1,7 @@
 'use client'
 
 import React, {useState, useEffect} from "react";
-import NavBar from '../../../components/NavBar';
+import PHNavBar from '../../../components/PHNavBar';
 import { useRouter } from 'next/router';
 // import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
 //import MapComponent from '../../../components/map';
@@ -55,7 +55,7 @@ export default function UserTypingReport() {
     return (
         <div className="flex flex-row justify-center items-center bg-[#f2f2f2]">
             <form action="">
-                <NavBar />
+                <PHNavBar />
                 <div className="w-[100%] h-[100%] text-center p-20 pt-3vh pb-2vh "> {/* min-h-screen */}
                     <div className="font-bold text-6xl max-w-[1200px] text-center text-[500%] p-20 ">
                         Typing Report
