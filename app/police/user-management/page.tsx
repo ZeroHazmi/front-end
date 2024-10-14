@@ -15,7 +15,7 @@ export default function PoliceUserManagement(){
             {/* PAGE BODY */}
             <div className="flex justify-center items-center mt-[175px]"> {/* min-h-screen: center */}
                 {/* TABLE CONTAINER */}
-                <div className="w-[1120px] justify-center items-center ">
+                <div className="max-w-[1120px] justify-center items-center ">
                     {/* SEPARATE/OUSIDE TABLE HEAD */}
                     <table className="w-[1120px] mb-2 rounded-t-lg shadow-custom-blue overflow-hidden table-fixed">
                         <thead className="shadow-custom-blue">
