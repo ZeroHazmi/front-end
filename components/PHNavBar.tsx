@@ -24,8 +24,11 @@ export default function PHNavBar() {
                 <div className="flex gap-[50px] text-white text-[16px] font-medium items-center">
                     <div className="cursor-pointer">Communication</div>
                     <div className="cursor-pointer">FAQ</div>
+                    {/* <div className="cursor-pointer"></div> */}
                     <div className="flex items-center gap-[10px]">
-                        <button className="bg-[#D0DAED] text-black hover:bg-red-500 hover:text-white rounded-lg  font-semibold px-4 h-[35px] w-[175px] cursor-pointer mr-[10px] shadow-[5px_5px_5px_rgba(0,0,0,0.25)] " type='button' onClick={logout}>Logout</button>
+                        <button type='button' onClick={logout} className="bg-red-600 text-white hover:bg-red-700 hover:text-white rounded-lg  font-semibold px-4 h-[35px] w-[175px] cursor-pointer mr-[10px] shadow-[5px_5px_5px_rgba(0,0,0,0.25)] ">
+                            Logout
+                        </button>
                         <Image src="https://via.placeholder.com/30x30" className="w-[35px] h-[35px] rounded-lg" alt="User" height={30} width={30}/>
                     </div>
                 </div>

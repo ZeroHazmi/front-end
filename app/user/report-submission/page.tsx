@@ -22,10 +22,12 @@ export default function UserReportingSubmission() {
                 </div>
                 {/* MAIN CONTAINER */}
                 <div className=" flex flex-col justify-center items-center">
+                    
                     {/* TITLE (INSIDE) */}
                     {/* <div className="flex justify-center items-center font-bold text-6xl text-center text-7 gap-10 mb-[10vh]">
                         <h1>Reporting Submission</h1>
                     </div> */}
+
                     {/*SPEECH & TYPING CONTAINER */}
                     <div className="text-center mb-4 max-w-[1120px] mx-auto">
                         <div className="flex justify-center items-center gap-[20px] ">
@@ -90,9 +92,7 @@ export default function UserReportingSubmission() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center justify-center space-x-4">
                                 <div className="p-3 bg-police-blue rounded-full">
-                                    <i className="fas fa-clipboard-list text-white text-lg">
-                                        
-                                    </i>
+                                    {/* <i className="fas fa-clipboard-list text-white text-lg"></i> */}
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold text-gray-800">Select Your Report</h2>
