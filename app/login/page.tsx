@@ -106,7 +106,7 @@ export default function LoginPage() {
         <div className="flex md:flex-row flex-col justify-center items-center">
             {/* LTS */}
             <div className="flex md:flex-row flex-col justify-center items-center md:pr-10 md:pl-8 md:mr-10 m-2">
-                <div className="w-[240px] h-[240px] m-auto my-4 ">
+                <div className="w-[240px] h-[240px] m-auto my-4">
                     <Image src="/Images/loginlogo.png" alt="Logo" width={245} height={245} />
                 </div>
                 <div className="flex flex-col justify-center items-center">
