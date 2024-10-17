@@ -7,10 +7,10 @@ import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 export default function FrequentlyAskedQuestions () {
     return (
-        <div className='flex justify-center items-center min-w-[390px] max-w-[1200px] mx-auto mt-[15vh]'> {/* PAGE BODY */}
+        <div className='flex justify-center items-center min-w-[375px] max-w-[1200px] mx-auto mt-[15vh]'> {/* PAGE BODY */}
         <PHNavBar />
             {/* CONTAINER */}
-            <div>
+            <div className='mx-2'>
                 {/* TITLE */}
                 <div className="flex justify-center items-center font-bold text-4xl text-center mb-[6vh] ">
                     <h1>
@@ -18,6 +18,7 @@ export default function FrequentlyAskedQuestions () {
                     </h1>
                 </div>
                 {/* SEARCHBAR */}
+                {/* need to be responsive!!! */}
                 <div className="mb-7 flex justify-center items-center shadow-middle-custom-blue">
                     <div className="flex w-[100%]">
                         <div className="bg-police-blue w-[88.5%] flex items-center justify-center rounded-l-lg  ">
@@ -34,10 +35,10 @@ export default function FrequentlyAskedQuestions () {
                 <div className='bg-white rounded-lg shadow-middle-custom-blue p-5 mb-7'>
                     <div>
                         <div className='flex'>
-                            <h1 className='text-3xl font-bold mb-3 pr-2'>{/* the number inside "Q_:" will increase if there additional faq */}
+                            <h1 className='text-3xl font-bold mb-3 pr-2'>{/* the number inside "Q_:" will increase if there an additional FAQ*/}
                                 Q1: 
                             </h1>
-                            <h1 className='text-3xl font-bold mb-3'> {/* admin can output the question without Q_:*/}
+                            <h1 className='text-3xl font-bold mb-3'> {/* admin can output the question without add Q1:, Q2: etc*/}
                                 How do I file a report using the AI system?
                             </h1>
                         </div>
@@ -113,7 +114,7 @@ export default function FrequentlyAskedQuestions () {
                                 Q6:
                             </h1>
                             <h1 className='text-3xl font-bold mb-3'> 
-                                Example of how long text gonna look like in this container
+                                Example of how long the text gonna look like in this container
                             </h1>
                         </div>
                         <p className='text-justify'>
@@ -126,13 +127,13 @@ export default function FrequentlyAskedQuestions () {
                     </div>
                 </div>
                 {/* SPACER */}
-                <div className='mb-52'></div>
+                <div className='mb-48'></div>
             </div>
             {/* ADD BUTTON */}
-            <div className='fixed md:bottom-[4%] bottom-[5%] md:right-[16%] right-[10%] border-solid'>
-                <button className='flex justify-center items-center w-[60px] h-[60px] sm:w-[75px] sm:h-[75px] text-[30px] sm:text-[40px] text-white bg-police-blue hover:bg-[#0022AA] rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)]  '>
-                    <FontAwesomeIcon icon={faPlus} />
-                </button>
+            <div className='fixed md:bottom-[4%] bottom-[5%] md:right-[13%] right-[10%] border-solid'>
+                <button className='flex justify-center items-center w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] text-[20px] text-center sm:text-[35px] text-white bg-police-blue hover:bg-[#0022AA] rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)]  '>
+                    <FontAwesomeIcon icon={faPlus} />  {/* link to add faq page */}
+                </button> 
             </div>
         </div>
     );

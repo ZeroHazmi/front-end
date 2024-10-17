@@ -37,10 +37,10 @@ export default function UserReportingSubmission() {
                                     <h2 className="font-bold text-2xl mb-4">
                                         Ai Speech to Text
                                     </h2>
-                                    <p className='text-justify text-base mb-2'>
+                                    <p className='text-justify text-base mb-2 '>
                                     Before continue, remember to speak clearly for the AI system to understand and summarize the report correctly. Find a quiet place and make sure to pronounce your words clearly for the best outcome.
                                     </p>
-                                    <p className="text-red-500 text-base mb-4">
+                                    <p className="text-red-500 text-base mb-4 text-left">
                                         Required Microphone or Audio input
                                     </p>
                                 </div>
@@ -70,7 +70,7 @@ export default function UserReportingSubmission() {
                         </div>
                     </div>
                     {/* LIST CONTTAINER */}
-                    <div className="flex justify-center items-center mb-4 ">
+                    {/* <div className="flex justify-center items-center mb-4 ">
                         <div className="flex justify-center items-center w-[1120px] h-[50px]  bg-white shadow-middle-custom-blue rounded-lg gap-4 z-20">
                             <div className="flex">
                                 type of case / report type
@@ -85,10 +85,10 @@ export default function UserReportingSubmission() {
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                     {/* LIST CONTAINER TEMPLETE V2 */}
                     {/* <div className="w-[1120px] mx-auto my-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-2xl z-30"> */}
-                    <div className="w-[1120px] mx-auto p-6 mb-4 bg-white shadow-buttom-custom-blue rounded-lg z-20"> 
+                    <div className="w-[1120px] mx-auto p-4 mb-4 bg-white shadow-buttom-custom-blue rounded-lg z-20"> 
                         <div className="flex items-center justify-between">
                             <div className="flex items-center justify-center space-x-4">
                                 <div className="p-3 bg-police-blue rounded-full">
@@ -104,7 +104,7 @@ export default function UserReportingSubmission() {
                             
                             <div className="space-x-5">
                                 <select className="w-[200px] h-[35px] px-2 bg-white rounded-lg border border-[#696969]" name='reportype' required>
-                                    <option value="placeholder">Type of reports</option>
+                                    <option value="placeholder">Type of reports</option> {/* placeholder */}
                                     <option value="wan">1</option>
                                     <option value="to">2</option>
                                     <option value="tree">3</option>

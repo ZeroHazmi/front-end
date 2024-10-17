@@ -8,6 +8,9 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect } from 'react';
+import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import '../globals.css';
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -98,56 +101,83 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-[98vh] pl-[50px] gap-[300px]">
-            <div className="flex items-center relative w-[630px] h-[361px]">
-                <Image className="w-[358px] h-[361px]" src="/Images/loginlogo.png" alt="Logo" width={358} height={361}/>
-                <div>
-                    <div className="ml-[-50px] w-[344px] h-full  flex flex-col justify-center">
-                        <h1 className="text-8xl font-extrabold absolute top-[110px] ">
-                            P.R.A.S
-                        </h1>
-                        <p className="font-bold absolute top-[200px] right-[-27px]">
-                            Police Reporting Artificial Intelligence System
-                        </p>
+
+    <div className="flex flex-col justify-center items-center min-h-screen md:min-w-[1190px] max-w-[1200px] mx-auto">
+        <div className="flex md:flex-row flex-col justify-center items-center border">
+            {/* LTS */}
+            <div className="flex md:flex-row flex-col justify-center items-center md:pr-10 md:pl-8 md:mr-10 m-2">
+                <div className="w-[240px] h-[240px] m-auto my-4 ">
+                    <Image src="/Images/loginlogo.png" alt="Logo" width={240} height={240} />
+                </div>
+                <div className="flex flex-col justify-center items-center">
+                    <div className="text-8xl font-extrabold">
+                        P.R.A.S
+                    </div>
+                    <div className="font-bold break-words text-[15px] md:mr-2">
+                        Police Reporting Artificial intelligence System.
                     </div>
                 </div>
             </div>
-            <div className="flex justify-center items-center gap-[10px] transform -translate-x-[115px]">
-                <div className="relative w-[550px] h-[593px]">
-                    <div className="login-bg-animation">
-                        <form onSubmit={Login}>
-                            <button className="absolute top-[440px] left-[175px] w-[200px] h-[35px] bg-[#0044cc] text-white rounded-[8px] shadow-md font-bold text-[16px] flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading}>
-                                {isLoading ? 'Logging in...' : 'Login'}
-                            </button>
-                            <div className="absolute top-[489px] left-[269px] text-center text-black text-[10.24px] font-normal">
-                                Or
+            <div className="md:hidden animate-bounce flex justify-center items-center px-4 bg-white mt-3 z-30 font-medium rounded-lg h-[35px]  bg-white/20 shadow-lg backdrop-blur-custom border border-white/30">
+                <div>
+                    <FontAwesomeIcon icon={faAnglesDown} />
+                </div>
+                <div className='px-2 '>
+                    login animation for mobile
+                </div>
+                <div>
+                    <FontAwesomeIcon icon={faAnglesDown} />
+                </div>
+            </div>
+            {/* FORM */}
+            <div className="login-bg-animation bg-white md:py-10 md:px-10 px-6 py-6 md:ml-8 rounded-lg w-fit m-2">
+                <div>
+                    <div className="text-4xl font-bold">
+                        Welcome to
+                    </div>
+                    <div className="text-2xl font-medium">
+                        Police Reporting Ai System
+                    </div>
+                    <div className="text-justify text-black py-4 mb-1">
+                        This is an AI powered Police Reporting System. It provide online convenience for the public to sumbit police complaint via the internet. This facility is specially provided for lodging police report pertaining to case of lost document or item that doest not relate to the crime
+                    </div>
+                    <div className="flex flex-col justify-center items-center">     
+                        <form onSubmit={Login}>     
+                            <div className="">
+                                <input type="text" name="username" placeholder="Username or id..." className="w-full h-[35px] bg-white border border-gray-400 rounded-lg text-black/50 px-3" required/>
                             </div>
-                            <button className="absolute top-[514px] left-[175px] w-[200px] h-[35px] bg-[#0044cc] text-white rounded-[8px] shadow-md font-bold text-[16px] flex items-center justify-center transition duration-400 hover:bg-[#0022aa]">
-                                <Link href="/register">
-                                    Register
-                                </Link>
-                            </button>
-                            <div className="absolute top-[342px] left-[130px] w-[290px] h-[35px]">
-                                <input type="text" name="username" placeholder="Username or id..." className="w-full h-full bg-white border border-gray-400 rounded-[8px] text-black/50 text-[16px] px-[13px] box-border" required/>
+                            <div className="my-4">
+                                <input type="password" name="password" placeholder="Password" className="w-full h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
                             </div>
-                            <div className="absolute top-[392px] left-[130px] w-[290px] h-[35px]">
-                                <input type="password" name="password" placeholder="Password" className="w-full h-full bg-white border border-gray-400 rounded-[8px] text-black/50 text-[16px] px-[13px] box-border" required/>
+                                
+                            <div className='flex items-center justify-center'>
+                                 <button className="w-[200px] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading} >
+                                    {isLoading ? 'Logging in...' : 'Login'}
+                                </button>
                             </div>
-                            <div className="absolute top-[492px] left-[312px] w-[172px] h-[5px] bg-black rounded-full"></div>
-                            <div className="absolute top-[492px] left-[65px] w-[172px] h-[5px] bg-black rounded-full"></div>
-                            <div className="absolute top-[148px] left-[65px] w-[420px] text-justify text-black text-[16px] font-normal leading-snug">
-                                This is an AI powered Police Reporting system. It provide online convenience for the public to submit police complaint via the Internet. This facility is specially provided for lodging police report pertaining to case of lost document or item that does not relate to crime.
+                            <div className="flex flex-row items-center justify-center my-4">
+                                <div className=" w-32 h-1 bg-black rounded-full"></div>
+                                <div className="text-center text-xs font-medium mx-4">
+                                    or
+                                </div>
+                                <div className="w-32 h-1 bg-black rounded-full"></div>
                             </div>
-                            <div className="absolute top-[45px] left-[65px] w-[419px] text-justify text-black text-[40px] font-bold">
-                                Welcome to
+                            <div className='flex items-center justify-center'>
+                                <button className="w-[200px] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]">
+                                    <Link href="/register">
+                                        Register
+                                    </Link>
+                                </button>
                             </div>
-                            <div className="login-subtitle absolute top-[93px] left-[69px] w-[415px] text-justify text-black text-[25px] font-medium">
-                                Police Reporting Ai System
-                            </div>
-                        </form>
+                        </form>   
                     </div>
                 </div>
             </div>
         </div>
+        <div className="flex justify-center items-center text-justify font-medium mt-10 m-4">
+            if there are any problems while using the Ai Police Reporting System, please email the IT Department: zalhazmi.it@pras.inc.my 
+        </div>
+    </div>
+
     );
 };
