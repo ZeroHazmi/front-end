@@ -103,11 +103,11 @@ export default function LoginPage() {
     return (
 
     <div className="flex flex-col justify-center items-center min-h-screen md:min-w-[1190px] max-w-[1200px] mx-auto">
-        <div className="flex md:flex-row flex-col justify-center items-center border">
+        <div className="flex md:flex-row flex-col justify-center items-center">
             {/* LTS */}
             <div className="flex md:flex-row flex-col justify-center items-center md:pr-10 md:pl-8 md:mr-10 m-2">
                 <div className="w-[240px] h-[240px] m-auto my-4 ">
-                    <Image src="/Images/loginlogo.png" alt="Logo" width={240} height={240} />
+                    <Image src="/Images/loginlogo.png" alt="Logo" width={245} height={245} />
                 </div>
                 <div className="flex flex-col justify-center items-center">
                     <div className="text-8xl font-extrabold">
@@ -118,12 +118,12 @@ export default function LoginPage() {
                     </div>
                 </div>
             </div>
-            <div className="md:hidden animate-bounce flex justify-center items-center px-4 bg-white mt-3 z-30 font-medium rounded-lg h-[35px]  bg-white/20 shadow-lg backdrop-blur-custom border border-white/30">
+            <div className="md:hidden animate-bounce flex justify-center items-center px-4 bg-white mt-[30vh] mb-[5vh] z-30 font-medium rounded-lg h-[35px]  bg-white/20 shadow-lg backdrop-blur-custom border border-white/30">
                 <div>
                     <FontAwesomeIcon icon={faAnglesDown} />
                 </div>
-                <div className='px-2 '>
-                    login animation for mobile
+                <div className='px-4'>
+                    login
                 </div>
                 <div>
                     <FontAwesomeIcon icon={faAnglesDown} />
@@ -143,19 +143,23 @@ export default function LoginPage() {
                     </div>
                     <div className="flex flex-col justify-center items-center">     
                         <form onSubmit={Login}>     
-                            <div className="">
-                                <input type="text" name="username" placeholder="Username or id..." className="w-full h-[35px] bg-white border border-gray-400 rounded-lg text-black/50 px-3" required/>
+                            <div className="text-center">
+                                <input type="text" name="username" placeholder="Username or id..." className="w-[90%] h-[35px] bg-white border border-gray-400 rounded-lg text-black/50 px-3" required/>
                             </div>
-                            <div className="my-4">
-                                <input type="password" name="password" placeholder="Password" className="w-full h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
+                            <div className="text-center my-2">
+                                <input type="password" name="password" placeholder="Password" className="w-[90%] h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
                             </div>
-                                
+                            <div className='flex items-center justify-center w-[90%] h-[35px] my-2 text-sm'>
+                                 <button className="w-[90%] h-[35px]  text-sky-500  flex items-center">
+                                    Forgot password?
+                                </button>
+                            </div>
                             <div className='flex items-center justify-center'>
-                                 <button className="w-[200px] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading} >
+                                 <button className="w-[90%] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading} >
                                     {isLoading ? 'Logging in...' : 'Login'}
                                 </button>
                             </div>
-                            <div className="flex flex-row items-center justify-center my-4">
+                            <div className="flex flex-row items-center justify-center my-2">
                                 <div className=" w-32 h-1 bg-black rounded-full"></div>
                                 <div className="text-center text-xs font-medium mx-4">
                                     or
@@ -163,7 +167,7 @@ export default function LoginPage() {
                                 <div className="w-32 h-1 bg-black rounded-full"></div>
                             </div>
                             <div className='flex items-center justify-center'>
-                                <button className="w-[200px] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]">
+                                <button className="w-[90%] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]">
                                     <Link href="/register">
                                         Register
                                     </Link>
@@ -175,7 +179,7 @@ export default function LoginPage() {
             </div>
         </div>
         <div className="flex justify-center items-center text-justify font-medium mt-10 m-4">
-            if there are any problems while using the Ai Police Reporting System, please email the IT Department: zalhazmi.it@pras.inc.my 
+            If there are any problems while using the Ai Police Reporting System, please email the IT Department: zalhazmi.it@pras.inc.my 
         </div>
     </div>
 
