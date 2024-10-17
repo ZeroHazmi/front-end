@@ -103,7 +103,7 @@ export default function LoginPage() {
     return (
 
     <div className="flex flex-col justify-center items-center min-h-screen md:min-w-[1190px] max-w-[1200px] mx-auto">
-        <div className="flex md:flex-row flex-col justify-center items-center">
+        <div className="flex md:flex-row flex-col justify-center items-center border">
             {/* LTS */}
             <div className="flex md:flex-row flex-col justify-center items-center md:pr-10 md:pl-8 md:mr-10 m-2">
                 <div className="w-[240px] h-[240px] m-auto my-4 ">
@@ -122,8 +122,8 @@ export default function LoginPage() {
                 <div>
                     <FontAwesomeIcon icon={faAnglesDown} />
                 </div>
-                <div className='px-4 '>
-                    Login
+                <div className='px-2 '>
+                    login animation for mobile
                 </div>
                 <div>
                     <FontAwesomeIcon icon={faAnglesDown} />
@@ -143,15 +143,15 @@ export default function LoginPage() {
                     </div>
                     <div className="flex flex-col justify-center items-center">     
                         <form onSubmit={Login}>     
-                            <div className="text-center">
-                                <input type="text" name="username" placeholder="Username or id..." className="w-[90%] h-[35px] bg-white border border-gray-400 rounded-lg text-black/50 px-3" required/>
+                            <div className="">
+                                <input type="text" name="username" placeholder="Username or id..." className="w-full h-[35px] bg-white border border-gray-400 rounded-lg text-black/50 px-3" required/>
                             </div>
-                            <div className="text-center my-4">
-                                <input type="password" name="password" placeholder="Password" className="w-[90%] h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
+                            <div className="my-4">
+                                <input type="password" name="password" placeholder="Password" className="w-full h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
                             </div>
                                 
                             <div className='flex items-center justify-center'>
-                                 <button className="w-[90%] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading} >
+                                 <button className="w-[200px] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading} >
                                     {isLoading ? 'Logging in...' : 'Login'}
                                 </button>
                             </div>
@@ -163,7 +163,7 @@ export default function LoginPage() {
                                 <div className="w-32 h-1 bg-black rounded-full"></div>
                             </div>
                             <div className='flex items-center justify-center'>
-                                <button className="w-[90%] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]">
+                                <button className="w-[200px] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]">
                                     <Link href="/register">
                                         Register
                                     </Link>

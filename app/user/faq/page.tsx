@@ -26,7 +26,7 @@ export default function FrequentlyAskedQuestions () {
                         </div>
                         <button className="w-[175px] bg-police-blue hover:bg-[#0022AA] flex items-center justify-center flex-shrink-0 py-[6px] cursor-pointer rounded-r-lg border-none">
                             <span className="text-white text-[20px]">
-                                <FontAwesomeIcon icon={faMagnifyingGlass}/>
+                                <FontAwesomeIcon icon={faMagnifyingGlass} />
                             </span>
                         </button>
                     </div>
