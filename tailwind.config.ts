@@ -26,6 +26,8 @@ const config: Config = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
 
+		
+
 		boxShadow: {
 			'custom-blue': '0px 20px 75px rgba(0, 68, 204, 0.3)', //defult
 			'middle-custom-blue': '0px 0px 75px rgba(0, 68, 204, 0.3)',

@@ -10,7 +10,6 @@ import { jwtDecode } from 'jwt-decode';
 import { useEffect } from 'react';
 import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import '../globals.css';
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -102,23 +101,23 @@ export default function LoginPage() {
 
     return (
 
-    <div className="flex flex-col justify-center items-center min-h-screen md:min-w-[1190px] max-w-[1200px] mx-auto">
-        <div className="flex md:flex-row flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center min-h-screen lg:min-w-[1190px] max-w-[1200px] mx-auto">
+        <div className="flex lg:flex-row flex-col justify-center items-center z-30">
             {/* LTS */}
-            <div className="flex md:flex-row flex-col justify-center items-center md:pr-10 md:pl-8 md:mr-10 m-2">
-                <div className="w-[240px] h-[240px] m-auto my-4">
-                    <Image src="/Images/loginlogo.png" alt="Logo" width={245} height={245} />
+            <div className="flex flex-row justify-center items-center lg:pr-10 lg:pl-8 lg:mr-10 m-2 lg:mb-5 mb-0 z-30">
+                <div className="lg:w-[240px] lg:h-[240px] w-[60px] h-[60px]  m-auto my-4">
+                    <Image src="/Images/loginlogo.png" alt="Logo" width={245} height={245}/>
                 </div>
                 <div className="flex flex-col justify-center items-center">
-                    <div className="text-8xl font-extrabold">
+                    <div className="lg:text-8xl text-5xl font-extrabold font-animation bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-black">
                         P.R.A.S
                     </div>
-                    <div className="font-bold break-words text-[15px] md:mr-2">
+                    <p className="font-bold break-words lg:text-[15px] text-[7.5px] lg:mr-2 ">
                         Police Reporting Artificial intelligence System.
-                    </div>
+                    </p>
                 </div>
             </div>
-            <div className="md:hidden animate-bounce flex justify-center items-center px-4 bg-white mt-[30vh] mb-[5vh] z-30 font-medium rounded-lg h-[35px]  bg-white/20 shadow-lg backdrop-blur-custom border border-white/30">
+            {/* <div className="lg:hidden animate-bounce flex justify-center items-center px-4 bg-white mt-[30vh] mb-[5vh] z-30 font-medium rounded-lg h-[35px]  bg-white/20 shadow-lg backdrop-blur-custom border border-white/30">
                 <div>
                     <FontAwesomeIcon icon={faAnglesDown} />
                 </div>
@@ -128,9 +127,9 @@ export default function LoginPage() {
                 <div>
                     <FontAwesomeIcon icon={faAnglesDown} />
                 </div>
-            </div>
+            </div> */}
             {/* FORM */}
-            <div className="login-bg-animation bg-white md:py-10 md:px-10 px-6 py-6 md:ml-8 rounded-lg w-fit m-2">
+            <div className="login-bg-animation bg-white lg:py-10 lg:px-10 px-6 py-6 lg:ml-8 rounded-lg lg:w-fit max-w-[475px] m-2">
                 <div>
                     <div className="text-4xl font-bold">
                         Welcome to
@@ -149,10 +148,10 @@ export default function LoginPage() {
                             <div className="text-center my-2">
                                 <input type="password" name="password" placeholder="Password" className="w-[90%] h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
                             </div>
-                            <div className='flex items-center justify-center w-[90%] h-[35px] my-2 text-sm'>
-                                 <button className="w-[90%] h-[35px]  text-sky-500  flex items-center">
-                                    Forgot password?
-                                </button>
+                            <div className='flex items-center justify-center w-[90%] h-[35px] mb-2 -mt-2 pl-1 text-sm'>
+                                <Link href="/user/faq" className="w-[90%] h-[35px]  text-sky-500  flex items-center">
+                                     Forgot password? {/* link to forgot password page */}
+                                </Link>
                             </div>
                             <div className='flex items-center justify-center'>
                                  <button className="w-[90%] h-[35px] bg-[#0044cc] text-white rounded-lg shadow-md font-bold flex items-center justify-center transition duration-400 hover:bg-[#0022aa]" disabled={isLoading} >
@@ -178,8 +177,8 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
-        <div className="flex justify-center items-center text-justify font-medium mt-10 m-4">
-            If there are any problems while using the Ai Police Reporting System, please email the IT Department: zalhazmi.it@pras.inc.my 
+        <div className="flex justify-center items-center text-justify font-medium mt-10 m-4 z-30">
+            If there are any problems while using the Ai Police Reporting System, please email the IT Department: zalhazmi.dev@pras.inc.my 
         </div>
     </div>
 

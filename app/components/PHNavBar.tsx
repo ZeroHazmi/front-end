@@ -15,7 +15,8 @@ export default function PHNavBar() {
 
   return (
         <nav>
-            <div className="fixed top-[8px] left-[8px] right-[8px] z-[1000] h-[50px] bg-[#303091] rounded-[8px] flex items-center justify-between px-[10px] shadow-bottom-custom-blue">
+            <div className="fixed top-2 left-2 right-2 z-[1000] h-[50px] bg-[#303091] rounded-lg flex items-center justify-between px-2 shadow-bottom-custom-blue">
+                {/* LOGO/TILTE */}
                 <div>
                     <Link href="/user/report-submission" className="flex items-center">
                         <Image src="/Images/navbarlogo.png" className="w-[35px] h-[35px] rounded-lg mr-[10px]" alt="Logo" height={50} width={50}/>
@@ -24,9 +25,15 @@ export default function PHNavBar() {
                         </div>
                     </Link>
                 </div>
+                {/* LINK */}
                 <div className="flex gap-[50px] text-white text-[16px] font-medium items-center">
-                    <div className="cursor-pointer">Communication</div>
                     <div className="cursor-pointer">
+                        [PH]
+                    </div>
+                        <Link href="/user/communication">
+                            Comunnication
+                        </Link>
+                    <div className="">
                         <Link href="/user/faq">
                             FAQ
                         </Link>
