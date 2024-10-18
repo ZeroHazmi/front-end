@@ -26,7 +26,10 @@ const config: Config = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
 
-		
+		animation: {
+			slideIn: 'slideIn 0.5s ease-in-out forwards',
+			slideOut: 'slideOut 0.5s ease-in-out forwards',
+		},
 
 		boxShadow: {
 			'custom-blue': '0px 20px 75px rgba(0, 68, 204, 0.3)', //defult

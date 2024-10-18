@@ -105,14 +105,14 @@ export default function LoginPage() {
         <div className="flex lg:flex-row flex-col justify-center items-center z-30">
             {/* LTS */}
             <div className="flex flex-row justify-center items-center lg:pr-10 lg:pl-8 lg:mr-10 m-2 lg:mb-5 mb-0 z-30">
-                <div className="lg:w-[240px] lg:h-[240px] w-[60px] h-[60px]  m-auto my-4">
+                <div className="lg:w-[240px] lg:h-[240px] w-[60px] h-[60px]  m-auto my-4 transition-all duration-700 ease-in-out">
                     <Image src="/Images/loginlogo.png" alt="Logo" width={245} height={245}/>
                 </div>
                 <div className="flex flex-col justify-center items-center">
-                    <div className="lg:text-8xl text-5xl font-extrabold font-animation bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-black">
+                    <div className="lg:text-8xl text-5xl font-extrabold font-animation transition-all duration-300 ease-in-out bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-black">
                         P.R.A.S
                     </div>
-                    <p className="font-bold break-words lg:text-[15px] text-[7.5px] lg:mr-2 ">
+                    <p className="font-bold break-words lg:text-[15px] text-[7.5px] lg:mr-2 transition-all duration-300 ease-in-out">
                         Police Reporting Artificial intelligence System.
                     </p>
                 </div>
@@ -149,7 +149,7 @@ export default function LoginPage() {
                                 <input type="password" name="password" placeholder="Password" className="w-[90%] h-[35px] bg-white border border-gray-400 rounded-lg text-black/50  px-3 box-border" required/>
                             </div>
                             <div className='flex items-center justify-center w-[90%] h-[35px] mb-2 -mt-2 pl-1 text-sm'>
-                                <Link href="/user/faq" className="w-[90%] h-[35px]  text-sky-500  flex items-center">
+                                <Link href="/user/forgot-password" className="w-[90%] h-[35px]  text-sky-500  flex items-center">
                                      Forgot password? {/* link to forgot password page */}
                                 </Link>
                             </div>

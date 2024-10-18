@@ -1,14 +1,16 @@
 'use client'
 
 import React from 'react'
-import PHNavBar from '@/components/PHNavBar'
+import PHNavBar from '@/app/components/PHNavBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import UserNavBar from '@/app/components/userNavBar';
+
 
 export default function FrequentlyAskedQuestions () {
     return (
         <div className='flex justify-center items-center min-w-[375px] max-w-[1200px] mx-auto mt-[15vh]'> {/* PAGE BODY */}
-        <PHNavBar />
+        <UserNavBar />
             {/* CONTAINER */}
             <div className='mx-2'>
                 {/* TITLE */}

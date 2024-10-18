@@ -168,33 +168,80 @@ body {
 	backdrop-filter: blur(5px);
 }
 
-.font-animation {
-	background-image: linear-gradient(90deg, #1e40af, black, #991b1b, black);
-	background-size: 400% 400%;
-	transition: all 0.5s ease;
+@keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+/* @media (min-width: 640px) {
+	.hamburger-menu {
+	  display: none !important;
+	}
+  } */
+
+/* new */
+@media (min-width: 640px) {
+    .menu {
+        display: block !important;
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+    }
+
+    .menu-toggle,
+    .menu-icon {
+        display: none;
+    }
 }
 
-.font-animation {
-	transition: all 0.5s ease;
-	/* animation-delay: 0.5s; */
+/* Default state: menu hidden */
+.menu {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
 }
-  
-.font-animation:hover {
-	animation: gradientShift 6s ease infinite;
-	animation-delay: 0s;
+
+/* Show menu when checkbox is checked */
+.menu-toggle:checked ~ .menu {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    animation: slideIn 0.5s forwards;
 }
-  
-@keyframes gradientShift { /* left to right (0% (x) to 100%) & back to the left (100% to 0% (y)).*/
-	100% {
-	background-position: 0% 10%;
-	}
-	50% {
-	  background-position: 100% 50%;
-	}
-	0% {
-	  background-position: 0% 50%;
-	}
+
+/* Toggle icons based on checkbox state */
+.menu-toggle:checked + .menu-icon .icon-open {
+    display: none;
 }
+
+.menu-toggle:checked + .menu-icon .icon-close {
+    display: block;
+}
+
+
+
+
+
+
+
+
 
 /* register/signup */
 

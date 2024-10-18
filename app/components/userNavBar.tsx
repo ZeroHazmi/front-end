@@ -13,7 +13,7 @@ export default function UserNavBar() {
     const router = useRouter(); // Next.js's rounter hook for router object | componenet navigation/route handling in component
     const [ hamburgerOpen, setHamburgerOpen,] = useState (false); 
     // useState create state variable called hamburgerOpen
-    // setHamburgerOpen function update the hamburgerOpen false to true / true to false
+    // setHamburgerOpen function update the hamburgerOpen false to true @ true to false
 
     const logout = () => {
         localStorage.removeItem('token'); // Remove the token from local storage
@@ -40,14 +40,16 @@ export default function UserNavBar() {
                 </div>
 
                 {/* HAMBURGER PLS! - Pink Guy 2013 */}
-                <div onClick={toggleHamburgerMenu} className={`sm:hidden flex justify-center  text-white text-[35px] mr-1  cursor-pointer transition-transform duration-200 ${hamburgerOpen ? 'rotate-180' : 'rotate-0'}`} > {/* ${hamburgerOpen ? 'open' : 'start'}`} */}                                                                                        
+                <div onClick={toggleHamburgerMenu} className={`sm:hidden flex justify-center text-white text-[35px] mr-1  cursor-pointer transition-transform duration-200 ${hamburgerOpen ? 'rotate-180' : 'rotate-0'}`} > {/* ${hamburgerOpen ? 'open' : 'start'}`} */}                                                                                        
                 {/* <div className="sm:hidden flex justify-center text-white text-4xl mr-1  cursor-pointer" onClick={toggleHamburgerMenu}> */}
                     {/* <FontAwesomeIcon icon={faBars}/> */}
-                    {hamburgerOpen ? 
-                        ( <FontAwesomeIcon icon={faXmark}/> ) : ( <FontAwesomeIcon icon={faBars}/> )
-                    }
+                    {hamburgerOpen ? (
+                        <FontAwesomeIcon icon={faXmark} />
+                    ) : ( 
+                        <FontAwesomeIcon icon={faBars} />
+                    )}
                 </div>
-
+                
                 {/* LINK */}
                 <div className="hidden sm:flex items-center gap-8 text-white font-medium ">
                     <Link href="/user/communication" className="cursor-pointer">
@@ -67,25 +69,24 @@ export default function UserNavBar() {
                 </div>
             </div>
             
-            {/* REPONSIVE BACKGROUND */}
-            {hamburgerOpen && (  //displayed action section
-                <div className={`sm:hidden fixed top-16 left-2 right-2 bg-[#303091] rounded-lg p-4 shadow-bottom-custom-blue z-40 ${hamburgerOpen ? 'mobile-nav-animation-down' : 'mobile-nav-animation-up'}`}>
-                    <div className="flex flex-col gap-4 items-end text-white font-medium">
-                        <Link href="/user/communication" className="cursor-pointer" onClick={() => setHamburgerOpen(false)}>
-                            Communication
+            {/* REPONSIVE BACKGROUND FOR MOBILE */}
+                {/* <div> className={`hamburger-menu sm:hidden fixed top-16 left-2 right-2 bg-[#303091] rounded-lg p-4 shadow-lg z-40 transform transition-all duration-500 ease-in-out ${hamburgerOpen ? 'animate-slideIn' : 'animate-slideOut'}`}>   */}
+                <div  className={`sm:hidden fixed top-16 left-2 right-2 bg-[#303091] rounded-lg p-4 shadow-lg z-40 transition-all duration-500 ease-in-out ${hamburgerOpen ? ' visible animate-slideIn' : 'invisible animate-slideOut'}`}>                 
+                    <div className="flex flex-col gap-4 items-end text-white font-medium"> 
+                        <Link href="/user/communication" onClick={() => setHamburgerOpen(false)}>
+                            <span className="cursor-pointer">Communication</span>
                         </Link>
-                        <Link href="/user/faq" className="cursor-pointer">
-                            FAQ 
+                        <Link href="/user/faq" onClick={() => setHamburgerOpen(false)}>
+                            <span className="cursor-pointer">FAQ</span>
                         </Link>
-                        <Link href="/user/profile" className="cursor-pointer">
-                            Profile
+                        <Link href="/user/profile" onClick={() => setHamburgerOpen(false)}>
+                            <span className="cursor-pointer">Profile</span>
                         </Link>
-                        <button type="button" onClick={logout}  className="w-40 h-8 bg-red-500 text-white hover:bg-red-700 hover:text-white rounded-lg font-semibold cursor-pointer shadow-[5px_5px_5px_rgba(0,0,0,0.25)]">
+                        <button type="button" onClick={logout} className="w-40 h-8 bg-red-500 text-white hover:bg-red-700 rounded-lg font-semibold shadow-md">
                             Logout
                         </button>
                     </div>
                 </div>
-            )}
         </nav>
     );
 };
