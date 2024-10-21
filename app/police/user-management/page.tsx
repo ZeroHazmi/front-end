@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import PHNavBar from "@/components/PHNavBar";
+import PHNavBar from '@/app/components/PHNavBar';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react';

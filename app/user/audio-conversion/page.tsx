@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react";
-import PHNavBar from '@/components/PHNavBar';
+import PHNavBar from '@/app/components/PHNavBar';
 import { useRouter } from 'next/router';
 // import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
 //import MapComponent from '@/components/map';

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import PHNavBar from '@/components/PHNavBar';
+import PHNavBar from '@/app/components/PHNavBar';
 
 export default function PoliceDashboard(){
     return (

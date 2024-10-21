@@ -1,17 +1,44 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // import '../globals.css';
 import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faKeyboard } from '@fortawesome/free-regular-svg-icons'
 import { faMicrophoneLines } from '@fortawesome/free-solid-svg-icons'
-import PHNavBar from '@/components/PHNavBar';
+import PHNavBar from '@/app/components/PHNavBar';
+import { ReportType } from '@/app/Models';
 // import NavBar from '../../components/userNavBar';
 
 
 export default function UserReportingSubmission() {
     
+    const router = useRouter();
+    const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
+    const [selectedReportType, setSelectedReportType] = useState<string>('');
+
+    useEffect(() => {
+        async function fetchReportType() {
+            const response = await fetch('http://localhost:5035/api/report-type', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            const data = await response.json();
+            setReportTypes(data);
+        }
+
+        fetchReportType();
+    }, []);
+
+    
+
+    function newReportButton(){
+        router.push('/user/report-submission/new-report');
+    }
+
     return (
         <div className=" flex items-center justify-center mt-[16vh]"> {/* PAGE BODY */}
             <form action="">
@@ -103,17 +130,18 @@ export default function UserReportingSubmission() {
                             Dropdown Section
                             
                             <div className="space-x-5">
-                                <select className="w-[200px] h-[35px] px-2 bg-white rounded-lg border border-[#696969]" name='reportype' required>
-                                    <option value="placeholder">Type of reports</option> {/* placeholder */}
-                                    <option value="wan">1</option>
-                                    <option value="to">2</option>
-                                    <option value="tree">3</option>
-                                    <option value="for">4</option>
+                                <select className="w-[200px] h-[35px] px-2 bg-white rounded-lg border border-[#696969]" name='reportype' onChange={(e) => setSelectedReportType(e.target.value)} required>
+                                    <option value="">Type of reports</option> {/* placeholder */}
+                                    {reportTypes.map((reportType) => (
+                                        <option key={reportType.id} value={reportType.id}>
+                                            {reportType.name}
+                                        </option>
+                                    ))}
                                 </select>
                                 {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
                                     <i className="fas fa-chevron-down"></i>
                                 </div> */}
-                                <button  className=" w-[200px] h-[35px] bg-[#0044cc]  text-white rounded-lg font-bold hover:bg-[#0022aa]">
+                                <button  className=" w-[200px] h-[35px] bg-[#0044cc]  text-white rounded-lg font-bold hover:bg-[#0022aa]" onClick={newReportButton}>
                                         New Report
                                 </button>
                             </div>
