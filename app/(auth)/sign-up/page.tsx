@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, FormEvent, useRef } from 'react';
-import '../globals.css';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +17,6 @@ export default function SignUpPage(){
     const [icImage, setIcImage] = useState<File | null>(null);
     const [extractedData, setExtractedData] = useState<Partial<AppUser>>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
-
 
     async function Register(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();

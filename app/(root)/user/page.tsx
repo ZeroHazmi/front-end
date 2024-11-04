@@ -41,7 +41,7 @@ export default function UserReportingSubmission() {
             alert('Please select a report type');
             return;
         }
-        router.push(`/user/dashboard/new-report/${selectedReportType}`);
+        router.push(`/new-report/${selectedReportType}`);
     }
 
     return (

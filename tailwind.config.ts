@@ -25,21 +25,18 @@ const config: Config = {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-
-		animation: {
-			slideIn: 'slideIn 0.5s ease-in-out forwards',
-			slideOut: 'slideOut 0.5s ease-in-out forwards',
-		},
-
-		boxShadow: {
-			'custom-blue': '0px 20px 75px rgba(0, 68, 204, 0.3)', //defult
-			'middle-custom-blue': '0px 0px 75px rgba(0, 68, 204, 0.3)',
-			'top-custom-blue': '0px -20px 75px rgba(0, 68, 204, 0.3)',
-			'bottom-custom-blue': '0px 40px 75px rgba(0, 68, 204, 0.3)',
-			'left-custom-blue': '-25px 0px 75px rgba(0, 68, 204, 0.2)',
-			'right-custom-blue': '25px 00px 75px rgba(0, 68, 204, 0.2)'
-			// 					   x	y
-		}
+  		animation: {
+  			slideIn: 'slideIn 0.5s ease-in-out forwards',
+  			slideOut: 'slideOut 0.5s ease-in-out forwards'
+  		},
+  		boxShadow: {
+  			'custom-blue': '0px 20px 75px rgba(0, 68, 204, 0.3)',
+  			'middle-custom-blue': '0px 0px 75px rgba(0, 68, 204, 0.3)',
+  			'top-custom-blue': '0px -20px 75px rgba(0, 68, 204, 0.3)',
+  			'bottom-custom-blue': '0px 40px 75px rgba(0, 68, 204, 0.3)',
+  			'left-custom-blue': '-25px 0px 75px rgba(0, 68, 204, 0.2)',
+  			'right-custom-blue': '25px 00px 75px rgba(0, 68, 204, 0.2)'
+  		}
   	}
   },
   plugins: [require("tailwindcss-animate")],
