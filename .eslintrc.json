@@ -1,17 +1,14 @@
 {
-    "extends": [
-        "next/core-web-vitals",
-        "next",
-        "plugin:@typescript-eslint/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
     "plugins": [
-        "@typescript-eslint"
+        "next"
     ],
     "rules": {
-        "indent": [
-            "error",
-            4
-        ] // Use 2 spaces per indentation level
-    }
+        "google-font-display": "warn",
+        "google-font-preconnect": "warn",
+        "inline-script-id": "error"
+    },
+    "extends": [
+        "next/core-web-vitals",
+        "plugin:prettier/recommended"
+    ]
 }

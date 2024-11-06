@@ -1,15 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useToast } from '@/hooks/use-toast';
-import { jwtDecode } from 'jwt-decode';
-import { useEffect } from 'react';
-import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { login } from '@/lib/actions/user.actions';
-import AuthForm from '@/components/AuthForm';
-import { cookies } from 'next/headers';
+import LoginAuthForm from '@/components/LoginAuthForm';
 
 export default async function LoginPage() {
     return (
@@ -42,7 +33,7 @@ export default async function LoginPage() {
                         This is an AI powered Police Reporting System. It provide online convenience for the public to sumbit police complaint via the internet. This facility is specially provided for lodging police report pertaining to case of lost document or item that doest not relate to the crime
                     </div>
                     <div className="flex flex-col justify-center items-center">     
-                           <AuthForm type="sign-in" />
+                           <LoginAuthForm type="sign-in" />
                     </div>
                 </div>
             </div>
