@@ -17,12 +17,13 @@ import { toast, useToast } from '@/hooks/use-toast';
 import { login } from '@/lib/actions/user.actions';
 import SelectInput from './SelectInput'
 import { gender, nationality, descendants, religion, states } from '@/types/constants'
+import { Router } from 'express'
 
 const SignupAuthForm = () => {
     const formSchema = signUpFormSchema();
     const [district, setDistrict] = useState<string[]>([]);
-    const [image, setImage] = useState<string>("");
-    const [openAIResponse, setOpenAIResponse] = useState<string>("");
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
     // Watch the selected state
 
     // 1. Define your form.
@@ -31,7 +32,6 @@ const SignupAuthForm = () => {
         defaultValues: {
             username: "",
             password: '',
-            repassword: "",
             birthday: "",
             gender: "",
             nationality: "",
@@ -45,7 +45,6 @@ const SignupAuthForm = () => {
             state: "",
             region: "",
             email: "",
-            reemail: "",
             icNumber: ""
         },
     })
@@ -54,7 +53,50 @@ const SignupAuthForm = () => {
     const selectedState = watch('state');
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        setIsLoading(true);
+        // Perform validation checks before proceeding
+        try {
+    
+            const response = await fetch('http://localhost:5035/api/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+            });
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                console.error('Error response:', errorResponse); // Log the full error
+            
+                // Extract a meaningful message from the errorResponse object
+                const errorMessage = errorResponse.title || 'Registration failed'; // You can customize this based on the structure of the errorResponse
+            
+                // Pass the error message as a string to the toast
+                toast({ variant: 'destructive', description: errorMessage });
+                
+                return;
+            }else{
+                toast({description: 'Registration successful'});
+            }
+    
+            const data = await response.json();
+            const { token, userName } = data;
+    
+            // Store token in localStorage (or cookies)
+    
+            // Redirect to another page (e.g., dashboard) after successful registration
+            router.push('/login');
+        } catch (error: any) {
+            console.error('Registration error:', error);
+            toast({variant: 'destructive', description: 'Registration failed'});
 
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    function returnToLogin() {
+        router.push('/login');
     }
 
     useEffect(() => {
@@ -100,10 +142,10 @@ const SignupAuthForm = () => {
                         <RegisterCustomInput control={form.control} name='email' label="Email" placeholder='Enter your password' id='password-input'/>
                         <RegisterCustomInput control={form.control} name='reemail' label="Re-enter Email" placeholder='Enter your password' id='password-input'/>
                         <Button type="submit" className="btn-primary">Sign Up</Button>
+                        <Button type='button' onClick={returnToLogin} className='btn-secondary'>Back</Button>
                     </div>
                 </form>
             </Form>
-
 
         </section>
     )

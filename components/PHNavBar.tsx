@@ -21,7 +21,7 @@ export default function PHNavBar() {
             <div className="fixed top-2 left-2 right-2 z-[1000] h-[50px] bg-[#303091] rounded-lg flex items-center justify-between px-2 shadow-bottom-custom-blue">
                 {/* LOGO/TILTE */}
                 <div>
-                    <Link href="/user/report-submission" className="flex items-center">
+                    <Link href="user/" className="flex items-center">
                         <Image src="/Images/navbarlogo.png" className="w-[35px] h-[35px] rounded-lg mr-[10px]" alt="Logo" height={50} width={50}/>
                         <div className="text-white text-[30px] font-bold">                            
                             P.R.A.S
@@ -34,7 +34,7 @@ export default function PHNavBar() {
                         [PH]
                     </div>
                         <Link href="/user/communication">
-                            Comunnication
+                            Communication
                         </Link>
                     <div className="">
                         <Link href="/user/faq">

@@ -1,3 +1,4 @@
+import { toast } from '@/hooks/use-toast';
 import { ReportType } from '@/types';
 import { faKeyboard, faMicrophoneLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,7 +8,7 @@ import React, { useEffect, useState } from 'react'
 const ReportContent = () => {
     const router = useRouter();
     const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
-    const [selectedReportType, setSelectedReportType] = useState<string>('');
+    const [selectedReportType, setSelectedReportType] = useState<number>(0);
 
     async function fetchReportType() {
         const response = await fetch('http://localhost:5035/api/reporttype', {
@@ -23,12 +24,12 @@ const ReportContent = () => {
 
     function newReportButton(e: React.MouseEvent){
         e.preventDefault();
-        if(selectedReportType === '0'){
-            alert('Please select a report type');
+        if(selectedReportType === 0){
+            toast({ title: "Report Type", description: "Please select a valid report type" , variant: "destructive"});
             return;
+        }else{
+            router.push(`user/new-report/${selectedReportType}`);
         }
-        router.push(`/new-report/${selectedReportType}`);
-
     }
 
     useEffect(() => {
@@ -99,7 +100,8 @@ const ReportContent = () => {
                     Dropdown Section
                     
                     <div className="space-x-5">
-                        <select className="w-[200px] h-[35px] px-2 bg-white rounded-lg border border-[#696969]" name='reportype' onChange={(e) => setSelectedReportType(e.target.value)} required>
+                        <select className="w-[200px] h-[35px] px-2 bg-white rounded-lg border border-[#696969]" name='reportype' 
+                        onChange={(e) => setSelectedReportType(Number(e.target.value))} required>
                             <option value="0">Type of reports</option> {/* placeholder */}
                             {reportTypes.map((reportType) => (
                                 <option key={reportType.id} value={reportType.id}>

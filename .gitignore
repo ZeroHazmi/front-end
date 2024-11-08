@@ -41,4 +41,4 @@ next-env.d.ts
 .prettierignore
 eslint.config.mjs
 
-.env
+.env.local

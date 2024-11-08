@@ -41,20 +41,16 @@ export const signUpFormSchema = () => {
 			.max(20, {
 				message: 'Username must be at most 20 characters long.',
 			}),
+		email: z.string().email({ message: 'Invalid email address.' }),
+		phoneNumber: z
+			.string()
+			.min(10, { message: 'Phone number must be at least 10 digits.' }),
 		password: z
 			.string()
 			.min(8, { message: 'Password must be at least 8 characters long.' })
 			.max(20, {
 				message: 'Password must be at most 20 characters long.',
 			}),
-		repassword: z
-			.string()
-			.min(8, { message: 'Password must be at least 8 characters long.' })
-			.max(20, {
-				message: 'Password must be at most 20 characters long.',
-			}),
-		email: z.string().email({ message: 'Invalid email address.' }),
-		reemail: z.string().email({ message: 'Invalid email address.' }),
 		icNumber: z.string().min(1, { message: 'IC Number is required.' }),
 		birthday: z
 			.string()
@@ -99,9 +95,6 @@ export const signUpFormSchema = () => {
 			.string()
 			.min(1, { message: 'Descendants information is required.' }),
 		religion: z.string().min(1, { message: 'Religion is required.' }),
-		phoneNumber: z
-			.string()
-			.min(10, { message: 'Phone number must be at least 10 digits.' }),
 		housePhoneNumber: z.string().optional(),
 		officePhoneNumber: z.string().optional(),
 		address: z

@@ -6,15 +6,15 @@ import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faKeyboard } from '@fortawesome/free-regular-svg-icons'
 import { faMicrophoneLines } from '@fortawesome/free-solid-svg-icons'
-import PHNavBar from '@/components/PHNavBar';
 import ReportContent from '@/components/ReportContent';
 import { ReportType } from '@/types/index.d';
+import UserNavBar from '@/components/userNavBar';
 // import NavBar from '../../components/userNavBar';
 
 const UserMainPage = () => {
   return (
     <div>
-        <PHNavBar />
+        <UserNavBar />
         <ReportContent />
     </div>
   )

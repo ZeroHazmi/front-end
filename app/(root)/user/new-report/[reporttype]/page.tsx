@@ -1,86 +1,117 @@
 'use client'
 
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import PHNavBar from "@/components/PHNavBar";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 // import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
 //import MapComponent from '../../../components/map';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faCircleArrowUp, faMicrophone, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { ReportType } from "@/types/index.d";
 import { report } from "process";
+import Recorder, { mimeType } from "@/components/Recorder";
+import { useFormState } from "react-dom";
+import transcribe from "@/actions/transcribe";
+
+const initialState = {
+    sender: "",
+    message: "",
+}
+
+export type Message = {
+    sender: string;
+    message: string;
+    id: string;
+}
 
 export default function UserTypingReport() {
     const [reportType, setReportType] = useState<ReportType | null>(null);
     const [templateFields, setTemplateFields] = useState<[string, string][]>([]);
     const [loading, setLoading] = useState(true); // Loading state
-    const [error, setError] = useState<string | null>(null); // Error state
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const reporttype = searchParams.get('reporttype');
+    const { reporttype } = useParams();
+    const reportTypeID = reporttype as string;
 
-    useEffect(() => {
-        async function fetchAndRenderReport() {
-            try {
-                if (!reporttype) {
-                    throw new Error('Report type is not chosen.');
-                }
+    const fileRef = useRef<HTMLInputElement | null>(null);
+    const submitButtonRef = useRef<HTMLButtonElement | null>(null);
+    const[state, formAction] = useFormState(transcribe, initialState);
+    const [messages, setMessages] = useState<Message[]>([]);
 
-                const res = await fetch(`http://localhost:5035/api/reporttype/${reporttype}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+    async function fetchReportType() {
+        const response = await fetch(`http://localhost:5035/api/reporttype/${reportTypeID}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-                if (!res.ok) {
-                    throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-                }
+        const data = await response.json();
+        return data;
+    }
 
-                const reportTypeData = await res.json();
+    async function renderReport() {
+        try {
+            const reportTypeData = await fetchReportType();
+            console.log("Report Type Data:", reportTypeData);
+            setReportType(reportTypeData);
+            
+            // Ensure templateStructure is parsed only if it's a string
+            let parsedTemplate = {};
+            if (typeof reportTypeData.templateStructure === 'string') {
+                parsedTemplate = JSON.parse(reportTypeData.templateStructure);
+            } else {
+                parsedTemplate = reportTypeData.templateStructure; // In case it's already an object
+            }
+            console.log("Parsed Template:", parsedTemplate);
 
-                console.log(reportTypeData);
+            const fields = Object.entries(parsedTemplate).map(([key, value]) => {
+                return [key, typeof value === 'string' ? value : String(value)] as [string, string];
+            });
+            console.log("Fields:", fields);
+            setTemplateFields(fields);
+            setLoading(false);
+        } catch (parseError) {
+            setLoading(false);
+        }
+    }
 
-                if (!reportTypeData || !reportTypeData.templatestructure) {
-                    throw new Error('TemplateStructure is missing in the report type.');
-                }
+    const uploadAudio = ( blob: Blob ) => {        
+        const file = new File([blob], "audio.webm", { type: mimeType });
 
-                setReportType(reportTypeData);
+        // Set the file as the value of the file input field
+        if (fileRef.current){
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileRef.current.files = dataTransfer.files;
 
-                // Parse the template structure
-                try {
-                    const parsedTemplate = JSON.parse(reportTypeData.TemplateStructure);
-                    const fields = Object.entries(parsedTemplate).map(([key, value]) => {
-                        return [key, typeof value === 'string' ? value : String(value)] as [string, string];
-                    });
-                    setTemplateFields(fields);
-                } catch (parseError) {
-                    throw new Error('Error parsing template structure.');
-                }
-
-                //setLoading(false); // Stop loading
-            } catch (error) {
-                //setLoading(false);
-                setError((error as Error).message || 'An error occurred');
+            //simulate a click
+            if (submitButtonRef.current){
+                submitButtonRef.current.click();
             }
         }
-
-        if (reporttype) {
-            fetchAndRenderReport();
-        }
-    }, [reporttype]);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Handle form submission
-        console.log('Form submitted');
-    };
-
-    if (error) {
-        return <div>Error: {error}</div>;
     }
+
+    useEffect(() => {
+        console.log("Report Type ID:", reportTypeID);
+        renderReport();
+        
+    }, [reportTypeID]);
+
+    useEffect(() => {
+        if (state.message && state.sender){
+            setMessages((messages) => [
+                ...messages,
+                {
+                    sender: state.sender,
+                    message: state.message,
+                    id: `${Date.now()}-${Math.random()}`
+                },
+                ...messages
+            ]);
+        }
+    }, [state.message, state.sender]);
 
     // Split template fields into two columns
     const halfLength = Math.ceil(templateFields.length / 2);
@@ -142,26 +173,9 @@ export default function UserTypingReport() {
 
 
                             {/* CHANGE TO TEXT AREA!!! */}
-                            <div className="w-[950px] px-[15px] justify-center">
-                                I have been watching a situation develop at Taman Permainan Bandar Baru Bangi Seksyen 3 for the past hour. There is a man who has been hanging around near the playground, and his behavior is very suspicious. He has been walking back and forth, sometimes looking around as if he is searching for something or someone. I have seen him getting closer to the children playing, which is making me more and more worried. I have not seen any weapons, but his presence alone is alarming. I think it is very important that we deal with this right away to make sure everyone at the park is safe. Can you please send someone to check it out?
-                                <br />
-                                <br />
-                                repeat
-                                <br />
-                                <br />
-                                I have been watching a situation develop at Taman Permainan Bandar Baru Bangi Seksyen 3 for the past hour. There is a man who has been hanging around near the playground, and his behavior is very suspicious. He has been walking back and forth, sometimes looking around as if he is searching for something or someone. I have seen him getting closer to the children playing, which is making me more and more worried. I have not seen any weapons, but his presence alone is alarming. I think it is very important that we deal with this right away to make sure everyone at the park is safe. Can you please send someone to check it out?
-                                <br />
-                                <br />
-                                I have been watching a situation develop at Taman Permainan Bandar Baru Bangi Seksyen 3 for the past hour. There is a man who has been hanging around near the playground, and his behavior is very suspicious. He has been walking back and forth, sometimes looking around as if he is searching for something or someone. I have seen him getting closer to the children playing, which is making me more and more worried. I have not seen any weapons, but his presence alone is alarming. I think it is very important that we deal with this right away to make sure everyone at the park is safe. Can you please send someone to check it out?
-                                <br />
-                                <br />
-                                repeat
-                                <br />
-                                <br />
-                                I have been watching a situation develop at Taman Permainan Bandar Baru Bangi Seksyen 3 for the past hour. There is a man who has been hanging around near the playground, and his behavior is very suspicious. He has been walking back and forth, sometimes looking around as if he is searching for something or someone. I have seen him getting closer to the children playing, which is making me more and more worried. I have not seen any weapons, but his presence alone is alarming. I think it is very important that we deal with this right away to make sure everyone at the park is safe. Can you please send someone to check it out?
-                                <br />
-                                <br />
-                            </div>
+                            <textarea className="w-[950px] px-[15px] justify-center">
+
+                            </textarea>
                             <div className="w-[50px] border-solid border-2 border-[#696969] "> {/*border placeholder*/}
                                 <Image src="https://via.placeholder.com/50x50" className="user-navbar-icon" alt="User" height={50} width={50}/>
                             </div>
@@ -189,6 +203,16 @@ export default function UserTypingReport() {
                         </div>
                     </div>
                 </div>
+                <div className='fixed md:bottom-[4%] bottom-[5%] md:right-[13%] right-[10%] border-solid'>
+                <button type="button" className='flex justify-center items-center w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] text-[20px] text-center sm:text-[35px] text-white bg-police-blue hover:bg-[#0022AA] rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)]  '>
+                    <FontAwesomeIcon icon={faMicrophone}/> 
+                </button> 
+            </div>
+            </form>
+            <form action={formAction}>
+                <input type="file" hidden ref={ fileRef } name="audio"/>
+                <button type="submit" hidden ref={ submitButtonRef } name="submit"/>
+                <Recorder uploadAudio={uploadAudio}/>
             </form>
         </div> 
     );

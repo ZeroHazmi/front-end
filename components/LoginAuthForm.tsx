@@ -10,7 +10,6 @@ import { decodeToken, removeCookie, setCookie } from '@/app/lib/auth';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { login } from '@/lib/actions/user.actions';
 import { z } from 'zod';
 import { Form } from './ui/form';
 import LoginCustomInput from "@/components/LoginCustomInput";

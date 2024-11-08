@@ -11,14 +11,6 @@ import Image from 'next/image';
 import SignupAuthForm from '@/components/SignupAuthForm';
 
 export default function SignUpPage(){
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const router = useRouter();
-    const { toast } = useToast();
-    const [icImage, setIcImage] = useState<File | null>(null);
-    const [extractedData, setExtractedData] = useState<Partial<AppUser>>({});
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
     return (
         <div className="user-signup-body">
         <div className="user-signup-main-container">
