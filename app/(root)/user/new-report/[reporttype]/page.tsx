@@ -14,6 +14,7 @@ import { report } from "process";
 import Recorder, { mimeType } from "@/components/Recorder";
 import { useFormState } from "react-dom";
 import transcribe from "@/actions/transcribe";
+import GoogleMaps from "@/components/GoogleMap";
 
 const initialState = {
     sender: "",
@@ -128,7 +129,7 @@ export default function UserTypingReport() {
                     </div>
                     {/* MAP CONTAINER*/}
                     <div className="w-[1120px] h-[600px]  rounded-lg shadow-top-custom-blue border-double border-2 border-sky-500 ">
-                        {/* <MapComponent /> need to fix map border etc */}
+                        <GoogleMaps />
                     </div>
                     <div className="flex flex-col md:flex-row md:gap-5 justify-between m-[20px] mx-auto gap-5 items-center text-left">
                         {/* LEFT FORM */}

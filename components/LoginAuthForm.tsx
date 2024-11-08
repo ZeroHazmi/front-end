@@ -14,6 +14,7 @@ import { z } from 'zod';
 import { Form } from './ui/form';
 import LoginCustomInput from "@/components/LoginCustomInput";
 import { cookies } from 'next/headers';
+import { login } from '@/actions/user';
 
 const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
     const router = useRouter();

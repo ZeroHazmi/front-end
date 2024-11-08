@@ -7,6 +7,7 @@ import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import React from "react";
+import { removeCookie } from "@/app/lib/auth";
 
 export default function UserNavBar() {
     const router = useRouter(); // Next.js's rounter hook for router object | componenet navigation/route handling in component
@@ -15,7 +16,9 @@ export default function UserNavBar() {
     // setHamburgerOpen function update the hamburgerOpen false to true @ true to false
 
     const logout = () => {
-        localStorage.removeItem('token'); // Remove the token from local storage
+        // Remove the token from local storage
+        removeCookie("session");
+        removeCookie("roles");
         // Redirect to the login page
         router.push('/login'); // Adjust the path based on your routes
     };
