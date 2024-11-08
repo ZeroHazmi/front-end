@@ -1,13 +1,6 @@
 'use client'
 
 import React, { useState, FormEvent, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useToast } from '@/hooks/use-toast';
-import { AppUser } from '@/types/index.d';
-import { registerUser } from '@/lib/actions/user.actions';
-import Tesseract from 'tesseract.js';
-import Image from 'next/image';
 import SignupAuthForm from '@/components/SignupAuthForm';
 
 export default function SignUpPage(){
