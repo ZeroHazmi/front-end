@@ -30,8 +30,8 @@ const LoginCustomInput = ({ control, name, label, placeholder, id }: CustomInput
                 {...field}
               />
             </FormControl>
-            <FormMessage className="form-message mt-2" />
           </div>
+            <FormMessage className="form-message mt-2" />
         </div>
       )}
     />

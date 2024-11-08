@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { loginFormSchema } from '@/lib/utils';
-import { decodeToken, setCookie } from '@/app/lib/auth';
+import { decodeToken, removeCookie, setCookie } from '@/app/lib/auth';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,7 @@ import { login } from '@/lib/actions/user.actions';
 import { z } from 'zod';
 import { Form } from './ui/form';
 import LoginCustomInput from "@/components/LoginCustomInput";
+import { cookies } from 'next/headers';
 
 const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
     const router = useRouter();
@@ -22,7 +23,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
     const [token, setToken] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const formSchema = loginFormSchema();
-    let _role = '';
+    const [role, setRole] = useState("");
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -40,28 +41,19 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
         console.log("Form submitted with values:", values); // Add this line
         setIsLoading(true);
         try {
-            
-
             const response = await login(values.username, values.password);
 
             if (response){
-                setLoginSuccess(true);
                 setToken(response.token);
-                console.log("Login Successful:", response);
-
                 const decodedToken = await decodeToken(response.token);
                 console.log("Decoded Token:", decodedToken);
-                console.log("Role:", decodedToken.role);
-                const role : string = decodedToken.role;
-                if (decodedToken.role){
-                
-                    console.log("Role found in token is string", role);
-                    _role = role;
-                    console.log("Role found in token", _role);
-                } else {
-                    console.log("Role not found in token");
+                if (decodedToken.role) {
+                    const decodedRole = decodedToken.role.toString();
+                    console.log("Role:", decodedRole);
+                    setRole(decodedRole);
                 }
-
+                setLoginSuccess(true);
+                console.log("Login Successful:", response);
             }
           
         } catch (error: any) {
@@ -73,22 +65,28 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
     }
 
     useEffect(() => {
+        if (loginSuccess && role) {
+            
+            console.log("Role in useeffect", role);
+            console.log("Login Success:", loginSuccess);
 
-        if (loginSuccess) {
             setCookie('session', token);
-
-            // need to fix setting role cookie
-            setCookie('roles', _role);
+            setCookie('roles', role);
+            
             toast({ title: "Login Successful", description: "You have been logged in." });
-            console.log("Role in useeffect", _role);
 
-            if (_role === 'User'){
-                router.push('/user');
-            } else if (_role === 'Police'){
-                router.push('/police');
-            }
+            const redirectTimeout = setTimeout(() => {
+                if (role === 'User') {
+                    console.log("Route:", "Within Role User Checker");
+                    router.push('/user');
+                } else if (role === 'Police') {
+                    router.push('/police');
+                }
+            }, 2000); // 2-second delay
+    
+            return () => clearTimeout(redirectTimeout);
         }
-    }, [loginSuccess]);
+    }, [loginSuccess, token, role]);
 
     return (
         <section className='w-full pl-4 pr-4'>

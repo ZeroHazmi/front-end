@@ -13,40 +13,23 @@ export default function middleware(req: NextRequest) {
 		path.startsWith(route),
 	);
 	const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
-
-	//console.log(`Current path: ${path}`);
-
 	const sessionCookie = cookies().get('session');
-	const roles = cookies().get('roles');
+	const rolesCookie = cookies().get('roles')?.value;
 
-	//console.log("Session Cookie:", sessionCookie);
-	//console.log("Role exists", roles);
-	let role = null;
-	// Check if cookie exists and decode token
-	if (sessionCookie) {
-		//console.log("sessionCookie exists:", sessionCookie);
-		try {
-		} catch (error) {
-			console.error('Failed to decode token:', error);
-			// Redirect to login if token decoding fails
-			const loginUrl = new URL('/login', req.url);
-			return NextResponse.redirect(loginUrl);
-		}
-	} else {
-		role = null;
+	console.log('Session Cookie:', sessionCookie);
+	console.log('Roles:', rolesCookie);
+
+	if (isProtectedRoute && (!sessionCookie || !rolesCookie)) {
+		return NextResponse.redirect(new URL('/login', req.url));
 	}
 
-	// Role-based access control for specific routes
-	//     if (isProtectedRoute) {
-	//         if (path.startsWith('/user') && role !== 'User') {
-	//         // Redirect unauthorized "user" role access
-	//         return NextResponse.redirect(new URL('/login', req.url));
-	//         }
-	//         if (path.startsWith('/police') && role !== 'Police') {
-	//         // Redirect unauthorized "police" role access
-	//         return NextResponse.redirect(new URL('/login', req.url));
-	//         }
-	//      }
+	// Role-based redirects
+	if (path.startsWith('/user') && rolesCookie !== 'User') {
+		return NextResponse.redirect(new URL('/user', req.url));
+	}
+	if (path.startsWith('/police') && rolesCookie !== 'Police') {
+		return NextResponse.redirect(new URL('/police', req.url));
+	}
 
 	return NextResponse.next();
 }
