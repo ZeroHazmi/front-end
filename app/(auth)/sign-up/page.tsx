@@ -8,7 +8,6 @@ export default function SignUpPage(){
         <div className="user-signup-body">
         <div className="user-signup-main-container">
                 <div className="user-signup-container">
-
                     <div>
                         <SignupAuthForm />
                     </div>   
