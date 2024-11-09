@@ -26,7 +26,7 @@ export async function login(username: string, password: string) {
 	return await response.json();
 }
 
-export async function registerUser(registerData: AppUser): Promise<any> {
+export async function registerUser(registerData: AppUser) {
 	const response = await fetch('http://localhost:5035/api/user/register', {
 		method: 'POST',
 		headers: {
@@ -37,7 +37,9 @@ export async function registerUser(registerData: AppUser): Promise<any> {
 
 	if (!response.ok) {
 		const errorResponse = await response.json();
-		throw new Error(errorResponse.title || 'Registration failed');
+		throw new Error(
+			errorResponse?.message || 'Registration failed. Please try again.',
+		);
 	}
 
 	return response.json();

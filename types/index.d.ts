@@ -1,5 +1,5 @@
 export interface AppUser {
-	userName: string;
+	username: string;
 	password: string;
 	email: string;
 	icNumber: string;
@@ -9,8 +9,8 @@ export interface AppUser {
 	descendants: string;
 	religion: string;
 	phoneNumber: string;
-	housePhoneNumber: string;
-	officePhoneNumber: string;
+	housePhoneNumber?: string;
+	officePhoneNumber?: string;
 	address: string;
 	postcode: string;
 	region: string;
@@ -79,7 +79,7 @@ export interface FieldValue {
 }
 
 interface CustomInput {
-	control: Control<z.infer<typeof formSchema>>;
+	control?: Control<z.infer<typeof formSchema>>;
 	name: FieldPath<z.infer<typeof formSchema>>;
 	label: string;
 	placeholder: string;

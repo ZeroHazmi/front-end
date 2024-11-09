@@ -26,12 +26,12 @@ const RegisterCustomInput = ({ control, name, label, placeholder, id }: CustomIn
                 id={id}
                 placeholder={placeholder}
                 className="input-class"
-                type={name === 'password' ? 'password' : 'text'}
+                type={name === 'password' || name === 'repassword' ? 'password' : 'text'}
                 {...field}
               />
             </FormControl>
           </div>
-            <FormMessage className="form-message mt-2" />
+            <FormMessage className="flex justify-center items-center" />
         </div>
       )}
     />

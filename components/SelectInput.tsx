@@ -23,30 +23,32 @@ const SelectInput = ({ control, name, label, placeholder, options }: CustomSelec
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <FormControl>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <SelectTrigger>
-                <SelectValue placeholder={placeholder} />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(options).map(([key, value]) => (
-                    Array.isArray(value) ? (
-                      value.map((item, index) => (
-                          <SelectItem key={`${key}-${index}`} value={item}>
-                              {item}
-                          </SelectItem>
-                      ))
-                  ) : (
-                      <SelectItem key={key} value={key}>
-                          {value}
-                      </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-          </FormControl>
-          <FormMessage />
+          <div className="flex w-full space-x-4">
+            <FormLabel className="flex-none w-1/4">{label}</FormLabel>
+            <FormControl className="flex-none w-3/4">
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(options).map(([key, value]) => (
+                      Array.isArray(value) ? (
+                        value.map((item, index) => (
+                            <SelectItem key={`${key}-${index}`} value={item}>
+                                {item}
+                            </SelectItem>
+                        ))
+                    ) : (
+                        <SelectItem key={key} value={key}>
+                            {value}
+                        </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </div>
+          <FormMessage className="flex justify-center items-center"/>
         </FormItem>
       )}
     />
@@ -54,3 +56,4 @@ const SelectInput = ({ control, name, label, placeholder, options }: CustomSelec
 };
 
 export default SelectInput;
+
