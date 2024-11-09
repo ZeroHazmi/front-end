@@ -9,8 +9,7 @@ export default function GoogleMaps() {
 	useEffect(() => {
 		const initializeMap = async () => {
 			const loader = new Loader({
-				apiKey: process.env.GOOGLE_MAP_API_KEY as string,
-				version: 'quartely',
+				apiKey: process.env.GOOGLE_PLACE_API_KEY as string,
 			});
 
 			const { Map } = await loader.importLibrary('maps');
@@ -43,5 +42,5 @@ export default function GoogleMaps() {
 		initializeMap();
 	}, []);
 
-	return <div className="h-[600px]" ref={mapRef} />;
+	return <div className="w-[1120px] h-[400px]" ref={mapRef} />;
 }
