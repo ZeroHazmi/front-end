@@ -1,5 +1,5 @@
 export interface AppUser {
-	username: string;
+	userName: string;
 	password: string;
 	email: string;
 	icNumber: string;

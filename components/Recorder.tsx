@@ -72,7 +72,7 @@ function Recorder({uploadAudio}: {uploadAudio: (blob:Blob) => void}){
     }
 
   return (
-    <div className='flex items-center justify-center'>
+    <div className='fixed bottom-[5%] right-[10%] md:right-[13%] md:bottom-[4%] border-solid'>
         {!permission && (
             <button onClick={getMicrophonePermission}> Get Microphone</button>
         )} 
@@ -96,8 +96,10 @@ function Recorder({uploadAudio}: {uploadAudio: (blob:Blob) => void}){
                     <FontAwesomeIcon icon={faMicrophone} />
                 </button>
             )
-        }        
+        }
+                
     </div>
+    
   )
 }
 

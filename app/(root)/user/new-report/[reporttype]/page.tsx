@@ -32,6 +32,7 @@ export default function UserTypingReport() {
     const [reportType, setReportType] = useState<ReportType | null>(null);
     const [templateFields, setTemplateFields] = useState<[string, string][]>([]);
     const [loading, setLoading] = useState(true); // Loading state
+    const [textareaContent, setTextareaContent] = useState<string>("");
     const router = useRouter();
     const { reporttype } = useParams();
     const reportTypeID = reporttype as string;
@@ -115,6 +116,35 @@ export default function UserTypingReport() {
         }
     }, [state.message, state.sender]);
 
+    useEffect(() => {
+        if (state.message) {
+            const newMessage = `${state.message}\n`; // Only the message without sender
+            setMessages((messages) => [
+                {
+                    sender: state.sender, // Keep the sender in the messages state
+                    message: state.message,
+                    id: `${Date.now()}-${Math.random()}`,
+                },
+                ...messages,
+            ]);
+            setTextareaContent((prevContent) => prevContent + newMessage); // Append to the textarea content
+            setMessages([])
+        }
+    }, [state.message, state.sender]);
+
+    useEffect(() => {
+        // Retrieve the text from sessionStorage when the component is mounted
+        const savedText = sessionStorage.getItem("textareaContent");
+        if (savedText) {
+            setTextareaContent(savedText);
+        }
+    }, []);
+    
+    useEffect(() => {
+        // Save the text to sessionStorage whenever it changes
+        sessionStorage.setItem("textareaContent", textareaContent);
+    }, [textareaContent]);
+
     // Split template fields into two columns
     const halfLength = Math.ceil(templateFields.length / 2);
     const firstColumn = templateFields.slice(0, halfLength);
@@ -167,31 +197,15 @@ export default function UserTypingReport() {
                     </div>
                     {/* CHAT CONTAINER */}
                     <div className="w-[1120px] text-justify rounded-lg  bg-white shadow-bottom-custom-blue p-8">
-                        <div className="flex overflow-y-auto max-h-[200px] rounded-lg border border-solid border-[#696969]">
-                            <div className="w-[50px]  border-solid border-2 border-[#696969] n">
-                                {/* <Image src="https://via.placeholder.com/50x50" className="user-navbar-icon" alt="User" height={50} width={50}/> */}
-                            </div>
-
-
+                        <div className="flex overflow-y-auto max-h-[350px] rounded-lg border border-solid border-[#696969]">
                             {/* CHANGE TO TEXT AREA!!! */}
-                            <textarea className="w-[950px] px-[15px] justify-center">
+                            <textarea
+                                className="w-full px-[15px] justify-center"
+                                name="converted-speech-textarea"
+                                value={textareaContent} // Bind the textarea value to the state
+                                onChange={() => {}} // Optional: If you want to prevent editing, leave this empty
+                            ></textarea>
 
-                            </textarea>
-                            <div className="w-[50px] border-solid border-2 border-[#696969] "> {/*border placeholder*/}
-                                <Image src="https://via.placeholder.com/50x50" className="user-navbar-icon" alt="User" height={50} width={50}/>
-                            </div>
-                        </div>
-                        <div className="my-5 flex justify-center items-center">
-                            <div className="flex w-[100%] ">
-                                <div className="bg-[#0044cc] w-[88.5%] flex items-center justify-center rounded-l-lg  ">
-                                    <input type="text" placeholder="Type here..." className="w-full ml-[4px] rounded-md border-none h-[35px] box-border outline-none px-2"/>
-                                </div>
-                                <button className="w-[175px] bg-[#0044cc] flex items-center justify-center flex-shrink-0 py-[6px] cursor-pointer rounded-r-lg border-none">
-                                    <span className="text-white text-[20px]">
-                                        <FontAwesomeIcon icon={faCircleArrowUp} />
-                                    </span>
-                                </button>
-                            </div>
                         </div>
                         <div className="flex justify-around items-center border border-sky-500"> {/* need re-adjust position */}
                             <button className="w-[200px] h-[35px] flex items-center justify-center text-white bg-[#0044cc] border-none rounded-lg shadow-[5px_5px_5px_rgba(0,0,0,0.25)] font-bold text-[1rem] cursor-pointer ">
@@ -204,11 +218,6 @@ export default function UserTypingReport() {
                         </div>
                     </div>
                 </div>
-                <div className='fixed md:bottom-[4%] bottom-[5%] md:right-[13%] right-[10%] border-solid'>
-                <button type="button" className='flex justify-center items-center w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] text-[20px] text-center sm:text-[35px] text-white bg-police-blue hover:bg-[#0022AA] rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)]  '>
-                    <FontAwesomeIcon icon={faMicrophone}/> 
-                </button> 
-            </div>
             </form>
             <form action={formAction}>
                 <input type="file" hidden ref={ fileRef } name="audio"/>

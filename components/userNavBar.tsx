@@ -33,7 +33,7 @@ export default function UserNavBar() {
             <div className="flex justify-between items-center px-2 shadow-bottom-custom-blue bg-[#303091] h-[50px] fixed top-2 left-2 right-2 rounded-lg z-50 ">
                 {/* LOGO & TITLE */}
                 <div className="flex items-center justify-start">
-                    <Link href="user/" className="flex items-center">
+                    <Link href="/user/" className="flex items-center">
                         <Image src="/Images/navbarlogo.png" alt="Logo" className="w-9 h-9 rounded-lg mr-3" height={50} width={50}/>
                         <div className="text-white text-2xl mb-[2px] font-bold">
                             P.R.A.S

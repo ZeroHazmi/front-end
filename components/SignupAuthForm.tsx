@@ -27,8 +27,6 @@ const SignupAuthForm = () => {
     const [role, setRole] = useState("");
     const [token, setToken] = useState("");
     const [registered, setRegistered] = useState(false);
-    const [repassword, setRepassword] = useState("");
-    const [reemail, setReemail] = useState("");
     // Watch the selected state
     const router = useRouter();
     const {toast} = useToast();
@@ -37,9 +35,9 @@ const SignupAuthForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
-            password: '',
-            repassword: '',  // Make sure this is defined as an empty string or other default value
+            userName: "",
+            password: "",
+            repassword: "",
             birthday: "",
             gender: "",
             nationality: "",
@@ -53,18 +51,18 @@ const SignupAuthForm = () => {
             state: "",
             region: "",
             email: "",
-            reemail: "",  // Same here
             icNumber: ""
         },
     });
 
     const {watch} = form;
     const selectedState = watch('state');
+    
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log("Attempting to submit form");
         setIsLoading(true);
         // Perform validation checks before proceeding
-        const { repassword, reemail, ...filteredValues } = values;
+        const { repassword, ...filteredValues } = values;
 
         try {
             const response = await registerUser(filteredValues);
@@ -129,7 +127,6 @@ const SignupAuthForm = () => {
         <section>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
                     {/* MAIN CONTAINER */}
                     <div className='w-[1200px] flex flex-wrap justify-center items-center mt-[15vh]'>
                         {/* TITLE CONTAINER */}
@@ -141,10 +138,10 @@ const SignupAuthForm = () => {
                         {/* CONTAINERS 1&2 */}
                         <div className="max-w-[1200px] min-w-[550px] flex justify-center items-center flex-wrap gap-5 mb-5">
                             <div className="w-[550px] bg-white  rounded-lg shadow-left-custom-blue p-4">
-                                <RegisterCustomInput control={form.control} name='icnumber' label="IC Number" placeholder='Enter your IC' id='ic-input'/>
-                                <ICScanner />
+                                <RegisterCustomInput control={form.control} name='icNumber' label="IC Number" placeholder='Enter your IC' id='ic-input'/>
+                                {/* <ICScanner /> */}
                                 {/* add file picker beside IC input */}
-                                <RegisterCustomInput control={form.control} name='username' label="Username" placeholder='Enter your username' id='username-input'/>
+                                <RegisterCustomInput control={form.control} name='userName' label="Username" placeholder='Enter your username' id='username-input'/>
                                 <RegisterCustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' id='password-input'/>
                                 <RegisterCustomInput control={form.control} name='repassword' label="Re-enter Password" placeholder='Enter your typed password' id='repassword-input'/>
                                 <RegisterCustomInput control={form.control} name='phoneNumber' label="Phone Number" placeholder='Enter your phone number' id='phone-input'/>
@@ -168,7 +165,6 @@ const SignupAuthForm = () => {
                                 <SelectInput control={form.control} name='state' label="States" placeholder='Select a State' id='state-input' options={states} />
                                 <SelectInput control={form.control} name='region' label="Districts" placeholder='Select a district' id='district-input' options={district}  />
                                 <RegisterCustomInput control={form.control} name='email' label="Email" placeholder='Enter your email' id='email-input'/>
-                                <RegisterCustomInput control={form.control} name='reemail' label="Re-enter Email" placeholder='Double check your email' id='reemail-input'/>
                             </div>
                             <div className="flex justify-around items-center w-[550px] bg-white rounded-lg shadow-bottom-custom-blue p-4">
                             <div className="flex flex-col justify-center items-center gap-4">
@@ -187,8 +183,6 @@ const SignupAuthForm = () => {
                                 <Button type='button' onClick={returnToLogin} className='btn-secondary'>Back</Button>
                             </div>
                         </div>
-
-
                     </div>
                 </form>
             </Form>

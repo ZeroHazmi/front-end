@@ -7,8 +7,6 @@ import { z } from 'zod'
 import { loginFormSchema } from '@/lib/utils'
 import { CustomInput } from '@/types'
 
-const formSchema = loginFormSchema()
-
 const LoginCustomInput = ({ control, name, label, placeholder, id }: CustomInput) => {
   return (
     <FormField
