@@ -12,9 +12,9 @@ export default function SignUpPage(){
                         <SignupAuthForm />
                     </div>   
                 </div>
-                <div className="mt-[1vh]">
+                {/* <div className="mt-[1vh]">
                     If there are any problems while using the Ai Police Reporting system, please email the IT department: zalhazmi@gmail.com
-                </div>
+                </div> */}
             </div>
         </div>
     );

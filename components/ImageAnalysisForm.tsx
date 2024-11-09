@@ -6,26 +6,23 @@ import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import axios from 'axios';
 
-interface ICScannerFields {
-  issuingCountry: string; // "Malaysia"
-  issuingState?: string; // Not provided in the sample, but could be added
-  issuingStateCode?: string; // Not provided, could be used if needed
-  fullName: string; // "ZAL HAZMI BIN MUSRIZAL"
-  documentNumber: string; // "041107-05-0253"
-  checkDigit?: string; // Not available in the sample
-  nationality?: string; // Not provided, could be derived if available
-  dateOfBirth: string; // "04-11-07"
-  sex: string; // "male"
-  dateOfExpiry?: string; // Not provided, could be inferred or added if available
-  issuingDate?: string; // Not provided
-  address?: string; // "NO 308 JALAN GEMILANG 12 TAMAN GEMILANG 09600 LUNAS KEDAH"
-  addressFields?: { postalCode: string, state: string }; // { postalCode: '09600', state: 'KEDAH' }
-  religion?: string; // "Islam"
-  personalNumber?: string; // Not available in the sample
-  finalCheckDigit?: string; // Not available in the sample
+export interface ICScannerFields {
+    documentNumber: string;
+    fullName: string;
+    dateOfBirth: string;
+    gender: string;
+    address: string;
+    addressFields?: {
+        postalCode: string;
+        state: string;
+    };
+    nationality: string;
+    religion: string;
 }
 
-
+interface ICScannerProps {
+    onScanComplete: (data: ICScannerFields) => void;
+}
 
 interface ICScannerResponse {
     status: number;
@@ -36,11 +33,7 @@ interface ICScannerResponse {
     fields: ICScannerFields;
 }
 
-interface ICScannerProps {
-    apiKey?: string;
-}
-
-const ICScanner = ({ apiKey }: ICScannerProps) => {
+const ICScanner: React.FC<ICScannerProps> = ({ onScanComplete }) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [scanResults, setScanResults] = useState<ICScannerResponse | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -74,32 +67,29 @@ const ICScanner = ({ apiKey }: ICScannerProps) => {
             const formData = new FormData();
             formData.append('file', selectedFile);
             formData.append('type', 'idcard');
-            formData.append('key', process.env.NEXT_PUBLIC_PIXLAB_API_KEY!);
+            formData.append('key', PIXLAB_API_KEY!);
             formData.append('country', 'Malaysia');
 
-            // Make POST request with FormData
-            const response = await axios.post('https://cors-anywhere.herokuapp.com/https://api.pixlab.io/docscan', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axios.post(
+                'https://cors-anywhere.herokuapp.com/https://api.pixlab.io/docscan',
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
 
             const data = response.data;
-console.log(data)
             if (data.status !== 200) {
-                throw new Error(data.error || 'Failed to scan passport');
+                throw new Error(data.error || 'Failed to scan IC');
             }
+            console.log(data);
 
-            setScanResults(data);
+            onScanComplete(data.fields); // Pass scanned fields to callback
+
         } catch (err) {
-            let errorMessage = 'An unknown error occurred';
-            if (err instanceof Error) {
-                errorMessage = err.message;
-                if (errorMessage.includes('Network Error')) {
-                    errorMessage = 'CORS Error: Unable to access the API. Please check CORS configuration.';
-                }
-            }
-            setError(errorMessage);
+            setError('An error occurred while scanning.');
         } finally {
             setIsLoading(false);
         }
@@ -108,7 +98,7 @@ console.log(data)
     return (
         <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle>Passport Scanner</CardTitle>
+                <CardTitle>IC Scanner</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
@@ -119,7 +109,7 @@ console.log(data)
                             type="button"
                         >
                             <Upload className="mr-2 h-4 w-4" />
-                            Select Passport Image
+                            Select IC Image
                         </Button>
                         <input
                             id="fileInput"
@@ -134,7 +124,7 @@ console.log(data)
                             variant="default"
                             type="button"
                         >
-                            {isLoading ? 'Scanning...' : 'Scan Passport'}
+                            {isLoading ? 'Scanning...' : 'Scan IC'}
                         </Button>
                     </div>
                 </div>

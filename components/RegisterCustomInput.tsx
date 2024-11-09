@@ -10,7 +10,7 @@ const RegisterCustomInput = ({ control, name, label, placeholder, id }: CustomIn
       control={control}
       name={name}
       render={({ field }) => (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full mb-2 mt-2">
           {/* Wrapper div to hold label and input side by side */}
           <div className="flex items-center space-x-4">
             <FormLabel className="flex-none w-1/4">

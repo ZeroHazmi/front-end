@@ -92,5 +92,7 @@ interface CustomSelectInput {
 	label: string;
 	placeholder: string;
 	options: Record<string, string> | string[];
+	setValue?: UseFormSetValue<z.infer<typeof formSchema>>;
+	// setValue?: Record<string, string> | string[];
 	id?: string;
 }

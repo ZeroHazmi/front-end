@@ -129,3 +129,19 @@ export const getDistricts = (state: string) => {
 			return [];
 	}
 };
+
+export const convertBirthdayFormat = (birthday: string): string => {
+	// Split the input date (DD-MM-YY) into day, month, and year parts
+	const [day, month, year] = birthday.split('-');
+
+	// Determine whether to prepend '20' or '19' based on the value of the year
+	const fullYear =
+		year.length === 2
+			? parseInt(year) < 50
+				? `20${year}`
+				: `19${year}`
+			: year;
+
+	// Return the date in the format DD-MM-YYYY
+	return `${day}-${month}-${fullYear}`;
+};
