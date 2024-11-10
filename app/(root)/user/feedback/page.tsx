@@ -13,7 +13,6 @@ export default function UserFeedbackAndRating () {
     return (
         <div className="flex justify-center items-center  bg-[#f2f2f2]">
             <form action="">
-                <PHNavBar />
                 <div className="flex justify-center items-center min-h-screen">
                     <div className="bg-white w-[500px] p-8 rounded-lg  shadow-custom-blue">
                         <div className="text-center text-xl font-bold mb-3">

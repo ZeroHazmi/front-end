@@ -1,149 +1,215 @@
 'use client'
 
-import React, {useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PHNavBar from "@/components/PHNavBar";
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-// import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
-//import MapComponent from '../../../components/map';
+import { useParams, useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleArrowUp, faMicrophone, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleArrowUp, faMicrophone, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ReportType } from "@/types/index.d";
-import { report } from "process";
 import Recorder, { mimeType } from "@/components/Recorder";
 import { useFormState } from "react-dom";
+import OpenAIApi, { OpenAI } from "openai";
 import transcribe from "@/actions/transcribe";
 import GoogleMaps from "@/components/GoogleMap";
 import MapForm from "@/components/MapForm";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, ArrowRight, Mic } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
+import { cookies } from "next/headers";
+import { fetchPriority } from "@/app/api/open-ai/route";
+import { toast } from "@/hooks/use-toast";
+
+// Types
+type LocationState = {
+  address: string;
+  date: Date;
+  time: number;
+};
+
+type Message = {
+  sender: string;
+  message: string;
+  id: string;
+};
 
 const initialState = {
-    sender: "",
-    message: "",
-}
-
-export type Message = {
-    sender: string;
-    message: string;
-    id: string;
-}
+  sender: "",
+  message: "",
+};
 
 export default function UserTypingReport() {
     const [reportType, setReportType] = useState<ReportType | null>(null);
     const [templateFields, setTemplateFields] = useState<[string, string][]>([]);
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const [textareaContent, setTextareaContent] = useState<string>("");
+    const [isEditable, setIsEditable] = useState(false);
+
     const router = useRouter();
     const { reporttype } = useParams();
     const reportTypeID = reporttype as string;
+    const reportTypeName = reportType?.name;
 
     const fileRef = useRef<HTMLInputElement | null>(null);
     const submitButtonRef = useRef<HTMLButtonElement | null>(null);
-    const[state, formAction] = useFormState(transcribe, initialState);
+    const [state, formAction] = useFormState(transcribe, initialState);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+    const [location, setLocation] = useState<LocationState>({
+      address: '',
+      date: new Date(),
+      time: 0,
+    });
 
+    // Fetch report type data
     async function fetchReportType() {
-        const response = await fetch(`http://localhost:5035/api/reporttype/${reportTypeID}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await response.json();
-        return data;
-    }
-
-    async function renderReport() {
         try {
-            const reportTypeData = await fetchReportType();
-            console.log("Report Type Data:", reportTypeData);
-            setReportType(reportTypeData);
-            
-            // Ensure templateStructure is parsed only if it's a string
-            let parsedTemplate = {};
-            if (typeof reportTypeData.templateStructure === 'string') {
-                parsedTemplate = JSON.parse(reportTypeData.templateStructure);
-            } else {
-                parsedTemplate = reportTypeData.templateStructure; // In case it's already an object
-            }
-            console.log("Parsed Template:", parsedTemplate);
-
-            const fields = Object.entries(parsedTemplate).map(([key, value]) => {
-                return [key, typeof value === 'string' ? value : String(value)] as [string, string];
+            const response = await fetch(`http://localhost:5035/api/reporttype/${reportTypeID}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
-            console.log("Fields:", fields);
-            setTemplateFields(fields);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch report type');
+            }
+
+            const data = await response.json();
+            setReportType(data);
             setLoading(false);
-        } catch (parseError) {
+        } catch (error) {
             setLoading(false);
+            console.error('Error fetching report type:', error);
         }
     }
 
-    const uploadAudio = ( blob: Blob ) => {        
+    // async function renderReport() {
+    //     try {
+    //         const reportTypeData = await fetchReportType();
+    //         setReportType(reportTypeData);
+
+    //         let parsedTemplate = {};
+    //         if (typeof reportTypeData.templateStructure === 'string') {
+    //             parsedTemplate = JSON.parse(reportTypeData.templateStructure);
+    //         } else {
+    //             parsedTemplate = reportTypeData.templateStructure;
+    //         }
+
+    //         const fields = Object.entries(parsedTemplate).map(([key, value]) => {
+    //             return [key, typeof value === 'string' ? value : String(value)] as [string, string];
+    //         });
+
+    //         setTemplateFields(fields);
+    //         setLoading(false);
+    //     } catch (parseError) {
+    //         setLoading(false);
+    //         console.error('Error fetching report type:', parseError);
+    //     }
+    // }
+
+    const uploadAudio = (blob: Blob) => {
         const file = new File([blob], "audio.webm", { type: mimeType });
 
-        // Set the file as the value of the file input field
-        if (fileRef.current){
+        if (fileRef.current) {
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             fileRef.current.files = dataTransfer.files;
 
-            //simulate a click
-            if (submitButtonRef.current){
+            if (submitButtonRef.current) {
                 submitButtonRef.current.click();
             }
         }
-    }
+    };
 
+    // Create report
+    const createReport = async () => {
+      try {
+          setSubmitting(true);
+
+          if (!reportTypeID || !reportTypeName) {
+              console.error('Missing report type information');
+          }
+
+          if (!textareaContent.trim()) {
+              console.error('Report content cannot be empty');
+          }
+
+          if (!location.address) {
+              console.error('Location is required');
+          }
+
+          const reportData = {
+            reportTypeID,
+            reportContent: textareaContent,
+            reportTypeName,
+            location: location.address,
+            date: location.date,
+            time: location.time,
+        };
+
+          const response = await fetch('/api/create-report', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(reportData),
+          });
+
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'Failed to create report');
+          }
+
+          toast({
+              title: "Success",
+              description: "Report submitted successfully",
+          });
+
+          setIsConfirmDialogOpen(false);
+          router.push('/user');
+      } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Error creating report';
+          toast({
+              title: "Error",
+              description: errorMessage,
+              variant: "destructive",
+          });
+      } finally {
+          setSubmitting(false);
+      }
+    };
+
+    // useEffect(() => {
+    //     renderReport();
+    // }, [reportTypeID]);
+
+// Effects
     useEffect(() => {
-        console.log("Report Type ID:", reportTypeID);
-        renderReport();
-        
+        fetchReportType();
     }, [reportTypeID]);
 
     useEffect(() => {
-        if (state.message && state.sender){
-            setMessages((messages) => [
-                ...messages,
+        if (state.message) {
+            const newMessage = `${state.message}\n`;
+            setTextareaContent((prevContent) => prevContent + newMessage);
+            setMessages((prev) => [
                 {
                     sender: state.sender,
                     message: state.message,
-                    id: `${Date.now()}-${Math.random()}`
-                },
-                ...messages
-            ]);
-        }
-    }, [state.message, state.sender]);
-
-    useEffect(() => {
-        if (state.message) {
-            const newMessage = `${state.message}\n`; // Only the message without sender
-            setMessages((messages) => [
-                {
-                    sender: state.sender, // Keep the sender in the messages state
-                    message: state.message,
                     id: `${Date.now()}-${Math.random()}`,
                 },
-                ...messages,
+                ...prev,
             ]);
-            setTextareaContent((prevContent) => prevContent + newMessage); // Append to the textarea content
-            setMessages([])
         }
     }, [state.message, state.sender]);
 
-    useEffect(() => {
-        // Retrieve the text from sessionStorage when the component is mounted
-        const savedText = sessionStorage.getItem("textareaContent");
-        if (savedText) {
-            setTextareaContent(savedText);
-        }
-    }, []);
-    
-    useEffect(() => {
-        // Save the text to sessionStorage whenever it changes
-        sessionStorage.setItem("textareaContent", textareaContent);
-    }, [textareaContent]);
 
     // Split template fields into two columns
     const halfLength = Math.ceil(templateFields.length / 2);
@@ -153,77 +219,77 @@ export default function UserTypingReport() {
     return (
         <div className="flex flex-row justify-center items-center bg-[#f2f2f2]">
             <form action="">
-                <PHNavBar />
-                <div className="w-[100%] h-[100%] text-center p-20 pt-3vh pb-2vh "> {/* min-h-screen */}
+                <div className="w-[100%] h-[100%] text-center p-20 pt-3vh pb-2vh">
                     <div className="font-bold text-6xl max-w-[1200px] text-center text-[500%] p-20 ">
-                        Typing Report
+                        {reportTypeName} Report
                     </div>
-                    {/* MAP CONTAINER*/}
-                    {/* LOCATION OF REPORT */}
-                    <MapForm />
-                    <div className="flex flex-col md:flex-row md:gap-5 justify-between m-[20px] mx-auto gap-5 items-center text-left">
-                        {/* LEFT FORM */}
-                        <div className="w-[550px] h-[375px] p-2 bg-white border-solid rounded-lg shadow-left-custom-blue">
-                            <div className="flex flex-wrap w-[534px] h-[350px] items-center justify-center mt-1">
-                                    {firstColumn.map(([key, value], index) => (
-                                        <div key={index} className="flex flex-col w-full mb-4">
-                                            <label className="w-[190px] leading-[normal]">{key}:</label>
-                                            <input 
-                                                type="text" 
-                                                name={key} 
-                                                placeholder={value} 
-                                                className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid p-2 border-[#696969]" 
-                                            />
-                                        </div>
-                                    ))}
-                            </div>
-                        </div>
-                        {/* RIGHT FORM */}
-                        <div className="w-[550px] h-[375px] p-2 bg-white border-solid rounded-lg shadow-right-custom-blue">
-                            <div className="flex flex-wrap w-[534px] h-[350px] items-center justify-center mt-1">
-                                {secondColumn.map(([key, value], index) => (
-                                    <div key={index} className="flex flex-col w-full mb-4">
-                                        <label className="w-[190px] leading-[normal]">{key}:</label>
-                                        <input 
-                                            type="text" 
-                                            name={key} 
-                                            placeholder={value} 
-                                            className="relative w-[300px] h-[35px] bg-white rounded-lg border border-solid p-2 border-[#696969]" 
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                    {/* CHAT CONTAINER */}
-                    <div className="w-[1120px] text-justify rounded-lg  bg-white shadow-bottom-custom-blue p-8">
-                        <div className="flex overflow-y-auto max-h-[350px] rounded-lg border border-solid border-[#696969]">
-                            {/* CHANGE TO TEXT AREA!!! */}
-                            <textarea
-                                className="w-full px-[15px] justify-center"
-                                name="converted-speech-textarea"
-                                value={textareaContent} // Bind the textarea value to the state
-                                onChange={() => {}} // Optional: If you want to prevent editing, leave this empty
-                            ></textarea>
 
-                        </div>
-                        <div className="flex justify-around items-center border border-sky-500"> {/* need re-adjust position */}
-                            <button className="w-[200px] h-[35px] flex items-center justify-center text-white bg-[#0044cc] border-none rounded-lg shadow-[5px_5px_5px_rgba(0,0,0,0.25)] font-bold text-[1rem] cursor-pointer ">
-                                Proceed
-                            </button>
-                            <button className="w-[200px] h-[35px] flex items-center justify-center text-white bg-[#0044cc] border-none rounded-lg shadow-[5px_5px_5px_rgba(0,0,0,0.25)] font-bold text-[1rem] cursor-pointer " 
-                            onClick={() => router.push('..')}>
-                                Return
-                            </button>
-                        </div>
+                    {/* MAP CONTAINER */}
+                    <MapForm onLocationChange={(address, date, time) => setLocation({ address, date, time })}/>
+
+                    {/* One button to enable edit */}
+                    {/* By default the textarea is not editable */}
+                    <Card className="mb-8">
+                        <CardContent className="p-6">
+                            <Label htmlFor="report-content">Report Content</Label>
+                            <textarea
+                                id="report-content"
+                                className="w-full h-64 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none resize-none"
+                                value={textareaContent}
+                                onChange={(e) => setTextareaContent(e.target.value)}
+                                placeholder="Type or dictate your report here..."
+                                disabled={!isEditable} // Disable the textarea if not editable
+                            ></textarea>
+                            <Button
+                                type="button"
+                                className={`w-[20%] text-white ${isEditable ? 'bg-red-500 hover:bg-red-600' : 'bg-police-blue hover:bg-[#0022AA]'} mt-4`}
+                                onClick={() => setIsEditable(!isEditable)}
+                            >
+                                {isEditable ? 'Stop Editing' : 'Edit'}
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <div className="flex justify-between items-center">
+                        <Button onClick={() => router.push('/user/')} className="text-white bg-police-blue hover:bg-[#0022AA]">
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Return
+                        </Button>
+                        <Button type="button" className="text-white bg-police-blue hover:bg-[#0022AA]" onClick={() => setIsConfirmDialogOpen(true)}>
+                            Confirm <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
             </form>
+
             <form action={formAction}>
-                <input type="file" hidden ref={ fileRef } name="audio"/>
-                <button type="submit" hidden ref={ submitButtonRef } name="submit"/>
-                <Recorder uploadAudio={uploadAudio}/>
+                <input type="file" hidden ref={fileRef} name="audio" />
+                <button type="submit" hidden ref={submitButtonRef} name="submit" />
+                <Recorder uploadAudio={uploadAudio} />
             </form>
-        </div> 
+
+            <ConfirmDialog isConfirmDialogOpen={isConfirmDialogOpen} setIsConfirmDialogOpen={setIsConfirmDialogOpen} onConfirm={createReport} />
+        </div>
     );
-};
+}
+
+function ConfirmDialog({ isConfirmDialogOpen, setIsConfirmDialogOpen, onConfirm }: { 
+    isConfirmDialogOpen: boolean, 
+    setIsConfirmDialogOpen: (value: boolean) => void,
+    onConfirm: () => void 
+}) {
+    const handleClose = () => setIsConfirmDialogOpen(false);
+
+    return (
+        <Dialog open={isConfirmDialogOpen} onOpenChange={handleClose} aria-label="Confirmation Dialog">
+            <DialogTitle className="text-xl font-semibold" hidden>Confirm Submission</DialogTitle>
+            <DialogOverlay className="fixed inset-0 z-50 bg-black opacity-50" />
+            <DialogContent className="fixed top-[30%] left-[50%] transform -translate-x-[50%] bg-white p-8 rounded-md shadow-md max-w-lg">
+                <p>Are you sure you want to submit this report?</p>
+                <div className="flex justify-between mt-4">
+                    <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                    <Button variant="default" onClick={onConfirm}>Confirm</Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}

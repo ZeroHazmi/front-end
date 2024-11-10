@@ -6,6 +6,8 @@ import { useFormStatus } from 'react-dom';
 import { profile } from 'console';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
+import { Button } from '@/components/ui/button';
+import { Mic } from 'lucide-react';
 
 export const mimeType = "audio/webm";
 
@@ -72,29 +74,31 @@ function Recorder({uploadAudio}: {uploadAudio: (blob:Blob) => void}){
     }
 
   return (
-    <div className='fixed bottom-[5%] right-[10%] md:right-[13%] md:bottom-[4%] border-solid'>
+    <div className='fixed bottom-[5%] left-1/2 transform -translate-x-1/2 md:bottom-[4%] border-solid'>
         {!permission && (
-            <button onClick={getMicrophonePermission}> Get Microphone</button>
+            <Button onClick={getMicrophonePermission}>
+                        <Mic className="mr-2 h-4 w-4" /> Get Microphone
+            </Button>
         )} 
 
         {pending && (
-            <button className="flex justify-center items-center w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] text-[20px] text-center sm:text-[35px] text-white bg-police-blue hover:bg-[#0022AA] rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)] greyscale">
-                <FontAwesomeIcon icon={faMicrophone} />
-            </button>
+            <Button onClick={getMicrophonePermission} className='greyscale text-white bg-police-blue hover:bg-[#0022AA]'>
+                        <Mic className="mr-2 h-4 w-4" /> Pending
+            </Button>
         )}
             
         {
             permission && recordingStatus === "inactive" && !pending && (
-                <button className="flex justify-center items-center w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] text-[20px] text-center sm:text-[35px] text-white bg-police-blue hover:bg-[#0022AA] rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)]" onClick={startRecording} >
-                    <FontAwesomeIcon icon={faMicrophone} />
-                </button>
+                <Button onClick={startRecording} className='greyscale text-white bg-police-blue hover:bg-[#0022AA]' >
+                    <Mic className="mr-2 h-4 w-4" /> Microphone
+                </Button>
             )
         }        
         {
             recordingStatus === "recording" && (
-                <button className="flex justify-center items-center w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] text-[20px] text-center sm:text-[35px] text-white bg-red-600 rounded-full shadow-[0px_20px_75px_rgba(0,68,204,1)]" onClick={stopRecording}  >
-                    <FontAwesomeIcon icon={faMicrophone} />
-                </button>
+                <Button onClick={stopRecording} className='greyscale text-white text-white bg-red-600 rounded-full' >
+                    <Mic className="mr-2 h-4 w-4" /> Recording
+                </Button>
             )
         }
                 
@@ -104,3 +108,5 @@ function Recorder({uploadAudio}: {uploadAudio: (blob:Blob) => void}){
 }
 
 export default Recorder
+
+

@@ -16,7 +16,6 @@ export default function UserSpeechToTextConversation () {
     return (
         <div className="flex flex-row justify-center items-center bg-[#f2f2f2] ">
             <form action="">
-                <PHNavBar />
                 <div className="w-[100%] h-[100%] text-center p-20 pt-3vh pb-2vh "> {/* min-h-screen */}
                     <div className="font-bold text-6xl max-w-[1200px] text-center text-[500%] p-20 ">
                         Ai Speech Report

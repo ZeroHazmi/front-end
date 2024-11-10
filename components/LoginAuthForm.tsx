@@ -53,12 +53,15 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
                     setRole(decodedRole);
                 }
                 setLoginSuccess(true);
+                toast({ title: "Login Successful", description: "You have been logged in." });
+
                 console.log("Login Successful:", response);
             }
           
         } catch (error: any) {
             console.error("Login Failed:", error);
-            toast({ title: "Login Failed" });
+            toast({ title: "Login Unsuccessful", description: "You have not logged in.", variant: "destructive" });
+
         } finally {
             setIsLoading(false);
         }
@@ -73,8 +76,6 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
             setCookie('session', token);
             setCookie('roles', role);
             
-            toast({ title: "Login Successful", description: "You have been logged in." });
-
             const redirectTimeout = setTimeout(() => {
                 if (role === 'User') {
                     console.log("Route:", "Within Role User Checker");
@@ -85,6 +86,8 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
             }, 2000); // 2-second delay
     
             return () => clearTimeout(redirectTimeout);
+        }else{
+            console.log("Login Failed");
         }
     }, [loginSuccess, token, role]);
 

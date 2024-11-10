@@ -10,7 +10,6 @@ import UserNavBar from '@/components/userNavBar';
 export default function FrequentlyAskedQuestions () {
     return (
         <div className='flex justify-center items-center min-w-[375px] max-w-[1200px] mx-auto mt-[15vh]'> {/* PAGE BODY */}
-        <UserNavBar />
             {/* CONTAINER */}
             <div className='mx-2'>
                 {/* TITLE */}

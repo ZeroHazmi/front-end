@@ -7,7 +7,6 @@ import Image from 'next/image';
 export default function UserProfile () {
     return (
         <div className="flex justify-center items-center "> {/* PAGE BODY */}
-            <PHNavBar/>
             {/* MAIN CONTAINER */}
             <div className="w-[1200px] flex flex-wrap justify-center items-center mt-[15vh]">
                 {/* PAGE TITLE */}

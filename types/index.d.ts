@@ -42,9 +42,13 @@ export interface Report {
 export interface ReportDetail {
 	id: number;
 	reportTypeId: number;
+	date: Date;
+	location: string;
+	time: string;
 	fieldValue: string; // Store JSON string, parse as needed
 	audio: string;
 	image: string;
+	transcript: string;
 	reportType: ReportType;
 }
 

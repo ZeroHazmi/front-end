@@ -12,7 +12,6 @@ export default function IssueTrackingManagement(){
 
     return (
         <form action="">
-            <PHNavBar/>
             {/* PAGE BODY */}
             <div className="flex justify-center items-center mt-[175px]"> {/* min-h-screen: center */}
                 {/* TABLE CONTAINER */}

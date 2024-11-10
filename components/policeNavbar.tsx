@@ -6,7 +6,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
-import '../globals.css';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
+import { ChevronDown, UserCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { removeCookie } from "@/app/lib/auth";
 
 export default function PoliceNavBar() {
     const router = useRouter(); // Next.js's rounter hook for router object | componenet navigation/route handling in component
@@ -15,7 +25,8 @@ export default function PoliceNavBar() {
     // setHamburgerOpen function update the hamburgerOpen false to true / true to false
 
     const logout = () => {
-        localStorage.removeItem('token'); // Remove the token from local storage
+        removeCookie("session");
+        removeCookie("roles");
         // Redirect to the login page
         router.push('/login'); // Adjust the path based on your routes
     };
@@ -27,7 +38,7 @@ export default function PoliceNavBar() {
     return (
         <nav>
             {/* STANDARD BACKGROUND */}
-            <div className="flex justify-between items-center px-2 shadow-bottom-custom-blue bg-[#303091] h-[50px] fixed top-2 left-2 right-2 rounded-lg z-50 ">
+            <div className="flex justify-between items-center px-2 shadow-bottom-custom-blue bg-[#303091] h-[50px] fixed top-2 left-2 right-2 rounded-lg z-50 text-white ">
                 {/* LOGO & TITLE */}
                 <div className="flex items-center justify-start">
                     <Link href="/user/report-submission" className="flex items-center">
@@ -46,21 +57,53 @@ export default function PoliceNavBar() {
                 </label>
                 
                 {/* LINK */}
-                <div className="hidden sm:flex items-center gap-8 text-white font-medium ">
-                    <Link href="/user/communication" className="cursor-pointer">
+                <div className="flex items-center space-x-6">
+                    <Link href="/police/" className="hover:text-gray-200">
+                        Dashboard
+                    </Link>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="flex items-center hover:text-gray-200">
+                        Reports <ChevronDown className="ml-1 h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                        <DropdownMenuItem>
+                            <Link href="/police/reports/create">Create Report</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Link href="/police/reports/view">View Reports</Link>
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Link href="/police/user" className="hover:text-gray-200">
+                        Users
+                    </Link>
+                    <Link href="/police/communication" className="hover:text-gray-200">
                         Communication
                     </Link>
-                    <Link href="/user/faq" className="cursor-pointer">
+                    <Link href="/police/faq" className="hover:text-gray-200">
                         FAQ
                     </Link>
-                    <div className="flex items-center gap-2">
-                        <button type="button" onClick={logout}  className="w-40 h-8 bg-red-500 text-white hover:bg-red-700 hover:text-white rounded-lg font-semibold cursor-pointer mr-3 shadow-[5px_5px_5px_rgba(0,0,0,0.25)]">
-                            Logout
-                        </button>
-                        <Link href="/user/profile" className="cursor-pointer">
-                            <Image src="https://via.placeholder.com/30x30" className="w-9 h-9 rounded-lg" alt="User"  height={30} width={30}/>
-                        </Link>
-                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="flex items-center hover:text-gray-200">
+                        Admin <ChevronDown className="ml-1 h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                        <DropdownMenuItem>
+                            <Link href="/police/admin/add-police">Add Police</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Link href="/police/admin/settings">Settings</Link>
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button
+                        onClick={logout}
+                        variant="destructive"
+                        className="bg-red-500 hover:bg-red-600"
+                    >
+                        Logout
+                    </Button>
+                        <UserCircle className="w-8 h-8 cursor-pointer" />
                 </div>
             </div>
             
