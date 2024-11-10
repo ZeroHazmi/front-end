@@ -13,7 +13,7 @@ type ReportRequest = {
 	reportContent: string;
 	reportTypeName: string;
 	location: string;
-	date: Date;
+	date: string;
 	time: number;
 };
 
@@ -23,7 +23,7 @@ type ReportData = {
 	priority: string;
 	reportDetail: {
 		reportTypeId: string;
-		date: number;
+		date: string;
 		location: string;
 		time: number;
 		fieldValue: string;
@@ -57,84 +57,71 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Generate priority using OpenAI
-		const prompt = `Analyze the following report content and determine a priority level from Low, Medium, High, and Critical (where Low is lowest priority and Critical is highest priority) and provide only the value of the priority level which can be Low, Medium, High or Critical.\n\nReport: "${reportContent}\n\n${reportTypeName}"`;
+		// Generate random priority (Low, Medium, High, Critical)
+		const priorities = ['Low', 'Medium', 'High', 'Critical'];
+		const randomPriority =
+			priorities[Math.floor(Math.random() * priorities.length)];
 
-		try {
-			const priorityResponse = await openai.chat.completions.create({
-				model: 'gpt-4-turbo',
-				messages: [
-					{
-						role: 'system',
-						content:
-							'You are an assistant helping to prioritize police reports based on content analysis.',
-					},
-					{
-						role: 'user',
-						content: prompt,
-					},
-				],
-				max_tokens: 10,
-				temperature: 0.5,
-			});
+		// Convert the date string to a Date object and get the Unix timestamp (in seconds)
+		const dateObj = new Date(date); // Convert string to Date object
+		const dateTimestamp = dateObj.toISOString(); // Convert to ISO 8601 format
 
-			const priority =
-				priorityResponse.choices[0].message?.content?.trim() || 'Low';
-
-			
-
-			// Prepare report data
-			const reportData: ReportData = {
+		// Prepare report data
+		const reportData: ReportData = {
+			reportTypeId: reportTypeID,
+			status: 'Open',
+			priority: randomPriority,
+			reportDetail: {
 				reportTypeId: reportTypeID,
-				status: 'Open',
-				priority,
-				reportDetail: {
-					reportTypeId: reportTypeID,
-					date: date.getTime(),
-					location: location || '',
-					time: time,
-					fieldValue: '',
-					audio: '',
-					image: '',
-					transcript: reportContent,
+				date: dateTimestamp,
+				location: location || '',
+				time: time,
+				fieldValue: '{}',
+				audio: '',
+				image: '',
+				transcript: reportContent,
+			},
+		};
+
+		console.log('Report data:', reportData);
+
+		// Create report in backend API
+		const createReportResponse = await fetch(
+			'http://localhost:5035/api/report/create',
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json-patch+json',
+					Authorization: `Bearer ${authToken.value}`,
 				},
-			};
+				body: JSON.stringify(reportData),
+			},
+		);
 
-			console.log('Report data:', reportData);
+		const contentType = createReportResponse.headers.get('Content-Type');
 
-			// Create report in backend API
-			const createReportResponse = await fetch(
-				'http://localhost:5035/api/report/create',
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json-patch+json',
-						Authorization: `Bearer ${authToken.value}`,
-					},
-					body: JSON.stringify(reportData),
-				},
-			);
-
-			if (!createReportResponse.ok) {
-				const errorData = await createReportResponse.json();
-				console.error('Failed to create report:', errorData);
-				return NextResponse.json(
-					{ error: 'Failed to create report' },
-					{ status: createReportResponse.status },
-				);
-			}
-
+		if (!createReportResponse.ok) {
+			const errorMessage =
+				contentType && contentType.includes('application/json')
+					? await createReportResponse.json()
+					: await createReportResponse.text();
+			console.error('Failed to create report:', errorMessage);
 			return NextResponse.json(
-				{ success: true, message: 'Report created successfully' },
-				{ status: 200 },
-			);
-		} catch (openAiError) {
-			console.error('OpenAI API error:', openAiError);
-			return NextResponse.json(
-				{ error: 'Failed to analyze report priority' },
-				{ status: 500 },
+				{ error: 'Failed to create report' },
+				{ status: createReportResponse.status },
 			);
 		}
+
+		const responseBody =
+			contentType && contentType.includes('application/json')
+				? await createReportResponse.json()
+				: await createReportResponse.text();
+
+		console.log('Response:', responseBody);
+		return NextResponse.json(
+			{ success: true, message: 'Report created successfully' },
+			{ status: 200 },
+		);
 	} catch (error) {
 		console.error('Error processing request:', error);
 		return NextResponse.json(
