@@ -112,7 +112,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
                 </form>
             </Form>
 
-            <footer className="flex justify-center gap-1">
+            <footer className="flex justify-center gap-1 mt-2">
                 <p className="text-14 font-normal text-gray-600">
                     {type === 'sign-in'
                         ? "Don't have an account?"
