@@ -18,6 +18,7 @@ type ReportRequest = {
 };
 
 type ReportData = {
+	icNumber?: string;
 	reportTypeId: string;
 	status: string;
 	priority: string;

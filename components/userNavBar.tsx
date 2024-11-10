@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faUser, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import React from "react";
@@ -65,7 +65,7 @@ export default function UserNavBar() {
                             Logout
                         </button>
                         <Link href="/user/profile" className="cursor-pointer">
-                            <Image src="https://via.placeholder.com/30x30" className="w-9 h-9 rounded-lg" alt="User"  height={30} width={30}/>
+                            <FontAwesomeIcon icon={faUser} height={30} width={30}/>
                         </Link>
                     </div>
                 </div>

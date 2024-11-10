@@ -27,6 +27,7 @@ const SignupAuthForm = () => {
     const [role, setRole] = useState("");
     const [token, setToken] = useState("");
     const [registered, setRegistered] = useState(false);
+    const [userId, setUserId] = useState("");
     // Watch the selected state
     const router = useRouter();
     const {toast} = useToast();
@@ -76,6 +77,7 @@ const SignupAuthForm = () => {
                     const decodedRole = decodedToken.role.toString();
                     console.log("Role:", decodedRole);
                     setRole(decodedRole);
+                    setUserId(decodedToken.nameid);
                 }
                 setRegistered(true);
                 console.log("Registration Successful:", response);
@@ -128,6 +130,7 @@ const SignupAuthForm = () => {
 
             setCookie('session', token);
             setCookie('roles', role);
+            setCookie('userId', userId);
             
             toast({ title: "Register Successful", description: "You have successfully registered." });
 

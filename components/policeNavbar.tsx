@@ -27,6 +27,7 @@ export default function PoliceNavBar() {
     const logout = () => {
         removeCookie("session");
         removeCookie("roles");
+        
         // Redirect to the login page
         router.push('/login'); // Adjust the path based on your routes
     };

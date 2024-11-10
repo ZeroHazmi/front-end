@@ -132,7 +132,7 @@ export const getDistricts = (state: string) => {
 
 export const convertBirthdayFormat = (birthday: string): string => {
 	// Split the input date (DD-MM-YY) into day, month, and year parts
-	const [day, month, year] = birthday.split('-');
+	const [year, month, day] = birthday.split('-');
 
 	// Determine whether to prepend '20' or '19' based on the value of the year
 	const fullYear =

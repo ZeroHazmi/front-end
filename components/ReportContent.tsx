@@ -2,17 +2,20 @@ import { toast } from '@/hooks/use-toast';
 import { ReportType } from '@/types';
 import { faKeyboard, faMicrophoneLines } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileTextIcon, MicIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const ReportContent = () => {
     const router = useRouter();
     const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
     const [selectedReportType, setSelectedReportType] = useState<number>(0);
+    const [icNumber, setIcNumber] = useState<string>('');
+    const currentRoute = usePathname();
 
     async function fetchReportType() {
         const response = await fetch('http://localhost:5035/api/reporttype', {
@@ -26,13 +29,24 @@ const ReportContent = () => {
         setReportTypes(data);
     }
 
-    function newReportButton(e: React.MouseEvent){
+    function newReportButton(e: React.MouseEvent) {
         e.preventDefault();
-        if(selectedReportType === 0){
-            toast({ title: "Report Type", description: "Please select a valid report type" , variant: "destructive"});
+        if (selectedReportType === 0) {
+            toast({
+                title: "Report Type",
+                description: "Please select a valid report type",
+                variant: "destructive",
+            });
             return;
-        }else{
-            router.push(`user/new-report/${selectedReportType}`);
+        } else {
+            // Check the current route    
+            if (currentRoute.includes('police')) {
+                // If in the police route, navigate to the police-specific route
+                router.push(`/police/reports/create/${selectedReportType}`);
+            } else {
+                // If in the user route, navigate to the user-specific route
+                router.push(`/user/new-report/${selectedReportType}`);
+            }
         }
     }
 
@@ -86,6 +100,9 @@ const ReportContent = () => {
                             ))}
                         </SelectContent>
                     </Select>
+                    {/* {currentRoute.includes('police') && (
+                        <Input type="text" placeholder="Enter the IC Number of User" onChange={(e) => setIcNumber(e.target.value)}/>
+                    )} */}
                     <Button className="w-full sm:w-auto bg-[#0044cc]  text-white rounded-lg font-bold hover:bg-[#0022aa]" onClick={newReportButton}>
                         Start New Report
                     </Button>

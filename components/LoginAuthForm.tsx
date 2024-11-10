@@ -24,6 +24,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
     const [isLoading, setIsLoading] = useState(false);
     const formSchema = loginFormSchema();
     const [role, setRole] = useState("");
+    const [userId, setUserId] = useState("");
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -42,6 +43,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
         setIsLoading(true);
         try {
             const response = await login(values.username, values.password);
+            console.log("Response:", response);
 
             if (response){
                 setToken(response.token);
@@ -51,6 +53,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
                     const decodedRole = decodedToken.role.toString();
                     console.log("Role:", decodedRole);
                     setRole(decodedRole);
+                    setUserId(decodedToken.name);
                 }
                 setLoginSuccess(true);
                 toast({ title: "Login Successful", description: "You have been logged in." });
@@ -75,6 +78,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
 
             setCookie('session', token);
             setCookie('roles', role);
+            setCookie('userId', userId);
             
             const redirectTimeout = setTimeout(() => {
                 if (role === 'User') {
