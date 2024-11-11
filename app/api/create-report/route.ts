@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server';
-import { OpenAI } from 'openai';
 import { cookies } from 'next/headers';
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-	apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-});
 
 // Type definitions
 type ReportRequest = {
