@@ -39,7 +39,7 @@ const ICScanner: React.FC<ICScannerProps> = ({ onScanComplete }) => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const PIXLAB_API_KEY = process.env.NEXT_PUBLIC_PIXLAB_API_KEY;
+    const PIXLAB_API_KEY = process.env.PIXLAB_API_KEY;
 
     const handleFileSelect = (event: ChangeEvent<HTMLInputElement>): void => {
         const files = event.target.files;

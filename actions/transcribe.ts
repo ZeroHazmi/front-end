@@ -1,6 +1,5 @@
 'use server';
 import OpenAI from 'openai';
-import { AzureOpenAI } from 'openai';
 
 async function transcribe(prevState: any, formData: FormData) {
 	const file = formData.get('audio') as File;
@@ -15,7 +14,7 @@ async function transcribe(prevState: any, formData: FormData) {
 	console.log('>>>', file);
 
 	const openai = new OpenAI({
-		apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+		apiKey: process.env.OPENAI_API_KEY,
 	});
 
 	try {

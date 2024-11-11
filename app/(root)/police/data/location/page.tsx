@@ -19,7 +19,7 @@ const center = {
 function IncidentHeatmap() {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API!, // Replace with your Google Maps API Key
+    googleMapsApiKey: process.env.GOOGLE_MAP_API!, // Replace with your Google Maps API Key
     libraries: ['visualization'], // Required for HeatmapLayer
   });
 

@@ -34,7 +34,7 @@ const MapForm: React.FC<MapFormProps> = ({ onLocationChange }) => {
     });
 
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAP_API;  // Replace with your actual Google API key
+  const apiKey = process.env.GOOGLE_MAP_API;  // Replace with your actual Google API key
 
   // Callback function to handle the data from MapComponent
   const handleMapData = (lat: number, lng: number, address: string) => {

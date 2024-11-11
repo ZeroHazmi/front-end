@@ -11,9 +11,8 @@ import fs from 'fs';
 
 export async function analyzeImage(base64Image: string): Promise<string> {
 	// Initialize the OpenAI client
-	console.log(process.env.NEXT_PUBLIC_OPENAI_API_KEY);
 	const openai = new OpenAI({
-		apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+		apiKey: process.env.OPENAI_API_KEY,
 	});
 
 	try {
@@ -58,5 +57,3 @@ function blobToBase64(blob: Blob): Promise<string> {
 		reader.readAsDataURL(blob);
 	});
 }
-
-
