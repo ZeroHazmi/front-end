@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import UserNavBar from '@/components/userNavBar';
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
     return (
         <div>
             <UserNavBar />

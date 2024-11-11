@@ -6,14 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { loginFormSchema } from '@/lib/utils';
-import { decodeToken, removeCookie, setCookie } from '@/app/lib/auth';
+import { decodeToken, setCookie } from '@/app/lib/auth';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
 import { Form } from './ui/form';
 import LoginCustomInput from "@/components/LoginCustomInput";
-import { cookies } from 'next/headers';
 import { login } from '@/actions/user';
 
 const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
@@ -93,7 +92,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
         }else{
             console.log("Login Failed");
         }
-    }, [loginSuccess, token, role]);
+    }, [loginSuccess, token, role, router, userId]);
 
     return (
         <section className='w-full pl-4 pr-4'>

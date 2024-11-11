@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { use, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { set, z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -10,14 +10,13 @@ import {
 } from "@/components/ui/form"
 import RegisterCustomInput from './RegisterCustomInput'
 import { convertBirthdayFormat, getDistricts, signUpFormSchema } from '@/lib/utils';
-import { decodeToken, setCookie, removeCookie } from '@/app/lib/auth';
+import { decodeToken, setCookie } from '@/app/lib/auth';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { toast, useToast } from '@/hooks/use-toast';
-import { login, registerUser } from '@/actions/user';
+import { useToast } from '@/hooks/use-toast';
+import { registerUser } from '@/actions/user';
 import SelectInput from './SelectInput'
 import { gender, nationality, descendants, religion, states } from '@/types/constants'
-import { Router } from 'express'
 import ICScanner, { ICScannerFields } from './ImageAnalysisForm'
 
 const SignupAuthForm = () => {
@@ -144,7 +143,7 @@ const SignupAuthForm = () => {
             }, 2000); // 2-second delay
             return () => clearTimeout(redirectTimeout);
         }
-    }, [registered, token, role]);
+    }, [registered, token, role, router, userId, toast]);
 
     return (
         <section>

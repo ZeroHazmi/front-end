@@ -2,16 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import GoogleMaps from './GoogleMap';
 import { MapProvider } from '@/providers/map-provider';
 import { MapComponent } from './map';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { states } from '@/types/constants';
 
 interface MapFormProps {
-  onLocationChange: (address: string, date: Date, time: number) => void;
+  onLocationChange: (address: string, date: string, time: number) => void;
+}
+interface AddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
 }
 
 const MapForm: React.FC<MapFormProps> = ({ onLocationChange }) => {
@@ -48,7 +52,7 @@ const MapForm: React.FC<MapFormProps> = ({ onLocationChange }) => {
       });
   
       if (response.data.results.length > 0) {
-        const addressComponents = response.data.results[0].address_components;
+        const addressComponents: AddressComponent[] = response.data.results[0].address_components;
   
         // Extract address components
         // Map each component from the response to your state fields
@@ -88,16 +92,16 @@ const MapForm: React.FC<MapFormProps> = ({ onLocationChange }) => {
       if (!date) console.error("Date is null");
       if (time === null) console.error("Time is null");
     }
-  }, [markerData, date, time]);
+  }, [markerData, date, time, onLocationChange]);
 
     // Update time state when the input value changes
-    const handleTimeChange = (e) => {
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const timeValue = e.target.value; // Get the new value from the input
-      setTime(timeValue); // Update the state with the new time value
+      setTime(Number(timeValue)); // Update the state with the new time value
       console.log('Time selected:', timeValue); // Log the value to the console
     };
     // Update date state when the input value changes
-    const handleDateChange = (e) => {
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const dateValue = e.target.value; // Get the new value from the input
       setDate(dateValue); // Update the state with the new time value
       console.log('Time selected:', dateValue); // Log the value to the console

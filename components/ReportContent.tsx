@@ -1,14 +1,11 @@
 import { toast } from '@/hooks/use-toast';
 import { ReportType } from '@/types';
-import { faKeyboard, faMicrophoneLines } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useRouter, usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileTextIcon, MicIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 const ReportContent = () => {
     const router = useRouter();

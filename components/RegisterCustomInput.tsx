@@ -1,5 +1,4 @@
 import React from 'react'
-import { Control } from 'react-hook-form'
 import { CustomInput } from '@/types'
 import { FormControl, FormField, FormLabel, FormMessage, FormItem } from './ui/form'
 import { Input } from './ui/input'

@@ -1,10 +1,6 @@
 import React from 'react'
 import { FormControl, FormField, FormLabel, FormMessage } from './ui/form'
 import { Input } from './ui/input'
-
-import { Control, FieldPath } from 'react-hook-form'
-import { z } from 'zod'
-import { loginFormSchema } from '@/lib/utils'
 import { CustomInput } from '@/types'
 
 const LoginCustomInput = ({ control, name, label, placeholder, id }: CustomInput) => {

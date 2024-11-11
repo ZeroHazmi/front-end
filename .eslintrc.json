@@ -1,14 +1,12 @@
 {
-    "plugins": [
-        "next"
+    "extends": [
+        "next",
+        "next/core-web-vitals",
+        "next/typescript",
+        "prettier"
     ],
     "rules": {
-        "google-font-display": "warn",
-        "google-font-preconnect": "warn",
-        "inline-script-id": "error"
-    },
-    "extends": [
-        "next/core-web-vitals",
-        "plugin:prettier/recommended"
-    ]
+        "@typescript-eslint/no-unused-vars": "off", // Disables the rule globally
+        "@typescript-eslint/no-explicit-any": "off"
+    }
 }

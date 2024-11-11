@@ -1,13 +1,13 @@
 'use client'
 
 import { useToast } from "@/hooks/use-toast";
-import { AppUser, Priority, Report, Status } from "@/types";
+import { Priority, Report, Status } from "@/types";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Eye, Loader2, PencilIcon, TrashIcon } from "lucide-react";
+import { ChevronDown, Loader2, PencilIcon, TrashIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from "framer-motion";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -19,7 +19,14 @@ async function fetchReports(reportMode: 'Open' | 'InProgress' | 'Closed'): Promi
         const response = await fetch(`http://localhost:5035/api/report?status=${reportMode === 'Open' ? 'InProgress' : 'Closed'}`);
         const data = await response.json();
         
-        return data.map((item: any) => ({
+        return data.map((item: {
+            id: number;
+            userId: string;
+            status: number;
+            priority: number;
+            reportTypeId: number;
+            createdAt: string;
+        }) => ({
             id: item.id,
             userId: item.userId,
             status: item.status === 0 ? 'Open' : 'Closed',

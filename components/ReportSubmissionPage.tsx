@@ -1,34 +1,24 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from "react";
-import PHNavBar from "@/components/PHNavBar";
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
-import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleArrowUp, faMicrophone, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ReportType } from "@/types/index.d";
 import Recorder, { mimeType } from "@/components/Recorder";
 import { useFormState } from "react-dom";
-import OpenAIApi, { OpenAI } from "openai";
 import transcribe from "@/actions/transcribe";
-import GoogleMaps from "@/components/GoogleMap";
 import MapForm from "@/components/MapForm";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, ArrowRight, Mic } from "lucide-react";
+import { ArrowLeft, ArrowRight} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
-import { cookies } from "next/headers";
-import { fetchPriority } from "@/app/api/open-ai/route";
 import { toast } from "@/hooks/use-toast";
 
 // Types
 type LocationState = {
   address: string;
-  date: Date;
+  date: string;
   time: number;
 };
 
@@ -64,32 +54,36 @@ export default function SubmitReportPage() {
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [location, setLocation] = useState<LocationState>({
       address: '',
-      date: new Date(),
+      date: '',
       time: 0,
     });
 
-    // Fetch report type data
-    async function fetchReportType() {
-        try {
-            const response = await fetch(`http://localhost:5035/api/reporttype/${reportTypeID}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch report type');
+    useEffect(() => {
+        const fetchReportType = async () => {
+            try {
+                const response = await fetch(`http://localhost:5035/api/reporttype/${reportTypeID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to fetch report type');
+                }
+    
+                const data = await response.json();
+                setReportType(data);
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+                console.error('Error fetching report type:', error);
             }
-
-            const data = await response.json();
-            setReportType(data);
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            console.error('Error fetching report type:', error);
-        }
-    }
+        };
+    
+        fetchReportType();
+    }, [reportTypeID]);
+    
 
     // async function renderReport() {
     //     try {
@@ -194,11 +188,6 @@ export default function SubmitReportPage() {
     // useEffect(() => {
     //     renderReport();
     // }, [reportTypeID]);
-
-// Effects
-    useEffect(() => {
-        fetchReportType();
-    }, [reportTypeID]);
 
     useEffect(() => {
         if (state.message) {

@@ -1,11 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { useFormStatus } from 'react-dom';
-import { profile } from 'console';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicrophone } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/components/ui/button';
 import { Mic } from 'lucide-react';
 
@@ -49,7 +45,7 @@ function Recorder({uploadAudio}: {uploadAudio: (blob:Blob) => void}){
         mediaRecorder.current = media;
         mediaRecorder.current.start();
 
-        let localAudioChucks: Blob[] = [];
+        const localAudioChucks: Blob[] = [];
         mediaRecorder.current.ondataavailable = (event) => {
             if (typeof event.data === "undefined") return;
             if (event.data.size === 0) return;

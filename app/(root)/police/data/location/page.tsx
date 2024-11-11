@@ -60,10 +60,27 @@ function IncidentHeatmap() {
       .filter((incident) => incident !== null); // Remove any null values in case google.maps is not available
   }, [selectedType, selectedSeverity, incidentData]);
 
-  const onLoad = useCallback((map) => {
+  interface Incident {
+    location: { lat: number; lng: number };
+    weight: number;
+    type: string;
+    severity: string;
+  }
+
+  interface LatLng {
+    lat: number;
+    lng: number;
+  }
+
+  interface FilteredIncident {
+    location: google.maps.LatLng;
+    weight: number;
+  }
+
+  const onLoad = useCallback((map: google.maps.Map) => {
     // Optional: you can adjust map bounds based on the data
     const bounds = new window.google.maps.LatLngBounds();
-    filteredData.forEach((incident) => bounds.extend(incident.location));
+    filteredData.forEach((incident: FilteredIncident) => bounds.extend(incident.location));
     map.fitBounds(bounds);
   }, [filteredData]);
 

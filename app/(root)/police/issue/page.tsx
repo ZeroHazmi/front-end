@@ -1,12 +1,6 @@
 'use client'
 
 import React from "react";
-import PHNavBar from '@/components/PHNavBar';
-
-import { useState } from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/free-solid-svg-icons";
-
 
 export default function IssueTrackingManagement(){
 

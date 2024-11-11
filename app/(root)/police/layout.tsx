@@ -1,7 +1,9 @@
 import React from 'react';
 import PoliceNavBar from '@/components/policeNavbar';
 
-const Layout = ({ children }) => {
+import { ReactNode } from 'react';
+
+const Layout = ({ children }: { children: ReactNode }) => {
     return (
         <div>
             <PoliceNavBar />

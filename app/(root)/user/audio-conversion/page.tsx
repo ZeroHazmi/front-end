@@ -1,10 +1,6 @@
 'use client'
 
 import React from "react";
-import PHNavBar from '@/components/PHNavBar';
-import { useRouter } from 'next/router';
-// import {GoogleApiWrapper} from 'google-maps-react'; // mahal nak mampus
-//import MapComponent from '@/components/map';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

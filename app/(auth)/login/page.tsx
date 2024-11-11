@@ -1,4 +1,3 @@
-import React, { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import LoginAuthForm from '@/components/LoginAuthForm';
 

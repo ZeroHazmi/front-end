@@ -2,7 +2,6 @@ import React from 'react'
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { cookies } from 'next/headers';
 import { removeCookie } from '@/app/lib/auth';
 
 export default function PHNavBar() {
