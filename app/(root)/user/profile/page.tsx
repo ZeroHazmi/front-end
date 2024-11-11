@@ -67,7 +67,7 @@ export default function UserProfile() {
       try {
         const userId = await getCookie("userId");
         console.log("User ID from cookies:", userId);
-
+  
         if (userId) {
           const response = await fetch(`http://localhost:5035/api/user/${userId}`);
           if (response.ok) {
@@ -103,7 +103,7 @@ export default function UserProfile() {
         setIsLoading(false);
       }
     };
-
+  
     fetchUserData();
   }, []);
 
@@ -177,7 +177,7 @@ export default function UserProfile() {
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender</Label>
                   <Select
-                    disabled={!isEditing}
+                    disabled={true}
                     onValueChange={(value) => handleSelectChange('gender', value)}
                     value={userData.gender}
                   >
@@ -197,7 +197,7 @@ export default function UserProfile() {
                     name="nationality"
                     value={userData.nationality}
                     onChange={handleInputChange}
-                    disabled={!isEditing}
+                    disabled={true}
                   />
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function UserProfile() {
                     name="descendants"
                     value={userData.descendants}
                     onChange={handleInputChange}
-                    disabled={!isEditing}
+                    disabled={true}
                   />
                 </div>
                 <div className="space-y-2">

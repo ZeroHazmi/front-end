@@ -100,7 +100,7 @@ const SignupAuthForm = () => {
         form.setValue('icNumber', data.documentNumber);
         form.setValue('userName', data.fullName);
         form.setValue('birthday', convertedBirthday);
-        form.setValue('gender', data.gender); // Use lowercase keys to match `gender`
+        form.setValue('gender', data.gender); 
         form.setValue('address', data.address);
         form.setValue('postcode', data.addressFields?.postalCode || '');
         

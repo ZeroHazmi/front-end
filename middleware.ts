@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { decodeToken, getCookie, removeCookie } from '@/app/lib/auth';
 
 // 1. Specify protected and public routes
-const protectedRoutes = ['/user', '/police'];
+const protectedRoutes = ['/user', '/police', '/admin'];
 const publicRoutes = ['/login', '/signup', '/'];
 
 export default function middleware(req: NextRequest) {
@@ -25,6 +25,9 @@ export default function middleware(req: NextRequest) {
 		return NextResponse.redirect(new URL('/user', req.url));
 	}
 	if (path.startsWith('/police') && rolesCookie !== 'Police') {
+		return NextResponse.redirect(new URL('/police', req.url));
+	}
+	if (path.startsWith('/admin') && rolesCookie !== 'Admin') {
 		return NextResponse.redirect(new URL('/police', req.url));
 	}
 

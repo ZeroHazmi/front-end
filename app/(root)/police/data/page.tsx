@@ -1,10 +1,10 @@
+"use client"
+
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import IncidentRateComponent from './incident-rate/page'
-import OutcomeBreakdownChart from './demographic/page'
 import DemographicsChartComponent from './demographic/page'
 import IncidentHeatmap from './location/page'
-
 
 const DataPage = () => {
   return (

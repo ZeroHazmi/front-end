@@ -53,7 +53,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
                     const decodedRole = decodedToken.role.toString();
                     console.log("Role:", decodedRole);
                     setRole(decodedRole);
-                    setUserId(decodedToken.name);
+                    setUserId(decodedToken.nameid);
                 }
                 setLoginSuccess(true);
                 toast({ title: "Login Successful", description: "You have been logged in." });

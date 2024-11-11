@@ -1,18 +1,49 @@
-import React, { useState } from 'react';
+"use client"
+
+import React, { useMemo, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Card } from '@/components/ui/card';
 
-const data = [
-  { name: 'Low', incidents: 200 },
-  { name: 'Medium', incidents: 300 },
-  { name: 'High', incidents: 150 },
-  { name: 'Critical', incidents: 50 },
+const fullData = [
+  { date: '2023-01-01', location: 'Location 1', type: 'Theft', severity: 'Low', incidents: 50 },
+  { date: '2023-01-01', location: 'Location 1', type: 'Assault', severity: 'Medium', incidents: 30 },
+  { date: '2023-01-01', location: 'Location 2', type: 'Theft', severity: 'High', incidents: 20 },
+  { date: '2023-01-01', location: 'Location 2', type: 'Assault', severity: 'Critical', incidents: 10 },
+  { date: '2023-01-02', location: 'Location 1', type: 'Theft', severity: 'Medium', incidents: 40 },
+  { date: '2023-01-02', location: 'Location 1', type: 'Assault', severity: 'Low', incidents: 25 },
+  { date: '2023-01-02', location: 'Location 2', type: 'Theft', severity: 'Critical', incidents: 15 },
+  { date: '2023-01-02', location: 'Location 2', type: 'Assault', severity: 'High', incidents: 35 },
 ];
 
 const IncidentRateComponent = () => {
   const [timeRange, setTimeRange] = useState('daily');
   const [location, setLocation] = useState('All Locations');
   const [incidentType, setIncidentType] = useState('All Types');
+
+    const filteredData = useMemo(() => {
+      return fullData.filter(item => {
+        const locationMatch = location === 'All Locations' || item.location === location;
+        const typeMatch = incidentType === 'All Types' || item.type === incidentType;
+        return locationMatch && typeMatch;
+      });
+    }, [location, incidentType]);
+
+    const chartData = useMemo(() => {
+      const severityOrder = ['Low', 'Medium', 'High', 'Critical'];
+      const aggregatedData = filteredData.reduce((acc: { [key: string]: number }, item) => {
+        if (!acc[item.severity]) {
+          acc[item.severity] = 0;
+        }
+        acc[item.severity] += item.incidents;
+        return acc;
+      }, {});
+
+      return severityOrder.map(severity => ({
+        name: severity,
+        incidents: aggregatedData[severity] || 0
+      }));
+    }, [filteredData]);
 
   return (
     <div className="p-4 bg-white rounded-md shadow">
@@ -55,8 +86,9 @@ const IncidentRateComponent = () => {
       </div>
 
       {/* Chart Component */}
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+    <Card>
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
@@ -65,6 +97,7 @@ const IncidentRateComponent = () => {
           <Bar dataKey="incidents" fill="#8884d8" />
         </BarChart>
       </ResponsiveContainer>
+    </Card>
     </div>
   );
 };
