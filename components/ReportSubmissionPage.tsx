@@ -1,32 +1,32 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
 import { ReportType } from "@/types/index.d";
 import Recorder, { mimeType } from "@/components/Recorder";
 import { useFormState } from "react-dom";
 import transcribe from "@/actions/transcribe";
-import MapForm from "@/components/MapForm";
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, ArrowRight} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-
-// Types
-type LocationState = {
-  address: string;
-  date: string;
-  time: number;
-};
+import GoogleMap, { LatLng } from "./GoogleMap";
+import { Input } from "./ui/input";
+import { states } from "@/types/constants";
 
 type Message = {
   sender: string;
   message: string;
   id: string;
 };
+
+interface LocationWithAddress {
+    coordinates: LatLng;
+    geocodeObject: google.maps.GeocoderResult;
+  }
 
 const initialState = {
   sender: "",
@@ -52,11 +52,22 @@ export default function SubmitReportPage() {
     const [state, formAction] = useFormState(transcribe, initialState);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-    const [location, setLocation] = useState<LocationState>({
-      address: '',
-      date: '',
-      time: 0,
+
+    // State for parsed address fields and date/time
+    const [addressFields, setAddressFields] = useState({
+        lotRoomBuilding: '',
+        streetName: '',
+        placeName: '',
+        postcode: '',
+        city: '',
+        state: '',
     });
+    const [date, setDate] = useState('');
+    const [time, setTime] = useState('');
+    const [location, setLocation] = useState<LocationWithAddress | null>(null);
+    const handleLocationChange = useCallback((coordinates: LatLng, geocodeObject: google.maps.GeocoderResult) => {
+        setLocation({ coordinates, geocodeObject });
+    }, []);
 
     useEffect(() => {
         const fetchReportType = async () => {
@@ -123,6 +134,18 @@ export default function SubmitReportPage() {
         }
     };
 
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const timeValue = e.target.value; // Get the new value from the input
+        setTime(timeValue); // Update the state with the new time value
+        console.log('Time selected:', timeValue); // Log the value to the console
+      };
+      // Update date state when the input value changes
+      const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const dateValue = e.target.value; // Get the new value from the input
+        setDate(dateValue); // Update the state with the new time value
+        console.log('Time selected:', dateValue); // Log the value to the console
+      };
+
     // Create report
     const createReport = async () => {
       try {
@@ -136,7 +159,7 @@ export default function SubmitReportPage() {
               console.error('Report content cannot be empty');
           }
 
-          if (!location.address) {
+          if (!location) {
               console.error('Location is required');
           }
 
@@ -144,9 +167,12 @@ export default function SubmitReportPage() {
             reportTypeID,
             reportContent: textareaContent,
             reportTypeName,
-            location: location.address,
-            date: location.date,
-            time: location.time,
+            address: location?.geocodeObject.formatted_address,
+            latitue: location?.coordinates.lat,
+            longitude: location?.coordinates.lng,
+            state: location?.geocodeObject.address_components.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '',
+            date: date,
+            time: time,
         };
 
           const response = await fetch('/api/create-report', {
@@ -168,26 +194,19 @@ export default function SubmitReportPage() {
           });
 
           setIsConfirmDialogOpen(false);
-          if(currentPath.includes('police')) {
-            router.push('/police');
-          } else {
-            router.push('/user');
-          }
-      } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Error creating report';
-          toast({
-              title: "Error",
-              description: errorMessage,
-              variant: "destructive",
-          });
+          router.push(currentPath.includes('police') ? '/police' : '/user');
+      } catch (error: any) {
+        toast({
+            title: "Error",
+            description: error.message || 'Error creating report',
+            variant: "destructive",
+        });
       } finally {
           setSubmitting(false);
       }
     };
 
-    // useEffect(() => {
-    //     renderReport();
-    // }, [reportTypeID]);
+    
 
     useEffect(() => {
         if (state.message) {
@@ -204,6 +223,49 @@ export default function SubmitReportPage() {
         }
     }, [state.message, state.sender]);
 
+    useEffect(() => {
+        const splitAddress = async () => {
+            if (!location?.geocodeObject) {
+                console.error("No geocode object available");
+                return;
+              }
+            
+              try {
+                const geocodeObject = location.geocodeObject;
+                const addressComponents: google.maps.GeocoderAddressComponent[] = geocodeObject.address_components;
+            
+                // Extract address components
+                const lotRoomBuilding = addressComponents.find(component => component.types.includes('street_number'))?.long_name || '';
+                const streetName = addressComponents.find(component => component.types.includes('route'))?.long_name || '';
+                const placeName = addressComponents.find(component => component.types.includes('neighborhood') || component.types.includes('sublocality'))?.long_name || '';
+                const postcode = addressComponents.find(component => component.types.includes('postal_code'))?.long_name || '';
+                const city = addressComponents.find(component => component.types.includes('locality'))?.long_name || '';
+                const stateFromAPI = addressComponents.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '';
+            
+                // Set the state based on the provided states object
+                const state = Object.values(states).find(state => stateFromAPI.toLowerCase().includes(state.toLowerCase())) || stateFromAPI;
+            
+                // Update the addressFields state
+                setAddressFields({
+                  lotRoomBuilding,
+                  streetName,
+                  placeName,
+                  postcode,
+                  city,
+                  state,
+                });
+            
+              } catch (error) {
+                console.error("Error parsing address:", error);
+              }
+        }
+
+        if (location) {
+            splitAddress();
+        }
+        console.log('Location:', addressFields);
+    }, [location, addressFields]);
+
 
     // Split template fields into two columns
     const halfLength = Math.ceil(templateFields.length / 2);
@@ -212,14 +274,106 @@ export default function SubmitReportPage() {
 
     return (
         <div className="flex flex-row justify-center items-center bg-[#f2f2f2]">
-            <form action="">
                 <div className="w-[100%] h-[100%] text-center p-20 pt-3vh pb-2vh">
                     <div className="font-bold text-6xl max-w-[1200px] text-center text-[500%] p-20 ">
                         {reportTypeName} Report
                     </div>
 
                     {/* MAP CONTAINER */}
-                    <MapForm onLocationChange={(address, date, time) => setLocation({ address, date, time })}/>
+                    <div className="font-semibold text-2xl max-w-[1200px] text-center text-[300%] p-20">
+                        Location of Incident
+                    </div>
+
+                    <GoogleMap onLocationChange={handleLocationChange} />                    
+
+                    <form action="">
+
+                    <div className="grid md:grid-cols-2 gap-8 mb-8">
+                        <Card>
+                            <CardContent className="p-6">
+                            <div className="mb-4">
+                                <Label htmlFor="lotRoomBuilding" className='w-full flex items-start mb-2'>Lot/Room/Office/Building No.</Label>
+                                <Input
+                                id="lotRoomBuilding"
+                                placeholder="Enter lot/room/office/building no."
+                                value={addressFields.lotRoomBuilding}
+                                onChange={(e) => setAddressFields({ ...addressFields, lotRoomBuilding: e.target.value })}
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <Label htmlFor="streetName" className='w-full flex items-start mb-2'>Street Name</Label>
+                                <Input
+                                id="streetName"
+                                placeholder="Enter street name"
+                                value={addressFields.streetName}
+                                onChange={(e) => setAddressFields({ ...addressFields, streetName: e.target.value })}
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <Label htmlFor="placeName" className='w-full flex items-start mb-2'>Park/Place Name</Label>
+                                <Input
+                                id="placeName"
+                                placeholder="Enter park/place name"
+                                value={addressFields.placeName}
+                                onChange={(e) => setAddressFields({ ...addressFields, placeName: e.target.value })}
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <Label htmlFor="postcode" className='w-full flex items-start mb-2'>Postcode</Label>
+                                <Input
+                                id="postcode"
+                                placeholder="Enter postcode"
+                                value={addressFields.postcode}
+                                onChange={(e) => setAddressFields({ ...addressFields, postcode: e.target.value })}
+                                />
+                            </div>
+                            </CardContent>
+                        </Card>
+
+                            <Card>
+                            <CardContent className="p-6">
+                                <div className="mb-4">
+                                <Label htmlFor="city" className='w-full flex items-start mb-2'>City</Label>
+                                <Input
+                                    id="city"
+                                    placeholder="Enter city"
+                                    value={addressFields.city}
+                                    onChange={(e) => setAddressFields({ ...addressFields, city: e.target.value })}
+                                />
+                                </div>
+                                <div className="mb-4">
+                                <Label htmlFor="state" className='w-full flex items-start mb-2'>State</Label>
+                                <Input
+                                    id="state"
+                                    placeholder="Enter state"
+                                    value={addressFields.state}
+                                    onChange={(e) => setAddressFields({ ...addressFields, state: e.target.value })}
+                                />
+                                </div>
+                                <div className="mb-4">
+                                <Label htmlFor="date" className='w-full flex items-start mb-2'>Date</Label>
+                                <Input
+                                    id="date"
+                                    type="date"
+                                    placeholder="Enter date of incident"
+                                    value={date}
+                                    onChange={handleDateChange}
+                                />
+                                </div>
+                                <div className="mb-4">
+                                    <Label htmlFor="time" className="w-full flex items-start mb-2">Time</Label>
+                                    <Input
+                                    id="time"
+                                    type="time"
+                                    placeholder="Enter time of incident"
+                                    value={time}
+                                    onChange={handleTimeChange}
+                                    />
+                                </div>
+                            </CardContent>
+                            </Card>
+
+                        </div>
 
                     {/* One button to enable edit */}
                     {/* By default the textarea is not editable */}
@@ -252,8 +406,9 @@ export default function SubmitReportPage() {
                             Confirm <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </div>
+                </form>
+
                 </div>
-            </form>
 
             <form action={formAction}>
                 <input type="file" hidden ref={fileRef} name="audio" />

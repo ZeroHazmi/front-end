@@ -6,7 +6,10 @@ type ReportRequest = {
 	reportTypeID: string;
 	reportContent: string;
 	reportTypeName: string;
-	location: string;
+	address: string;
+	latitute: number;
+	longitude: number;
+	state: string;
 	date: string;
 	time: number;
 };
@@ -19,8 +22,11 @@ type ReportData = {
 	reportDetail: {
 		reportTypeId: string;
 		date: string;
-		location: string;
 		time: number;
+		address: string;
+		latitute: number;
+		longitude: number;
+		state: string;
 		fieldValue: string;
 		audio: string;
 		image: string;
@@ -36,7 +42,10 @@ export async function POST(request: Request) {
 			reportTypeID,
 			reportContent,
 			reportTypeName,
-			location,
+			address,
+			latitute,
+			longitude,
+			state,
 			date,
 			time,
 		} = body;
@@ -69,8 +78,11 @@ export async function POST(request: Request) {
 			reportDetail: {
 				reportTypeId: reportTypeID,
 				date: dateTimestamp,
-				location: location || '',
 				time: time,
+				address: address,
+				latitute: latitute,
+				longitude: longitude,
+				state: state,
 				fieldValue: '{}',
 				audio: '',
 				image: '',

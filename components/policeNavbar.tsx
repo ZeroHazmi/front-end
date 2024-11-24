@@ -5,7 +5,7 @@ import Image from "next/image"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from 'next/navigation';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,11 +14,12 @@ import {
   } from "@/components/ui/dropdown-menu"
 import { ChevronDown, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { removeCookie } from "@/app/lib/auth";
+import { getCookie, removeCookie } from "@/app/lib/auth";
 
 export default function PoliceNavBar() {
     const router = useRouter(); // Next.js's rounter hook for router object | componenet navigation/route handling in component
     const [ hamburgerOpen, setHamburgerOpen,] = useState (false); 
+    const [admin, setAdmin] = useState(false);
     // useState create state variable called hamburgerOpen
     // setHamburgerOpen function update the hamburgerOpen false to true / true to false
 
@@ -33,6 +34,19 @@ export default function PoliceNavBar() {
     const toggleHamburgerMenu = () => { // switcher
         setHamburgerOpen(!hamburgerOpen); // setHamburgerOpen updates hamburgerOpen depends on false or true and switch it
     };
+
+    useEffect(() => {
+        const checkRoles = async () => {
+            const roles = await getCookie("roles");
+            if (roles != null) {
+                if (roles === "Admin") {
+                    setAdmin(true);
+                }
+            }
+        };
+        
+        checkRoles();
+    }, []);
 
     return (
         <nav>
@@ -82,19 +96,7 @@ export default function PoliceNavBar() {
                     <Link href="/police/faq" className="hover:text-gray-200">
                         FAQ
                     </Link>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="flex items-center hover:text-gray-200">
-                        Admin <ChevronDown className="ml-1 h-4 w-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                        <DropdownMenuItem>
-                            <Link href="/police/admin/add-police">Add Police</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href="/police/admin/settings">Settings</Link>
-                        </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    
                     <Button
                         onClick={logout}
                         variant="destructive"

@@ -92,7 +92,7 @@ function Recorder({uploadAudio}: {uploadAudio: (blob:Blob) => void}){
         }        
         {
             recordingStatus === "recording" && (
-                <Button onClick={stopRecording} className='greyscale text-white text-white bg-red-600 rounded-full' >
+                <Button onClick={stopRecording} className='greyscale text-white bg-red-600 rounded-full' >
                     <Mic className="mr-2 h-4 w-4" /> Recording
                 </Button>
             )

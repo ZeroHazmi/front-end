@@ -15,15 +15,20 @@ const ReportContent = () => {
     const currentRoute = usePathname();
 
     async function fetchReportType() {
-        const response = await fetch('http://localhost:5035/api/reporttype', {
+        const response = await fetch('http://localhost:5035/api/reporttype?isOnline=true', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
 
-        const data = await response.json();
-        setReportTypes(data);
+        if (response.ok) {
+            const data = await response.json();
+            console.log(data); // Check the fetched data in the console
+            setReportTypes(data); // Directly set the report types
+        } else {
+            console.error('Failed to fetch report types');
+        }
     }
 
     function newReportButton(e: React.MouseEvent) {
@@ -39,10 +44,10 @@ const ReportContent = () => {
             // Check the current route    
             if (currentRoute.includes('police')) {
                 // If in the police route, navigate to the police-specific route
-                router.push(`/police/reports/create/${selectedReportType}`);
+                router.push(`/police/create-report/${selectedReportType}`);
             } else {
                 // If in the user route, navigate to the user-specific route
-                router.push(`/user/new-report/${selectedReportType}`);
+            router.push(`/user/reports/new/${selectedReportType}`);
             }
         }
     }
