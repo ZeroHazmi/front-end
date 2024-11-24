@@ -11,7 +11,7 @@ export async function removeCookie(cookieName: string) {
 }
 
 export async function getCookie(name: string) {
-	const cookie = cookies().get(name);
+	const cookie = cookies()?.get(name);
 	return cookie ? cookie.value : ''; // Return cookie value or an empty string if not found
 }
 

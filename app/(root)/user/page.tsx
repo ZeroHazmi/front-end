@@ -1,14 +1,12 @@
 'use client'
 
 import React from 'react';
-import ReportContent from '@/components/ReportContent';
-import UserNavBar from '@/components/userNavBar';
+import ViewReportPage from './reports/view/page';
 
 const UserMainPage = () => {
   return (
     <div>
-        <UserNavBar />
-        <ReportContent />
+      <ViewReportPage />
     </div>
   )
 }

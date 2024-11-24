@@ -1,4 +1,4 @@
- @tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -30,38 +30,49 @@
 
 body {
 	background-color: #f2f2f2;
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important ;
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		Roboto,
+		Oxygen,
+		Ubuntu,
+		Cantarell,
+		'Open Sans',
+		'Helvetica Neue',
+		sans-serif !important ;
 }
 
 /* MOBILE NAVBAR */
 .mobile-nav-animation-down {
-    animation: mobileNavSlideDown 0.5s ease forwards;
+	animation: mobileNavSlideDown 0.5s ease forwards;
 }
 
 .mobile-nav-animation-up {
-    animation: mobileNavSlideUp 0.5s ease forwards;
+	animation: mobileNavSlideUp 0.5s ease forwards;
 }
 
 @keyframes mobileNavSlideDown {
-    0% {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+	0% {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
 }
 
 @keyframes mobileNavSlideUp {
-    0% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
+	0% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
 }
 
 /* login Animation*/
@@ -131,36 +142,36 @@ body {
 	background: white;
 	border-radius: 8px;
 	box-shadow:
-		-20px 0px 100px rgba(204, 0, 0, 0.7),    
-		20px 0px 100px rgba(0, 70, 204, 0.7);    
+		-20px 0px 100px rgba(204, 0, 0, 0.7),
+		20px 0px 100px rgba(0, 70, 204, 0.7);
 	animation: shadowCircle 3s infinite ease-in-out;
 }
 
 @keyframes shadowCircle {
 	0% {
 		box-shadow:
-			-25px 0px 125px rgba(204, 0, 0, 0.75),		/* left */
-			25px 0px 125px rgba(0, 70, 204, 0.75);		/* right */
+			-25px 0px 125px rgba(204, 0, 0, 0.75),
+			/* left */ 25px 0px 125px rgba(0, 70, 204, 0.75); /* right */
 	}
 	25% {
 		box-shadow:
-			0px -75px 125px rgba(0, 70, 204, 0.5),    /* top */
-			0px 75px 125px rgba(204, 0, 0, 0.5);      /* bottom */
+			0px -75px 125px rgba(0, 70, 204, 0.5),
+			/* top */ 0px 75px 125px rgba(204, 0, 0, 0.5); /* bottom */
 	}
 	50% {
 		box-shadow:
-			25px 0px 125px rgba(204, 0, 0, 0.75),     /* right */
-			-25px 0px 125px rgba(0, 70, 204, 0.75);   /* left */
+			25px 0px 125px rgba(204, 0, 0, 0.75),
+			/* right */ -25px 0px 125px rgba(0, 70, 204, 0.75); /* left */
 	}
 	75% {
 		box-shadow:
-			0px 75px 125px rgba(0, 70, 204, 0.5),     /* bottom */
-			0px -75px 125px rgba(204, 0, 0, 0.5);     /* top */
+			0px 75px 125px rgba(0, 70, 204, 0.5),
+			/* bottom */ 0px -75px 125px rgba(204, 0, 0, 0.5); /* top */
 	}
 	100% {
 		box-shadow:
-			-25px 0px 125px rgba(204, 0, 0, 0.75),		/* left */
-			25px 0px 125px rgba(0, 70, 204, 0.75);		/* right */
+			-25px 0px 125px rgba(204, 0, 0, 0.75),
+			/* left */ 25px 0px 125px rgba(0, 70, 204, 0.75); /* right */
 	}
 }
 
@@ -169,26 +180,26 @@ body {
 }
 
 @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
 
-  @keyframes slideOut {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-  }
+@keyframes slideOut {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+}
 
 /* @media (min-width: 640px) {
 	.hamburger-menu {
@@ -198,71 +209,79 @@ body {
 
 /* new */
 @media (min-width: 640px) {
-    .menu {
-        display: block !important;
-        opacity: 1;
-        transform: none;
-        pointer-events: auto;
-    }
+	.menu {
+		display: block !important;
+		opacity: 1;
+		transform: none;
+		pointer-events: auto;
+	}
 
-    .menu-toggle,
-    .menu-icon {
-        display: none;
-    }
+	.menu-toggle,
+	.menu-icon {
+		display: none;
+	}
 }
 
 /* Default state: menu hidden */
 .menu {
-    opacity: 0;
-    transform: translateY(-10px);
-    pointer-events: none;
+	opacity: 0;
+	transform: translateY(-10px);
+	pointer-events: none;
 }
 
 /* Show menu when checkbox is checked */
 .menu-toggle:checked ~ .menu {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-    animation: slideIn 0.5s forwards;
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+	animation: slideIn 0.5s forwards;
 }
 
 /* Toggle icons based on checkbox state */
 .menu-toggle:checked + .menu-icon .icon-open {
-    display: none;
+	display: none;
 }
 
 .menu-toggle:checked + .menu-icon .icon-close {
-    display: block;
+	display: block;
 }
-
-
-
-
-
-
-
-
 
 /* register/signup */
 
 .user-signup-body {
 	/* color: black; */
 	/* background-color: #303091; */
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		Roboto,
+		Oxygen,
+		Ubuntu,
+		Cantarell,
+		'Open Sans',
+		'Helvetica Neue',
 		sans-serif !important;
 
 	/* for signup page only */
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+	font-family:
+		system-ui,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Segoe UI',
+		Roboto,
+		Oxygen,
+		Ubuntu,
+		Cantarell,
+		'Open Sans',
+		'Helvetica Neue',
 		sans-serif !important;
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-	min-height: 100vh;
 }
-
 
 .user-signup-main-container {
 	padding-left: 0px;
@@ -1012,9 +1031,7 @@ body {
 
 /* reporting submission */
 
-
 .user-reporting-submisison-container {
-	
 	text-align: center;
 	padding: 20px;
 	max-width: 1200px;
@@ -1065,7 +1082,7 @@ body {
 	font-size: 20px;
 	font-weight: 400;
 	word-wrap: break-word;
-	text-align: justify
+	text-align: justify;
 }
 
 .user-reporting-submisison-typing-card-texts {
@@ -1100,8 +1117,6 @@ body {
 	display: inline-flex;
 }
 
-
-
 .user-reporting-submisison-speech-card-red-text {
 	width: 360px;
 	left: 0px;
@@ -1113,7 +1128,7 @@ body {
 	align-items: center;
 	font-weight: 400;
 	word-wrap: break-word;
-	text-align: justify
+	text-align: justify;
 }
 
 .user-reporting-submisison-speech-card-text {
@@ -1131,7 +1146,7 @@ body {
 	font-size: 20px;
 	font-weight: 400;
 	word-wrap: break-word;
-	text-align: justify
+	text-align: justify;
 }
 
 .user-reporting-submisison-card-btn {
@@ -1159,7 +1174,10 @@ body {
 .user-reporting-submisison-material-symbols-outlined {
 	/* font-size: 7px; */
 	color: white;
-	font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0;
+	font-variation-settings:
+		'FILL' 0,
+		'wght' 400,
+		'GRAD' 0;
 }
 
 .user-reporting-submisison-material-symbols-outlined-type-icon {
@@ -1339,7 +1357,7 @@ body {
 
 .police-user-management-user-per {
 	width: 547px;
-		/* height: 481px; */
+	/* height: 481px; */
 	background-color: white;
 	border-radius: 8px;
 	width: 50%;
@@ -1479,7 +1497,7 @@ body {
 }
 
 @layer base {
-  :root {
+	:root {
 		--radius: 0.5rem;
 	}
 }

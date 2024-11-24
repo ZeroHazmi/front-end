@@ -15,6 +15,7 @@ export default function middleware(req: NextRequest) {
 	const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
 	const sessionCookie = cookies().get('session');
 	const rolesCookie = cookies().get('roles')?.value;
+	console.log('Roles:', rolesCookie);
 
 	if (isProtectedRoute && (!sessionCookie || !rolesCookie)) {
 		return NextResponse.redirect(new URL('/login', req.url));
@@ -27,7 +28,7 @@ export default function middleware(req: NextRequest) {
 	if (path.startsWith('/police') && rolesCookie !== 'Police') {
 		return NextResponse.redirect(new URL('/police', req.url));
 	}
-	if (path.startsWith('/admin') && rolesCookie !== 'Admin') {
+	if (path.startsWith('/police/admin') && rolesCookie !== 'Admin') {
 		return NextResponse.redirect(new URL('/police', req.url));
 	}
 
