@@ -1,12 +1,12 @@
 'use client'
 
-import ReportContent from '@/components/ReportContent'
+import CreateNewReport from '@/components/CreateNewReport'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <ReportContent />
+      <CreateNewReport />
     </div>
   )
 }

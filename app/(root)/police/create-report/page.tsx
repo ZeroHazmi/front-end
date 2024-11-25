@@ -1,6 +1,6 @@
 'use client'
 
-import ReportContent from '@/components/ReportContent'
+import ReportContent from '@/components/CreateNewReport'
 import React from 'react'
 
 const PoliceCreateReportPage = () => {

@@ -12,17 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { ChevronDown, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { getCookie } from "@/app/lib/auth"
+import LogoutDialog from "./dialog/LogOutDialog"
 
 export default function NavBar() {
   const router = useRouter()
@@ -38,17 +31,6 @@ export default function NavBar() {
     checkRoles()
     console.log(userRole)
   }, [userRole])
-
-  const handleLogout = () => {
-    setIsLogoutDialogOpen(true)
-  }
-
-  const confirmLogout = () => {
-    // Placeholder logout function
-    console.log('Logging out')
-    setIsLogoutDialogOpen(false)
-    router.push('/login')
-  }
 
   const cancelLogout = () => {
     setIsLogoutDialogOpen(false)
@@ -106,6 +88,10 @@ export default function NavBar() {
               <Link href="/admin/user-management/" className="hover:text-gray-200 cursor-pointer">
                 User Management
               </Link>
+              {/* need to change to police faq to answer user questions */}
+              <Link href="/user/faq" className="hover:text-gray-200 cursor-pointer">
+                    FAQ
+                </Link>
             </>
             
             
@@ -133,14 +119,8 @@ export default function NavBar() {
                 
             )
           }
-          <Link href={`${isPolice ? '/police' : '/user'}/communication`} className="hover:text-gray-200">
-            Communication
-          </Link>
-          <Link href={`${isPolice ? '/police' : '/user'}/faq`} className="hover:text-gray-200">
-            FAQ
-          </Link>
           <Button
-            onClick={handleLogout}
+            onClick={() => setIsLogoutDialogOpen(true)}
             variant="destructive"
             className="bg-red-500 hover:bg-red-600"
           >
@@ -198,30 +178,16 @@ export default function NavBar() {
               <span className="cursor-pointer">Profile</span>
             </Link>
           )}
-          <button type="button" onClick={handleLogout} className="w-40 h-8 bg-red-500 text-white hover:bg-red-700 rounded-lg font-semibold shadow-md">
+          <button type="button" onClick={() => setIsLogoutDialogOpen(true)} className="w-40 h-8 bg-red-500 text-white hover:bg-red-700 rounded-lg font-semibold shadow-md">
             Logout
           </button>
         </div>
       </div>
 
-      <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Logout</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to log out? You will be redirected to the login page.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={cancelLogout}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmLogout}>
-              Logout
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LogoutDialog
+        isOpen={isLogoutDialogOpen}
+        onClose={() => setIsLogoutDialogOpen(false)}
+      />
     </nav>
   )
 }

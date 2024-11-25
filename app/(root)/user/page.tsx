@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react';
-import ViewReportPage from './reports/view/page';
+import CreateNewReport from '@/components/CreateNewReport';
 
 const UserMainPage = () => {
   return (
     <div>
-      <ViewReportPage />
+      <CreateNewReport />
     </div>
   )
 }

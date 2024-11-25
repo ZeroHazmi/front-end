@@ -1,3 +1,5 @@
+'use client'
+
 import { toast } from '@/hooks/use-toast';
 import { ReportType } from '@/types';
 import { useRouter, usePathname } from 'next/navigation';
@@ -7,7 +9,7 @@ import { FileTextIcon, MicIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
-const ReportContent = () => {
+const CreateNewReport = () => {
     const router = useRouter();
     const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
     const [selectedReportType, setSelectedReportType] = useState<number>(0);
@@ -118,4 +120,4 @@ const ReportContent = () => {
   )
 }
 
-export default ReportContent
+export default CreateNewReport
