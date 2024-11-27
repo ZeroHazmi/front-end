@@ -18,9 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Trash2, Eye, FileText, Search, Filter } from 'lucide-react'
+import { Trash2, Eye, FileText, Search, Filter, PlusCircle } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import DeleteEntityDialog from '@/components/dialog/DeleteEntityDialog'
+import AddUserDialog from '@/components/dialog/AddUserDialog'
+import { signUpFormSchema } from '@/lib/utils'
+import { z } from 'zod'
 
 type User = {
   id: string
@@ -40,10 +43,13 @@ const dummyUsers: User[] = [
   { id: '5', username: 'saml', name: 'Sam Lee', icNumber: 'IC567890', email: 'sam@example.com', age: 25, gender: 'Other' },
 ]
 
+type AddUserFormValues = z.infer<ReturnType<typeof signUpFormSchema>>
+
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>(dummyUsers)
   const [filteredUsers, setFilteredUsers] = useState<User[]>(dummyUsers)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isAddUserDialogOpen, setisAddUserDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [genderFilter, setGenderFilter] = useState<string | null>(null)
@@ -67,8 +73,6 @@ export default function UserManagementPage() {
     filterUsers()
   }, [searchQuery, genderFilter, users])
 
-  
-
   const handleDeleteUser = () => {
     if (!userToDelete) return
 
@@ -78,6 +82,23 @@ export default function UserManagementPage() {
     toast({
       title: "Success",
       description: "User deleted successfully",
+    })
+  }
+
+  const handleAddUser = (newUser: AddUserFormValues) => {
+    const user = {
+      id: `${users.length + 1}`,
+      username: newUser.userName,
+      name: newUser.name,
+      icNumber: newUser.icNumber,
+      email: newUser.email,
+      age: newUser.birthday ? new Date().getFullYear() - new Date(newUser.birthday).getFullYear() : 0,
+      gender: newUser.gender,
+    }
+    setUsers((prevUsers) => [...prevUsers, user])
+    toast({
+      title: "Success",
+      description: "User added successfully",
     })
   }
 
@@ -127,6 +148,12 @@ export default function UserManagementPage() {
           <Button variant="outline" className="flex items-center">
             <Filter className="h-4 w-4 mr-2" />
             Filter
+          </Button>
+          <Button
+          className="bg-police-blue hover:bg-blue-700"
+          onClick={() => setisAddUserDialogOpen(true)}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" /> Add New User
           </Button>
         </div>
       </div>
@@ -184,6 +211,13 @@ export default function UserManagementPage() {
         type="user"
         onDeleted={handleDeleteUser}
         />
+
+      <AddUserDialog 
+        isOpen={isAddUserDialogOpen} 
+        onOpenChange={setisAddUserDialogOpen} 
+        onUserAdded={handleAddUser}
+      />
+
     </div>
   )
 }
