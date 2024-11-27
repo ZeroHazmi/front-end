@@ -51,7 +51,7 @@ export async function POST(request: Request) {
 		} = body;
 
 		// Get authentication token from cookies
-		const cookieStore = cookies();
+		const cookieStore = await cookies();
 		const authToken = cookieStore.get('session');
 
 		if (!authToken) {

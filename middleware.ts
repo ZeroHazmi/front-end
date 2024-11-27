@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 import { decodeToken, getCookie, removeCookie } from '@/app/lib/auth';
 
 // 1. Specify protected and public routes
@@ -13,8 +13,8 @@ export default function middleware(req: NextRequest) {
 		path.startsWith(route),
 	);
 	const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
-	const sessionCookie = cookies().get('session');
-	const rolesCookie = cookies().get('roles')?.value;
+	const sessionCookie = (cookies() as unknown as UnsafeUnwrappedCookies).get('session');
+	const rolesCookie = (cookies() as unknown as UnsafeUnwrappedCookies).get('roles')?.value;
 	console.log('Roles:', rolesCookie);
 
 	if (isProtectedRoute && (!sessionCookie || !rolesCookie)) {

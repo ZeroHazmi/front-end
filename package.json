@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -44,12 +44,12 @@
     "leaflet": "^1.9.4",
     "leaflet-heatmap": "^1.0.0",
     "lucide-react": "^0.445.0",
-    "next": "^14.2.14",
+    "next": "15.0.3",
     "openai": "^4.71.0",
     "openai-edge": "^1.2.2",
-    "react": "^18.3.1",
+    "react": "19.0.0-rc-66855b96-20241106",
     "react-day-picker": "^8.10.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-hook-form": "^7.53.1",
     "react-leaflet": "^4.2.1",
     "recharts": "^2.13.3",
@@ -68,12 +68,12 @@
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20.17.6",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1",
     "@typescript-eslint/eslint-plugin": "^8.12.2",
     "@typescript-eslint/parser": "^8.12.2",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^15.0.2",
+    "eslint-config-next": "15.0.3",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-next": "^0.0.0",
     "eslint-plugin-react": "^7.37.2",
@@ -86,5 +86,9 @@
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.12.2",
     "vitest": "^2.1.4"
+  },
+  "overrides": {
+    "@types/react": "npm:types-react@19.0.0-rc.1",
+    "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
   }
 }
