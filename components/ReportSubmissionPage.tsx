@@ -274,17 +274,21 @@ export default function SubmitReportPage() {
 
     return (
         <div className="flex flex-row justify-center items-center bg-[#f2f2f2]">
-                <div className="w-[100%] h-[100%] text-center p-20 pt-3vh pb-2vh">
+                <div className="h-[100%] text-center p-20 pt-3vh pb-2vh">
+                    
+                    {/*## need to fix the width... it looks fine on the desktop but mobile ain't ##*/}
                     <div className="font-bold text-6xl max-w-[1200px] text-center text-[500%] p-20 ">
                         {reportTypeName} Report
                     </div>
-
-                    {/* MAP CONTAINER */}
+                    {/* INCIDENT TYPE TITLE */}
                     <div className="font-semibold text-2xl max-w-[1200px] text-center text-[300%] p-20">
                         Location of Incident
                     </div>
+                    {/* GOOGLE MAPS */}
+                    <div className="flex justify-center ite">
+                        <GoogleMap onLocationChange={handleLocationChange}  />                    
 
-                    <GoogleMap onLocationChange={handleLocationChange} />                    
+                    </div>
 
                     <form action="">
 

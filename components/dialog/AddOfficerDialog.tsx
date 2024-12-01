@@ -38,7 +38,8 @@ export default function AddOfficerDialog({
 
   const handleSubmit = async () => {
     try {
-      const token = getCookie("session");
+      const token = await getCookie("session");
+      console.log("Token:", token);
       if (!token) {
         toast({
           title: "Error",

@@ -63,6 +63,9 @@ export default function NavBar() {
         <div className="hidden sm:flex items-center space-x-6">
           {isPolice && (
             <>
+              <div>
+                Police
+              </div>
               <Link href="/police/report-management" className="hover:text-gray-200">
                 Reports Management
               </Link>

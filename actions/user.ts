@@ -27,20 +27,27 @@ export async function login(username: string, password: string) {
 }
 
 export async function registerUser(registerData: AppUser) {
-	const response = await fetch('http://localhost:5035/api/user/register', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(registerData),
-	});
+	try {
+		const response = await fetch('http://localhost:5035/api/user/register', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(registerData),
+		});
 
-	if (!response.ok) {
-		const errorResponse = await response.json();
-		throw new Error(
-			errorResponse?.message || 'Registration failed. Please try again.',
-		);
+		if (!response.ok) {
+			// Extract error details from the API response
+			const errorResponse = await response.json();
+			const errorMessage = errorResponse?.message || 'Registration failed. Please try again.';
+			throw new Error(errorMessage);
+		}
+
+		return await response.json();
+	} catch (error: any) {
+		// Handle fetch errors (e.g., network issues)
+		const errorMessage = error.message || 'An unknown error occurred.';
+		throw new Error(errorMessage);
 	}
-
-	return response.json();
 }
+

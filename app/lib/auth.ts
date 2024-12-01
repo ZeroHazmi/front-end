@@ -1,6 +1,7 @@
 "use server";
 
 import {cookies} from "next/headers";
+import {use} from "react";
 
 export async function setCookie(cookieName: string, token: string) {
 	(await cookies()).set(cookieName, token);
@@ -11,8 +12,8 @@ export async function removeCookie(cookieName: string) {
 }
 
 export async function getCookie(name: string) {
-	const cookie = (await cookies())?.get(name);
-	return cookie ? cookie.value : ""; // Return cookie value or an empty string if not found
+	const token = (await cookies()).get(name); // Get the cookie value by name
+	return token ? token.value : ""; // Return cookie value or an empty string if not found
 }
 
 export async function decodeToken(token: string) {

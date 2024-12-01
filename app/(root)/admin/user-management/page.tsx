@@ -18,12 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Trash2, Eye, FileText, Search, Filter, PlusCircle } from 'lucide-react'
+import { Trash2, Eye, FileText, Search, Filter, PlusCircle, Loader } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import DeleteEntityDialog from '@/components/dialog/DeleteEntityDialog'
 import AddUserDialog from '@/components/dialog/AddUserDialog'
 import { signUpFormSchema } from '@/lib/utils'
 import { z } from 'zod'
+import { getCookie } from '@/app/lib/auth'
 
 type User = {
   id: string
@@ -35,50 +36,72 @@ type User = {
   gender: string
 }
 
-const dummyUsers: User[] = [
-  { id: '1', username: 'johnd', name: 'John Doe', icNumber: 'IC123456', email: 'john@example.com', age: 30, gender: 'Male' },
-  { id: '2', username: 'janes', name: 'Jane Smith', icNumber: 'IC789012', email: 'jane@example.com', age: 28, gender: 'Female' },
-  { id: '3', username: 'bobw', name: 'Bob Wilson', icNumber: 'IC345678', email: 'bob@example.com', age: 35, gender: 'Male' },
-  { id: '4', username: 'aliceg', name: 'Alice Green', icNumber: 'IC901234', email: 'alice@example.com', age: 42, gender: 'Female' },
-  { id: '5', username: 'saml', name: 'Sam Lee', icNumber: 'IC567890', email: 'sam@example.com', age: 25, gender: 'Other' },
-]
-
 type AddUserFormValues = z.infer<ReturnType<typeof signUpFormSchema>>
 
 export default function UserManagementPage() {
-  const [users, setUsers] = useState<User[]>(dummyUsers)
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(dummyUsers)
+  const [users, setUsers] = useState<User[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isAddUserDialogOpen, setisAddUserDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [genderFilter, setGenderFilter] = useState<string | null>(null)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const filterUsers = () => {
-      let result = users
-      if (searchQuery) {
-        const lowerCaseQuery = searchQuery.toLowerCase()
-        result = result.filter(user => 
-          user.name.toLowerCase().includes(lowerCaseQuery) || 
-          user.username.toLowerCase().includes(lowerCaseQuery)
-        )
+  const fetchUsers = async () => {
+    try {
+      const token = await getCookie("session");
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Session token is missing. Redirecting to login...",
+          variant: "destructive",
+        });
+        return;
       }
-      if (genderFilter && genderFilter !== 'all') {
-        result = result.filter(user => user.gender === genderFilter)
+  
+      setLoading(true);
+  
+      // Construct query parameters
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("search", searchQuery);
+      if (genderFilter) params.append("gender", genderFilter);
+      params.append("sortOrder", sortOrder);
+  
+      const response = await fetch(`http://localhost:5035/api/user/getusers?${params.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
       }
-      setFilteredUsers(result)
+  
+      const data = await response.json();
+      console.log("Fetched Users:", data);
+  
+      // Directly set the filtered users from the server response
+      setUsers(data); // Update all users
+      setFilteredUsers(data); // Update displayed users
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-
-    filterUsers()
-  }, [searchQuery, genderFilter, users])
+  };
 
   const handleDeleteUser = () => {
     if (!userToDelete) return
 
-    setUsers(prev => prev.filter(user => user.id !== userToDelete))
     setIsDeleteDialogOpen(false)
     setUserToDelete(null)
+    fetchUsers()
     toast({
       title: "Success",
       description: "User deleted successfully",
@@ -86,16 +109,8 @@ export default function UserManagementPage() {
   }
 
   const handleAddUser = (newUser: AddUserFormValues) => {
-    const user = {
-      id: `${users.length + 1}`,
-      username: newUser.userName,
-      name: newUser.name,
-      icNumber: newUser.icNumber,
-      email: newUser.email,
-      age: newUser.birthday ? new Date().getFullYear() - new Date(newUser.birthday).getFullYear() : 0,
-      gender: newUser.gender,
-    }
-    setUsers((prevUsers) => [...prevUsers, user])
+    setisAddUserDialogOpen(false);
+    fetchUsers();
     toast({
       title: "Success",
       description: "User added successfully",
@@ -115,6 +130,10 @@ export default function UserManagementPage() {
       description: `Viewing reports for user ID: ${userId}`,
     })
   }
+
+  useEffect(() => {
+    fetchUsers();
+  }, [searchQuery, genderFilter, sortOrder]);
 
   return (
     <div className="container mx-auto p-4">
@@ -142,9 +161,11 @@ export default function UserManagementPage() {
               <SelectItem value="all">All Genders</SelectItem>
               <SelectItem value="Male">Male</SelectItem>
               <SelectItem value="Female">Female</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
             </SelectContent>
           </Select>
+          <Button variant="outline" className="flex items-center" onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}>
+            {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
+          </Button>
           <Button variant="outline" className="flex items-center">
             <Filter className="h-4 w-4 mr-2" />
             Filter
@@ -171,36 +192,53 @@ export default function UserManagementPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredUsers.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.username}</TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.icNumber}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.age}</TableCell>
-              <TableCell>{user.gender}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleViewProfile(user.id)}>
-                    <Eye className="h-4 w-4 mr-2" /> Profile
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleViewReports(user.id)}>
-                    <FileText className="h-4 w-4 mr-2" /> Reports
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      setUserToDelete(user.id)
-                      setIsDeleteDialogOpen(true)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="flex flex-row justify-center">
+                  <Loader className="h-8 w-8 animate-spin text-blue-600" />
+                  Loading Users...
+                </TableCell>
+              </TableRow>
+          ) : (
+            filteredUsers.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.icNumber}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.age}</TableCell>
+                <TableCell>{user.gender == "0" ? "Male" : "Female"}</TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewProfile(user.id)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" /> Profile
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleViewReports(user.id)}
+                    >
+                      <FileText className="h-4 w-4 mr-2" /> Reports
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setUserToDelete(user.id);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )))
+          }
         </TableBody>
       </Table>
 

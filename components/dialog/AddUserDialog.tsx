@@ -60,56 +60,58 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
     },
   })
 
-  const { watch, control, setValue } = form
+  const { watch, control, setValue, reset } = form
   const selectedState = watch('state')
 
   useEffect(() => {
-    if (selectedState) {
-      const fetchedDistricts = getDistricts(selectedState)
-      setDistricts(fetchedDistricts)
-    }
+      if (selectedState) {
+          const districts = getDistricts(selectedState);
+          setDistricts(districts);
+      }
   }, [selectedState])
 
   const onSubmit = async (values: AddUserFormValues) => {
-    setIsLoading(true);
-    
-    // Exclude `repassword` from the payload
-    const { repassword, ...filteredValues } = values;
-  
+    console.log('Submitting Form Values:', values);
+    setIsLoading(true)
     try {
-      // Register user via API
-      const response = await registerUser(filteredValues);
+      const { repassword, ...userDataToSubmit } = values
+      const response = await registerUser(userDataToSubmit)
+      console.log("API Response:", response);
       
-      // Close the dialog before displaying success toast
-      await onOpenChange(false);
-      
-      // Notify parent component about the new user
-      onUserAdded(filteredValues);
-  
-      // Reset the form fields
-      form.reset();
-  
-      // Display success toast
-      toast({
-        title: "Success",
-        description: "User added successfully",
-      });
-    } catch (error) {
-      console.error("Add user error:", error);
-  
-      // Close the dialog before displaying error toast
-      await onOpenChange(false);
-  
-      // Display error toast
-      toast({
-        title: "Error",
-        description: "Failed to add user",
-        variant: "destructive",
-      });
+      if (response) {
+        onOpenChange(false)
+        onUserAdded(userDataToSubmit)
+        reset() // Reset the form
+        toast({
+          title: "Success",
+          description: "User added successfully",
+        })
+      } else {
+        throw new Error(response.message || "Failed to add user")
+      }
+    } catch (error: any) {
+      console.error("Add user error:", error.message);
+    
+      // Check for error details in the response, assuming the response might contain more details
+      if (error?.response?.data?.message) {
+        // Retrieve and show the error message from the response
+        toast({
+          title: "Error",
+          description: error.response.data.message || "Failed to add user",
+          variant: "destructive",
+        });
+      } else {
+        // Fallback error message in case the error does not contain a response
+        toast({
+          title: "Error",
+          description: error.message || "An unknown error occurred",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -123,21 +125,24 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <RegisterCustomInput control={control} name="userName" label="Username" placeholder="Enter username" id="username-input"/>
-              <RegisterCustomInput control={control} name="password" label="Password" placeholder="Enter password" id="password-input"/>
-              <RegisterCustomInput control={control} name="repassword" label="Confirm Password" placeholder="Confirm password" id="repassword-input"/>
-              <RegisterCustomInput control={control} name="name" label="Name" placeholder="Enter name" id="name-input"/>
-              <RegisterCustomInput control={control} name="email" label="Email" placeholder="Enter email" id="email-input"/>
-              <RegisterCustomInput control={control} name="icNumber" label="IC Number" placeholder="Enter IC" id="ic-input"/>
-              <RegisterCustomInput control={control} name="birthday" label="Birthdate" placeholder="Enter birthdate" id="birthday-input"/>
-              <SelectInput control={control} name="gender" label="Gender" placeholder="Select gender" id="gender-input" options={gender} setValue={setValue}/>
-              <SelectInput control={control} name="nationality" label="Nationality" placeholder="Select nationality" id="nationality-input" options={nationality} setValue={setValue}/>
-              <SelectInput control={control} name="descendants" label="Descendants" placeholder="Select descendants" id="descendant-input" options={descendants} setValue={setValue}/>
-              <SelectInput control={control} name="religion" label="Religion" placeholder="Select religion" id="religion-input" options={religion} setValue={setValue}/>
-              <RegisterCustomInput control={control} name="phoneNumber" label="Phone Number" placeholder="Enter phone number" id="phone-input"/>
-              <RegisterCustomInput control={control} name="housePhoneNumber" label="House Phone" placeholder="Enter house phone" id="house-phone-input"/>
-              <SelectInput control={control} name="state" label="State" placeholder="Select state" id="state-input" options={states} setValue={setValue} />
-              <SelectInput control={control} name="district" label="District" placeholder="Select district" id="district-input" options={districts} setValue={setValue} />
+                <RegisterCustomInput control={form.control} name='icNumber' label="IC Number" placeholder='Enter your IC' id='ic-input'/>
+                <RegisterCustomInput control={form.control} name='name' label="Name" placeholder='Enter your name' id='name-input'/>
+                <RegisterCustomInput control={form.control} name='userName' label="Username" placeholder='Enter your username' id='username-input'/>
+                <RegisterCustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' id='password-input'/>
+                <RegisterCustomInput control={form.control} name='repassword' label="Re-enter Password" placeholder='Enter your typed password' id='repassword-input'/>
+                <RegisterCustomInput control={form.control} name='phoneNumber' label="Phone Number" placeholder='Enter your phone number' id='phone-input'/>
+                <RegisterCustomInput control={form.control} name='housePhoneNumber' label="House Phone Number" placeholder='Enter your house phone number' id='house-phone-input'/>
+                <RegisterCustomInput control={form.control} name='officePhoneNumber' label="Office Phone Number" placeholder='Enter your office phone number' id='office-phone-input'/>
+                <RegisterCustomInput control={form.control} name='birthday' label="Birthdate" placeholder='Enter your birthdate' id='birthday-input'/>
+                <SelectInput control={form.control} name='gender' label="Gender" placeholder='Enter your Gender' id='gender-input' options={gender} setValue={form.setValue}/>
+                <SelectInput control={form.control} name='nationality' label="Nationality" placeholder='Enter your nationality' id='nationality-input' options={nationality}/>
+                <SelectInput control={form.control} name='descendants' label="Descendants" placeholder='Enter your descendants' id='descendant-input' options={descendants}/>
+                <SelectInput control={form.control} name='religion' label="Religion" placeholder='Enter your Religion' id='religion-input' options={religion} />
+                <RegisterCustomInput control={form.control} name='address' label="Address" placeholder='Enter your address' id='address-input'/>
+                <RegisterCustomInput control={form.control} name='postcode' label="Postcode" placeholder='Enter your postcode' id='postcode-input'/>
+                <SelectInput control={form.control} name='state' label="States" placeholder='Select a State' id='state-input' options={states} />
+                <SelectInput control={form.control} name='region' label="Districts" placeholder='Select a district' id='district-input' options={districts}  />
+                <RegisterCustomInput control={form.control} name='email' label="Email" placeholder='Enter your email' id='email-input'/>
             </div>
 
             <DialogFooter>

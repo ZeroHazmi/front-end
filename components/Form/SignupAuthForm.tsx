@@ -187,7 +187,8 @@ const SignupAuthForm = () => {
                     
                         <div className=" max-w-[1200px] min-w-[550px] flex  justify-center items-center border-solid flex-wrap gap-5 ">
                             
-                            <div className="flex flex-col justify-center items-center gap-4">
+                            <div className="flex justify-center items-center gap-4">
+                                <Button type='button' onClick={returnToLogin} className='btn-secondary'>Back</Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
@@ -200,10 +201,8 @@ const SignupAuthForm = () => {
                                     ) : 'Sign Up'}
                                 </Button>
                             </div>
-                                <Button type='button' onClick={returnToLogin} className='btn-secondary'>Back</Button>
-                            </div>
-
                         </div>
+                    </div>
                 </form>
             </Form>
 

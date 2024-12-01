@@ -10,16 +10,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { PlusCircle, Trash2, Eye } from 'lucide-react'
+import { PlusCircle, Trash2, Eye, Filter, Loader } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import AddOfficerDialog from '@/components/dialog/AddOfficerDialog'
 import DeleteOfficerDialog from '@/components/dialog/DeleteOfficerDialog'
 import { getCookie } from '@/app/lib/auth'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import DeleteEntityDialog from '@/components/dialog/DeleteEntityDialog'
 
 type PoliceOfficer = {
   id: string
   name: string
-  username: string
   email: string
   icNumber: string
   gender: string
@@ -31,10 +38,11 @@ export default function PoliceManagementPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [officerToDelete, setOfficerToDelete] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [genderFilter, setGenderFilter] = useState<string>('all')
 
-  const fetchOfficers = async () => {
+  const fetchOfficers = async (gender: string = 'all') => {
     try {
-      const token = getCookie("session")
+      const token = await getCookie("session")
       if (!token) {
         toast({
           title: "Error",
@@ -45,7 +53,7 @@ export default function PoliceManagementPage() {
       }
 
       setLoading(true)
-      const response = await fetch("http://localhost:5035/api/police/get-all", {
+      const response = await fetch(`http://localhost:5035/api/police/all?gender=${gender}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,12 +77,12 @@ export default function PoliceManagementPage() {
   }
 
   useEffect(() => {
-    fetchOfficers()
-  }, [])
+    fetchOfficers(genderFilter)
+  }, [genderFilter])
 
   const handleOfficerAdded = () => {
     setIsAddDialogOpen(false)
-    fetchOfficers() // Refresh the list after adding an officer
+    fetchOfficers(genderFilter)
     toast({
       title: "Success",
       description: "Police officer added successfully.",
@@ -92,25 +100,40 @@ export default function PoliceManagementPage() {
     })
   }
 
+  const handleGenderFilterChange = (value: string) => {
+    setGenderFilter(value)
+  }
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Manage Police Officers</h1>
 
-      <div className="mb-4">
+      <div className="flex justify-between mb-4">
         <Button
           className="bg-police-blue hover:bg-blue-700"
           onClick={() => setIsAddDialogOpen(true)}
         >
           <PlusCircle className="mr-2 h-4 w-4" /> Add Police Officer
         </Button>
+        <div className="flex items-center space-x-2">
+          <Select value={genderFilter} onValueChange={handleGenderFilterChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Genders</SelectItem>
+              <SelectItem value="Male">Male</SelectItem>
+              <SelectItem value="Female">Female</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" className="flex items-center">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+        </div>
       </div>
 
-      {loading ? (
-        <p>Loading officers...</p>
-      ) : officers.length === 0 ? (
-        <p>No officers found.</p>
-      ) : (
-        <Table>
+      <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
@@ -120,13 +143,23 @@ export default function PoliceManagementPage() {
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {officers.map((officer) => (
+          {loading ? (
+            // Ensure proper handling of loading state
+            <TableRow>
+              <TableCell colSpan={5} className="flex flex-row justify-center">
+                <Loader className="h-8 w-8 animate-spin text-blue-600" />
+                Loading officers...
+              </TableCell>
+            </TableRow>
+          ) : officers.length > 0 ? (
+            officers.map((officer) => (
               <TableRow key={officer.id}>
                 <TableCell>{officer.name}</TableCell>
                 <TableCell>{officer.icNumber}</TableCell>
                 <TableCell>{officer.email}</TableCell>
-                <TableCell>{officer.gender}</TableCell>
+                <TableCell>{officer.gender == "0" ? "Male" : "Female"}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button
@@ -145,8 +178,9 @@ export default function PoliceManagementPage() {
                       variant="destructive"
                       size="sm"
                       onClick={() => {
-                        setOfficerToDelete(officer.id)
-                        setIsDeleteDialogOpen(true)
+                        console.log("Deleting officer with ID:", officer.id);
+                        setOfficerToDelete(officer.id);
+                        setIsDeleteDialogOpen(true);
                       }}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -154,10 +188,17 @@ export default function PoliceManagementPage() {
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+            ))
+          ) : (
+            // Ensure consistent output when no data is available
+            <TableRow>
+              <TableCell colSpan={5} className="text-center">
+                No officers found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
       {/* Add Officer Dialog */}
       <AddOfficerDialog
@@ -166,12 +207,12 @@ export default function PoliceManagementPage() {
         onOfficerAdded={handleOfficerAdded}
       />
 
-      {/* Delete Officer Dialog */}
-      <DeleteOfficerDialog
-        policeId={officerToDelete!}
+      <DeleteEntityDialog 
+        id={officerToDelete}
         isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onOfficerDeleted={handleOfficerDeleted}
+        type="police"
+        onDeleted={handleOfficerDeleted}
       />
     </div>
   )

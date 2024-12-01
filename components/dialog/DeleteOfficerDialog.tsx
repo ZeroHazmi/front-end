@@ -1,4 +1,11 @@
-import { getCookie } from "@/app/lib/auth";
+'use client'
+
+import { useState } from 'react'
+import { getCookie } from "@/app/lib/auth"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { toast } from "@/hooks/use-toast"
+import { Loader2 } from 'lucide-react'
 
 interface DeleteOfficerDialogProps {
   policeId: string;
@@ -13,47 +20,77 @@ export default function DeleteOfficerDialog({
   onOpenChange,
   onOfficerDeleted,
 }: DeleteOfficerDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
+
   const handleDelete = async () => {
+    setIsDeleting(true)
     try {
-      const token = getCookie("session");
+      const token = await getCookie("session");
       if (!token) {
-        console.error("Session token is missing");
+        toast({
+          title: "Error",
+          description: "Session token is missing",
+          variant: "destructive",
+        })
         return;
       }
 
-      const response = await fetch(`http://localhost:5035/api/police/delete/${policeId}`, {
+      const response = await fetch(`http://localhost:5035/api/police/delete?userId=${policeId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      console.log("Response:", response);
+
       if (!response.ok) {
-        console.error("Failed to delete officer");
-        return;
+        throw new Error("Failed to delete officer");
       }
 
       onOfficerDeleted(); // Notify parent to refresh the list
+      onOpenChange(false); // Close the dialog
+      toast({
+        title: "Success",
+        description: "Officer deleted successfully",
+      })
     } catch (error) {
       console.error("Error deleting officer:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete officer",
+        variant: "destructive",
+      })
+    } finally {
+      setIsDeleting(false)
     }
   };
 
-  if (!isOpen) {
-    return null; // Don't render the dialog if it is not open
-  }
-
   return (
-    <div className="dialog-backdrop">
-      <div className="dialog-content">
-        <p>Are you sure you want to delete this officer?</p>
-        <button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded">
-          Yes, Delete
-        </button>
-        <button onClick={() => onOpenChange(false)} className="bg-gray-300 p-2 rounded">
-          Cancel
-        </button>
-      </div>
-    </div>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Officer</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this officer? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              'Delete'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
