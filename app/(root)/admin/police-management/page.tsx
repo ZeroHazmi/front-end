@@ -71,13 +71,12 @@ export default function PoliceManagementPage() {
         },
       })
 
-      console.log(response)
-
       if (!response.ok) {
         throw new Error("Failed to fetch officers")
       }
 
       const data = await response.json()
+      console.log("Fetched Users:", data);
       setOfficers(data)
     } catch (error: any) {
       toast({
@@ -180,7 +179,7 @@ export default function PoliceManagementPage() {
               <TableCell>{officer.name}</TableCell>
               <TableCell>{officer.username}</TableCell>
               <TableCell>{officer.email}</TableCell>
-              <TableCell>{officer.gender === "0" ? "Male" : "Female"}</TableCell>
+              <TableCell>{officer.gender == "0" ? "Male" : "Female"}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button

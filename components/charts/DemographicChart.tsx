@@ -24,15 +24,16 @@ const DemographicsChartComponent = () => {
   const [incidentType, setIncidentType] = useState('All Types');
   const [severity, setSeverity] = useState('All Severities');
   const [location, setLocation] = useState('All Locations');
+  const [ageRange, setAgeRange] = useState('All Ages');
 
   const filteredData = useMemo(() => {
     return fullData.filter(item => {
       const typeMatch = incidentType === 'All Types' || item.type === incidentType;
       const severityMatch = severity === 'All Severities' || item.severity === severity;
-      const locationMatch = location === 'All Locations' || item.location === location;
-      return typeMatch && severityMatch && locationMatch;
+      const ageMatch = ageRange === 'All Ages' || item.age === ageRange;
+      return typeMatch && severityMatch && ageMatch;
     });
-  }, [incidentType, severity, location]);
+  }, [incidentType, severity, ageRange]);
 
   const chartData = useMemo(() => {
     const aggregatedData = filteredData.reduce((acc: { [key: string]: number }, item) => {
@@ -79,15 +80,17 @@ const DemographicsChartComponent = () => {
                   <SelectItem value="Critical">Critical</SelectItem>
                 </SelectContent>
               </Select>
-
-              <Select onValueChange={(value) => setLocation(value)} value={location}>
+              <Select onValueChange={(value) => setAgeRange(value)} value={ageRange}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Location" />
+                  <SelectValue placeholder="Age Range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="All Locations">All Locations</SelectItem>
-                  <SelectItem value="Location 1">Location 1</SelectItem>
-                  <SelectItem value="Location 2">Location 2</SelectItem>
+                  <SelectItem value="All Ages">All Ages</SelectItem>
+                  <SelectItem value="18-25">18-25</SelectItem>
+                  <SelectItem value="26-35">26-35</SelectItem>
+                  <SelectItem value="36-45">36-45</SelectItem>
+                  <SelectItem value="46-60">46-60</SelectItem>
+                  <SelectItem value="60+">60+</SelectItem>
                 </SelectContent>
               </Select>
             </div>

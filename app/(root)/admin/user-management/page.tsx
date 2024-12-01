@@ -74,12 +74,13 @@ export default function UserManagementPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
   
       const data = await response.json();
+
       console.log("Fetched Users:", data);
   
       // Directly set the filtered users from the server response

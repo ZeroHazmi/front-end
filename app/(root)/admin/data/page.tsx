@@ -2,9 +2,9 @@
 
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import IncidentRateComponent from './incident-rate/page'
-import DemographicsChartComponent from './demographic/page'
-import IncidentHeatmap from './location/page'
+import IncidentRateComponent from '@/components/charts/IncidentRateChart'
+import IncidentHeatmap from '@/components/charts/HeatMap'
+import DemographicsChartComponent from '@/components/charts/DemographicChart'
 
 const DataPage = () => {
   return (
@@ -20,10 +20,10 @@ const DataPage = () => {
                 <IncidentRateComponent />
               </TabsContent>
               <TabsContent value="concentration-map" className="space-y-4">
-                  <IncidentHeatmap />
+                <IncidentHeatmap />
               </TabsContent>
               <TabsContent value="demographic" className="space-y-4">
-                  <DemographicsChartComponent />
+                <DemographicsChartComponent />
               </TabsContent>
           </Tabs>
         </div>
