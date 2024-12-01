@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Trash2, Eye, FileText, Search, Filter, PlusCircle, Loader } from 'lucide-react'
+import { Trash2, Eye, FileText, Search, Filter, PlusCircle, Loader, ArrowUpDown } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import DeleteEntityDialog from '@/components/dialog/DeleteEntityDialog'
 import AddUserDialog from '@/components/dialog/AddUserDialog'
@@ -164,11 +164,8 @@ export default function UserManagementPage() {
             </SelectContent>
           </Select>
           <Button variant="outline" className="flex items-center" onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}>
-            {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-          </Button>
-          <Button variant="outline" className="flex items-center">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
+            <ArrowUpDown className="h-4 w-4 mr-2" />
+            Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
           </Button>
           <Button
           className="bg-police-blue hover:bg-blue-700"
