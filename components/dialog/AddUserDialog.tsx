@@ -60,7 +60,7 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
     },
   })
 
-  const { watch, control, setValue, reset } = form
+  const { watch, reset } = form
   const selectedState = watch('state')
 
   useEffect(() => {

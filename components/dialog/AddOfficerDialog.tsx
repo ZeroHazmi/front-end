@@ -1,16 +1,25 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { getCookie } from "@/app/lib/auth";
+'use client'
+
+import { useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+import { toast } from "@/hooks/use-toast"
+import { getCookie } from "@/app/lib/auth"
+import SelectInput from "../input/SelectInput"
+import { gender } from "@/types/constants"
+import RegisterCustomInput from "../input/RegisterCustomInput"
+import { AddPoliceSchema } from "@/lib/utils"
+
+type AddPoliceFormValues = z.infer<ReturnType<typeof AddPoliceSchema>>
 
 interface AddOfficerDialogProps {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  onOfficerAdded: () => void;
+  isOpen: boolean
+  onOpenChange: (isOpen: boolean) => void
+  onOfficerAdded: () => void
 }
 
 export default function AddOfficerDialog({
@@ -18,35 +27,33 @@ export default function AddOfficerDialog({
   onOpenChange,
   onOfficerAdded,
 }: AddOfficerDialogProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    username: "",
-    password: "",
-    email: "",
-    icNumber: "",
-    gender: "",
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const form = useForm<AddPoliceFormValues>({
+    resolver: zodResolver(AddPoliceSchema()),
+    defaultValues: {
+      userName: "",
+      name: "",
+      password: "",
+      repassword: "",
+      email: "",
+      icNumber: "",
+      gender: "",
+      phoneNumber: "",
+    },
+  })
 
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, gender: value }));
-  };
-
-  const handleSubmit = async () => {
+  const onSubmit = async (values: AddPoliceFormValues) => {
+    setIsSubmitting(true)
     try {
-      const token = await getCookie("session");
-      console.log("Token:", token);
+      const token = await getCookie("session")
       if (!token) {
         toast({
           title: "Error",
           description: "Session token is missing.",
           variant: "destructive",
-        });
-        return;
+        })
+        return
       }
 
       const response = await fetch("http://localhost:5035/api/police/register", {
@@ -55,99 +62,57 @@ export default function AddOfficerDialog({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
-      });
+        body: JSON.stringify(values),
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        toast({
-          title: "Error",
-          description: errorData.message || "Failed to register officer.",
-          variant: "destructive",
-        });
-        return;
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to register officer.")
       }
 
       toast({
         title: "Success",
         description: "Police officer added successfully.",
-      });
-      onOfficerAdded(); // Notify parent about the successful addition
+      })
+      onOfficerAdded()
+      onOpenChange(false)
+      form.reset()
     } catch (error) {
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
         variant: "destructive",
-      });
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Police Officer</DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Username
-              </Label>
-              <Input id="username" name="username" value={formData.username} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="password" className="text-right">
-                Password
-              </Label>
-              <Input id="password" name="password" type="password" value={formData.password} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="icNumber" className="text-right">
-                IC Number
-              </Label>
-              <Input id="icNumber" name="icNumber" value={formData.icNumber} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="gender" className="text-right">
-                Gender
-              </Label>
-              <Select onValueChange={handleSelectChange} value={formData.gender}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" className="bg-police-blue hover:bg-blue-700">
-              Add Officer
-            </Button>
-          </DialogFooter>
-        </form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <RegisterCustomInput control={form.control} name="icNumber" label="IC Number" placeholder="Enter your IC" id="ic-input"/>
+            <RegisterCustomInput control={form.control} name="name" label="Name" placeholder="Enter your name" id="name-input"/>
+            <RegisterCustomInput control={form.control} name="userName" label="Username" placeholder="Enter your username" id="username-input"/>
+            <RegisterCustomInput control={form.control} name="password" label="Password" placeholder="Enter your password" id="password-input"/>
+            <RegisterCustomInput control={form.control} name="repassword" label="Re-enter Password" placeholder="Enter your typed password" id="repassword-input"/>
+            <RegisterCustomInput control={form.control} name="phoneNumber" label="Phone Number" placeholder="Enter your phone number" id="phone-input"/>
+            <RegisterCustomInput control={form.control} name="email" label="Email" placeholder="Enter your email" id="email-input"/>
+            <SelectInput control={form.control} name="gender" label="Gender" placeholder="Enter your Gender" id="gender-input" options={gender} setValue={form.setValue}/>
+
+            <DialogFooter>
+              <Button type="submit" className="bg-police-blue hover:bg-blue-700" disabled={isSubmitting}>
+                {isSubmitting ? "Adding..." : "Add Officer"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

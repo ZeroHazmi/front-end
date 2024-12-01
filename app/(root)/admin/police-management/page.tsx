@@ -27,6 +27,7 @@ import DeleteEntityDialog from '@/components/dialog/DeleteEntityDialog'
 type PoliceOfficer = {
   id: string
   name: string
+  username: string,
   email: string
   icNumber: string
   gender: string
@@ -137,7 +138,7 @@ export default function PoliceManagementPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>IC Number</TableHead>
+              <TableHead>Username</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Gender</TableHead>
               <TableHead>Actions</TableHead>
@@ -157,6 +158,7 @@ export default function PoliceManagementPage() {
             officers.map((officer) => (
               <TableRow key={officer.id}>
                 <TableCell>{officer.name}</TableCell>
+                <TableCell>{officer.username}</TableCell>
                 <TableCell>{officer.icNumber}</TableCell>
                 <TableCell>{officer.email}</TableCell>
                 <TableCell>{officer.gender == "0" ? "Male" : "Female"}</TableCell>
