@@ -9,9 +9,6 @@ import { addDays, format } from "date-fns";
 import { states } from "@/types/constants";
 import { toast } from "@/hooks/use-toast";
 import { 
-  Chart, 
-  ChartBar, 
-  ChartBarList, 
   ChartConfig, 
   ChartContainer, 
   ChartLegend, 
@@ -19,6 +16,7 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis, ResponsiveContainer, YAxis, Tooltip } from "recharts"
 
 // Define the type for incident data based on the updated API response
 interface IncidentData {
@@ -26,17 +24,6 @@ interface IncidentData {
   reportTypeName: string;
   incidentCount: number;
 }
-
-const generateColorFromString = (str: string): string => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  
-  const hue = hash % 360;
-  return `hsl(${hue}, 70%, 50%)`;
-};
-
 
 const IncidentRateComponent = () => {
   const [timeRange, setTimeRange] = useState("All Time");
@@ -54,7 +41,7 @@ const IncidentRateComponent = () => {
 
   async function fetchReportType() {
     try {
-      const response = await fetch("http://localhost:5035/api/reporttype", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -86,7 +73,7 @@ const IncidentRateComponent = () => {
         params.append("endDate", format(dateRange.to, "yyyy-MM-dd"));
       }
 
-      const url = `http://localhost:5035/api/incident/incident-rates?${params.toString()}`;
+      const url = `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}incident/incident-rates?${params.toString()}`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -115,14 +102,6 @@ const IncidentRateComponent = () => {
     name: item.reportTypeName,
     value: item.incidentCount,
   }));
-
-  const chartConfig = incidentData.reduce((config, item) => {
-    config[item.reportTypeName] = {
-      label: item.reportTypeName,
-      color: generateColorFromString(item.reportTypeName),
-    };
-    return config;
-  }, {} as ChartConfig);
 
   return (
     <div className="p-4 bg-white rounded-md shadow">
@@ -191,15 +170,22 @@ const IncidentRateComponent = () => {
           <CardDescription>Data for {timeRange}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer className="h-[400px]" config={chartConfig}>
-            <Chart>
-              <ChartBar dataKey="value" data={chartData}>
-                <ChartBarList />
-                <ChartTooltip content={<ChartTooltipContent />} />
-              </ChartBar>
-              <ChartLegend content={<ChartLegendContent />} />
-            </Chart>
-          </ChartContainer>
+          <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="reportTypeName"
+                angle={-45}
+                textAnchor="end"
+                height={70}
+                interval={0}
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="reportTypeName" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
     </div>

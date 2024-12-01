@@ -56,7 +56,7 @@ export default function AddOfficerDialog({
         return
       }
 
-      const response = await fetch("http://localhost:5035/api/police/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}police/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -32,7 +32,7 @@ function IncidentHeatmap() {
         if (selectedSeverity) params.append("priority", selectedSeverity);
         if (selectedType) params.append("reportTypeId", selectedType);
 
-        const response = await fetch(`http://localhost:5035/api/incident/heatmap?${params.toString()}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}incident/heatmap?${params.toString()}`);
         const data = await response.json();
         console.log(data);
         setHeatMapData(data); // Assuming the data is in the expected format

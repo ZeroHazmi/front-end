@@ -69,7 +69,7 @@ export default function UserProfile() {
         console.log("User ID from cookies:", userId);
   
         if (userId) {
-          const response = await fetch(`http://localhost:5035/api/user/${userId}`);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/${userId}`);
           if (response.ok) {
             const data = await response.json();
             console.log("User data:", data);

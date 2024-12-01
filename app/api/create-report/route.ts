@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import {NextResponse} from "next/server";
+import {cookies} from "next/headers";
 
 // Type definitions
 type ReportRequest = {
@@ -52,17 +52,17 @@ export async function POST(request: Request) {
 
 		// Get authentication token from cookies
 		const cookieStore = await cookies();
-		const authToken = cookieStore.get('session');
+		const authToken = cookieStore.get("session");
 
 		if (!authToken) {
 			return NextResponse.json(
-				{ error: 'Authentication required' },
-				{ status: 401 },
+				{error: "Authentication required"},
+				{status: 401}
 			);
 		}
 
 		// Generate random priority (Low, Medium, High, Critical)
-		const priorities = ['Low', 'Medium', 'High', 'Critical'];
+		const priorities = ["Low", "Medium", "High", "Critical"];
 		const randomPriority =
 			priorities[Math.floor(Math.random() * priorities.length)];
 
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
 		// Prepare report data
 		const reportData: ReportData = {
 			reportTypeId: reportTypeID,
-			status: 'Open',
+			status: "Open",
 			priority: randomPriority,
 			reportDetail: {
 				reportTypeId: reportTypeID,
@@ -83,57 +83,57 @@ export async function POST(request: Request) {
 				latitute: latitute,
 				longitude: longitude,
 				state: state,
-				fieldValue: '{}',
-				audio: '',
-				image: '',
+				fieldValue: "{}",
+				audio: "",
+				image: "",
 				transcript: reportContent,
 			},
 		};
 
-		console.log('Report data:', reportData);
+		console.log("Report data:", reportData);
 
 		// Create report in backend API
 		const createReportResponse = await fetch(
-			'http://localhost:5035/api/report/create',
+			`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report/create`,
 			{
-				method: 'POST',
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/json-patch+json',
+					"Content-Type": "application/json-patch+json",
 					Authorization: `Bearer ${authToken.value}`,
 				},
 				body: JSON.stringify(reportData),
-			},
+			}
 		);
 
-		const contentType = createReportResponse.headers.get('Content-Type');
+		const contentType = createReportResponse.headers.get("Content-Type");
 
 		if (!createReportResponse.ok) {
 			const errorMessage =
-				contentType && contentType.includes('application/json')
+				contentType && contentType.includes("application/json")
 					? await createReportResponse.json()
 					: await createReportResponse.text();
-			console.error('Failed to create report:', errorMessage);
+			console.error("Failed to create report:", errorMessage);
 			return NextResponse.json(
-				{ error: 'Failed to create report' },
-				{ status: createReportResponse.status },
+				{error: "Failed to create report"},
+				{status: createReportResponse.status}
 			);
 		}
 
 		const responseBody =
-			contentType && contentType.includes('application/json')
+			contentType && contentType.includes("application/json")
 				? await createReportResponse.json()
 				: await createReportResponse.text();
 
-		console.log('Response:', responseBody);
+		console.log("Response:", responseBody);
 		return NextResponse.json(
-			{ success: true, message: 'Report created successfully' },
-			{ status: 200 },
+			{success: true, message: "Report created successfully"},
+			{status: 200}
 		);
 	} catch (error) {
-		console.error('Error processing request:', error);
+		console.error("Error processing request:", error);
 		return NextResponse.json(
-			{ error: 'Internal server error' },
-			{ status: 500 },
+			{error: "Internal server error"},
+			{status: 500}
 		);
 	}
 }

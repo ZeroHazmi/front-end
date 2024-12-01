@@ -17,7 +17,7 @@ const CreateNewReport = () => {
     const currentRoute = usePathname();
 
     async function fetchReportType() {
-        const response = await fetch('http://localhost:5035/api/reporttype?isOnline=true', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype?isOnline=true`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -69,7 +69,7 @@ export default function UserManagementPage() {
       if (genderFilter) params.append("gender", genderFilter);
       params.append("sortOrder", sortOrder);
   
-      const response = await fetch(`http://localhost:5035/api/user/getusers?${params.toString()}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/getusers?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

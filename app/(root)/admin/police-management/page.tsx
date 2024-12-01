@@ -65,7 +65,7 @@ export default function PoliceManagementPage() {
       if (genderFilter) params.append("gender", genderFilter);
       params.append("sortOrder", sortOrder);
 
-      const response = await fetch(`http://localhost:5035/api/police/all?${params.toString()}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}police/all?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

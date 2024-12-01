@@ -35,7 +35,7 @@ export default function DeleteOfficerDialog({
         return;
       }
 
-      const response = await fetch(`http://localhost:5035/api/police/delete?userId=${policeId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}police/delete?userId=${policeId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

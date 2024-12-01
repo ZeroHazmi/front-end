@@ -72,7 +72,7 @@ export default function SubmitReportPage() {
     useEffect(() => {
         const fetchReportType = async () => {
             try {
-                const response = await fetch(`http://localhost:5035/api/reporttype/${reportTypeID}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype/${reportTypeID}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

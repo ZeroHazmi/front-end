@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 
 async function fetchReports(reportMode: 'Open' | 'InProgress' | 'Closed'): Promise<Report[]> {
     try {
-        const response = await fetch(`http://localhost:5035/api/report?status=${reportMode === 'Open' ? 'InProgress' : 'Closed'}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report?status=${reportMode === 'Open' ? 'InProgress' : 'Closed'}`);
         const data = await response.json();
         
         return data.map((item: {
@@ -73,7 +73,7 @@ export default function PoliceReportTable() {
 
     const confirmDelete = async () => {
         if (reportToDelete !== null) {
-            const response = await fetch(`http://localhost:5035/api/report/${reportToDelete}`, { method: 'DELETE' });
+            const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report/${reportToDelete}`, { method: 'DELETE' });
             if (response.ok) {
                 toast({ title: "Report Removed", description: "Report has been removed successfully" });
                 setReports((prevReports) => prevReports.filter((report) => report.id !== Number(reportToDelete)));
@@ -86,7 +86,7 @@ export default function PoliceReportTable() {
 
     const confirmEdit = async () => {
         if (reportToEdit) {
-            const response = await fetch(`http://localhost:5035/api/report/${reportToEdit.id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report/${reportToEdit.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -43,8 +43,8 @@ export default function DeleteEntityDialog({
       // Construct the endpoint dynamically based on the type
       const endpoint =
         type === "police"
-          ? `http://localhost:5035/api/police/delete?userId=${id}`
-          : `http://localhost:5035/api/user/delete?userId=${id}`;
+          ? `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}police/delete?userId=${id}`
+          : `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/delete?userId=${id}`;
 
       const response = await fetch(endpoint, {
         method: "DELETE",
