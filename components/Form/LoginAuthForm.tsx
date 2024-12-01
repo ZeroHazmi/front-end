@@ -41,6 +41,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
         console.log("Form submitted with values:", values); // Add this line
         setIsLoading(true);
         try {
+            console.log(process.env.NEXT_PUBLIC_API_URL);
             const response = await login(values.username, values.password);
             console.log("Response:", response);
 

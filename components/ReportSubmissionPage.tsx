@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useActionState } from "react";
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
 import { ReportType } from "@/types/index.d";
 import Recorder, { mimeType } from "@/components/Recorder";
-import { useFormState } from "react-dom";
 import transcribe from "@/actions/transcribe";
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -49,7 +48,7 @@ export default function SubmitReportPage() {
 
     const fileRef = useRef<HTMLInputElement | null>(null);
     const submitButtonRef = useRef<HTMLButtonElement | null>(null);
-    const [state, formAction] = useFormState(transcribe, initialState);
+    const [state, formAction] = useActionState(transcribe, initialState);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
@@ -94,31 +93,6 @@ export default function SubmitReportPage() {
     
         fetchReportType();
     }, [reportTypeID]);
-    
-
-    // async function renderReport() {
-    //     try {
-    //         const reportTypeData = await fetchReportType();
-    //         setReportType(reportTypeData);
-
-    //         let parsedTemplate = {};
-    //         if (typeof reportTypeData.templateStructure === 'string') {
-    //             parsedTemplate = JSON.parse(reportTypeData.templateStructure);
-    //         } else {
-    //             parsedTemplate = reportTypeData.templateStructure;
-    //         }
-
-    //         const fields = Object.entries(parsedTemplate).map(([key, value]) => {
-    //             return [key, typeof value === 'string' ? value : String(value)] as [string, string];
-    //         });
-
-    //         setTemplateFields(fields);
-    //         setLoading(false);
-    //     } catch (parseError) {
-    //         setLoading(false);
-    //         console.error('Error fetching report type:', parseError);
-    //     }
-    // }
 
     const uploadAudio = (blob: Blob) => {
         const file = new File([blob], "audio.webm", { type: mimeType });
@@ -143,7 +117,7 @@ export default function SubmitReportPage() {
       const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const dateValue = e.target.value; // Get the new value from the input
         setDate(dateValue); // Update the state with the new time value
-        console.log('Time selected:', dateValue); // Log the value to the console
+        console.log('Date Selected:', dateValue); // Log the value to the console
       };
 
     // Create report

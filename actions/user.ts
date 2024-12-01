@@ -1,6 +1,7 @@
 import {AppUser} from "@/types/index.d";
 
 export async function login(username: string, password: string) {
+	console.log(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/login`);
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/login`,
 		{
