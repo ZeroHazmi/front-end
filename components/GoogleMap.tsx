@@ -95,7 +95,7 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
                   geometry: {
                     location,
                     location_type: google.maps.GeocoderLocationType.APPROXIMATE,
-                    viewport: null as any, // GeocoderResult includes `viewport`, which we can omit if not needed
+                    viewport: null as any,
                   },
                   address_components: place.address_components || [],
                   place_id: place.place_id || '',
@@ -118,6 +118,7 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
   
                 console.log('Location:', latLng, geocoderResult);
                 onLocationChange(latLng, geocoderResult);
+                setSearchQuery(geocoderResult.formatted_address);
               }
             } else {
               console.error('Place details not found or invalid');
@@ -167,6 +168,7 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
             { lat: latLng.lat(), lng: latLng.lng() },
             results.results[0]
           );
+          setSearchQuery(clickedAddress);  // Update the search bar with the clicked address
         } else {
           console.error('No address found for the clicked location');
         }
@@ -174,7 +176,6 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
         console.error('Geocoding error:', error);
       }
     };
-    
 
     const clickListener = map.addListener('click', handleMapClick);
 

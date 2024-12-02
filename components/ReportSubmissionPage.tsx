@@ -180,7 +180,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
           });
 
           setIsConfirmDialogOpen(false);
-          router.push(currentPath.includes('police') ? '/police' : '/user');
+          router.push(currentPath.includes('police') ? '/police' : '/user/reports/view');
       } catch (error: any) {
         toast({
             title: "Error",
