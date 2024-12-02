@@ -92,7 +92,7 @@ export default function NavBar() {
                 User Management
               </Link>
               {/* need to change to police faq to answer user questions */}
-              <Link href="/user/faq" className="hover:text-gray-200 cursor-pointer">
+              <Link href="/admin/faq" className="hover:text-gray-200 cursor-pointer">
                     FAQ
                 </Link>
             </>
@@ -129,7 +129,7 @@ export default function NavBar() {
           >
             Logout
           </Button>
-          {isPolice ? (
+          {isPolice || isAdmin ? (
             <UserCircle className="w-8 h-8 cursor-pointer" />
           ) : (
             <Link href="/user/profile" className="cursor-pointer">

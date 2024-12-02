@@ -27,7 +27,9 @@ const config: Config = {
   		},
   		animation: {
   			slideIn: 'slideIn 0.5s ease-in-out forwards',
-  			slideOut: 'slideOut 0.5s ease-in-out forwards'
+  			slideOut: 'slideOut 0.5s ease-in-out forwards',
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
   		},
   		boxShadow: {
   			'custom-blue': '0px 20px 75px rgba(0, 68, 204, 0.3)',
@@ -36,6 +38,24 @@ const config: Config = {
   			'bottom-custom-blue': '0px 40px 75px rgba(0, 68, 204, 0.3)',
   			'left-custom-blue': '-25px 0px 75px rgba(0, 68, 204, 0.2)',
   			'right-custom-blue': '25px 00px 75px rgba(0, 68, 204, 0.2)'
+  		},
+  		keyframes: {
+  			'accordion-down': {
+  				from: {
+  					height: '0'
+  				},
+  				to: {
+  					height: 'var(--radix-accordion-content-height)'
+  				}
+  			},
+  			'accordion-up': {
+  				from: {
+  					height: 'var(--radix-accordion-content-height)'
+  				},
+  				to: {
+  					height: '0'
+  				}
+  			}
   		}
   	}
   },
