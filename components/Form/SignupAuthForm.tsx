@@ -94,6 +94,7 @@ const SignupAuthForm = () => {
     }
 
     const onScanComplete = (data: ICScannerFields) => {
+        console.log("Data:", data);
         const convertedBirthday = convertBirthdayFormat(data.dateOfBirth);
         form.setValue('icNumber', data.documentNumber);
         form.setValue('name', data.fullName);

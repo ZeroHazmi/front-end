@@ -24,7 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { getCookie } from '@/app/lib/auth';
-import { mapPriority, mapStatus } from '@/lib/utils';
+import { mapPriority, mapStatus, renderFormattedDate } from '@/lib/utils';
 
 interface ReportData {
   reportId: string;
@@ -55,27 +55,6 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const canEdit = userType === 'police';
-
-  // Consistent date formatting to prevent hydration issues
-  const formatDate = (dateString: string): string => {
-    try {
-      const date = new Date(dateString);
-      // Use UTC methods to ensure consistency
-      return date.toISOString(); // ISO string ensures consistent formatting
-    } catch {
-      return '';
-    }
-  };
-
-  // Client-side only date rendering
-  const renderFormattedDate = (dateString: string): string => {
-    try {
-      const date = new Date(dateString);
-      return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'PPP p');
-    } catch {
-      return 'Invalid date';
-    }
-  };
 
   useEffect(() => {
     if (!reportId) return;

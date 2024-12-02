@@ -32,6 +32,7 @@ import { toast } from "@/hooks/use-toast"
 import { getCookie } from '@/app/lib/auth'
 import { Router } from 'express'
 import { useRouter } from 'next/navigation'
+import { mapPriority, mapStatus, renderFormattedDate } from '@/lib/utils'
 
 type Report = {
   id: string
@@ -301,9 +302,9 @@ export default function ReportManagementPage() {
               <TableRow key={report.id}>
                 <TableCell>{report.id}</TableCell>
                 <TableCell>{report.reportTypeName}</TableCell>
-                <TableCell>{new Date(report.createdAt).toLocaleString()}</TableCell>
-                <TableCell>{report.status}</TableCell>
-                <TableCell>{report.priority}</TableCell>
+                <TableCell>{renderFormattedDate(report.createdAt)}</TableCell>
+                <TableCell>{mapStatus(Number(report.status))}</TableCell>
+                <TableCell>{mapPriority(Number(report.priority))}</TableCell>
                 <TableCell>{report.name}</TableCell>
                 <TableCell>{report.icNumber}</TableCell>
                 <TableCell>

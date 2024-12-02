@@ -23,12 +23,13 @@ import { Search, Filter, ArrowUpDown, Loader, Eye } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import { getCookie } from '@/app/lib/auth'
 import { useRouter } from 'next/navigation'
+import { mapStatus, renderFormattedDate } from '@/lib/utils'
+import { format } from 'date-fns'
 
 type Report = {
   id: string
-  reportId: string
   reportTypeName: string
-  createdAt: string
+  createAt: string
   status: 'Low' | 'Medium' | 'High' | 'Critical'
 }
 
@@ -41,6 +42,17 @@ export default function UserReportTable() {
   const [sortOption, setSortOption] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  function renderFormattedDate(date: string) {
+    const parsedDate = new Date(date);
+    
+    if (isNaN(parsedDate.getTime())) {
+      console.error('Invalid date:', date); // Log the invalid date for debugging
+      return 'Invalid Date'; // Return a fallback value or handle accordingly
+    }
+  
+    return format(parsedDate, 'yyyy-MM-dd HH:mm:ss'); // Adjust date format as necessary
+  }
 
   const fetchReports = async () => {
     try {
@@ -128,7 +140,7 @@ export default function UserReportTable() {
   }, [searchQuery, statusFilter, priorityFilter, sortOption]);
 
   const handleViewReport = (reportId: string) => {
-    router.push(`/user/reports/${reportId}`)
+    router.push(`/user/reports/view/${reportId}`)
   }
 
   return (
@@ -168,23 +180,6 @@ export default function UserReportTable() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center">
-                <Filter className="h-4 w-4 mr-2" />
-                {priorityFilter || 'Priority'}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Filter by Priority</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setPriorityFilter(null)}>All Priorities</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPriorityFilter('Low')}>Low</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPriorityFilter('Medium')}>Medium</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPriorityFilter('High')}>High</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setPriorityFilter('Critical')}>Critical</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center">
                 <ArrowUpDown className="h-4 w-4 mr-2" />
                 {sortOption ? sortOption.replace(/([A-Z])/g, ' $1').trim() : 'Sort'}
               </Button>
@@ -204,7 +199,6 @@ export default function UserReportTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Report ID</TableHead>
             <TableHead>Report Type</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Status</TableHead>
@@ -229,10 +223,11 @@ export default function UserReportTable() {
           ) : (
             filteredReports.map((report) => (
               <TableRow key={report.id}>
-                <TableCell>{report.reportId}</TableCell>
                 <TableCell>{report.reportTypeName}</TableCell>
-                <TableCell>{new Date(report.createdAt).toLocaleString()}</TableCell>
-                <TableCell>{report.status}</TableCell>
+                <TableCell suppressHydrationWarning>
+                 {renderFormattedDate(report.createAt)}
+                </TableCell>
+                <TableCell>{mapStatus(Number(report.status))}</TableCell>
                 <TableCell>
                   <Button variant="outline" size="sm" onClick={() => handleViewReport(report.id)}>
                     <Eye className="h-4 w-4 mr-2" /> View Details
