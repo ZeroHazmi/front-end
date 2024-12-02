@@ -9,7 +9,7 @@ export default function UserTypingReport() {
 
     return (
         <div>
-            <SubmitReportPage />
+            <SubmitReportPage userAccess='user'/>
         </div>
     );
 }

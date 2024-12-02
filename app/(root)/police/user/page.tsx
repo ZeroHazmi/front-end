@@ -1,7 +1,7 @@
 import UserManagementPage from '@/components/UserManagementPage'
 import React from 'react'
 
-const AdminUserManagement = () => {
+const PoliceUserManagementPage = () => {
   return (
     <div>
         <UserManagementPage />
@@ -9,4 +9,4 @@ const AdminUserManagement = () => {
   )
 }
 
-export default AdminUserManagement;
+export default PoliceUserManagementPage

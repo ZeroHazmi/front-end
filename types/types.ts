@@ -9,9 +9,9 @@ export type UpdateLocationParams = {
 };
 
 export enum MapAddressType {
-	PARKINGLOCATION = 'PARKINGLOCATION',
-	DESTINATION = 'DESTINATION',
-	ADMIN = 'ADMIN',
+	PARKINGLOCATION = "PARKINGLOCATION",
+	DESTINATION = "DESTINATION",
+	ADMIN = "ADMIN",
 }
 
 export type MapParams = {
@@ -28,4 +28,14 @@ export type ActionResponse = {
 	message: string;
 	data?: any;
 	error?: any;
+};
+
+export type User = {
+	id: string;
+	username: string;
+	name: string;
+	icNumber: string;
+	email: string;
+	age: number;
+	gender: string;
 };

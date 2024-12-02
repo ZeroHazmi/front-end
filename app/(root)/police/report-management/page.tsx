@@ -27,8 +27,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Trash2, Eye, Search, Filter, ArrowUpDown } from 'lucide-react'
+import { Trash2, Eye, Search, Filter, ArrowUpDown, Loader } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
+import { getCookie } from '@/app/lib/auth'
 
 type Report = {
   id: string
@@ -40,63 +41,76 @@ type Report = {
   icNumber: string
 }
 
-const dummyReports: Report[] = [
-  { id: 'R001', reportType: 'Theft', createdAt: '2023-11-15', status: 'Open', priority: 'High', userName: 'John Doe', icNumber: 'IC123456' },
-  { id: 'R002', reportType: 'Vandalism', createdAt: '2023-11-14', status: 'In Progress', priority: 'Medium', userName: 'Jane Smith', icNumber: 'IC789012' },
-  { id: 'R003', reportType: 'Assault', createdAt: '2023-11-13', status: 'Completed', priority: 'Critical', userName: 'Bob Wilson', icNumber: 'IC345678' },
-  { id: 'R004', reportType: 'Fraud', createdAt: '2023-11-12', status: 'Open', priority: 'Low', userName: 'Alice Green', icNumber: 'IC901234' },
-  { id: 'R005', reportType: 'Burglary', createdAt: '2023-11-11', status: 'In Progress', priority: 'High', userName: 'Sam Lee', icNumber: 'IC567890' },
-]
-
 const priorityOrder = { 'Low': 0, 'Medium': 1, 'High': 2, 'Critical': 3 }
 
 export default function ReportManagementPage() {
-  const [reports, setReports] = useState<Report[]>(dummyReports)
-  const [filteredReports, setFilteredReports] = useState<Report[]>(dummyReports)
+  const [reports, setReports] = useState<Report[]>([])
+  const [filteredReports, setFilteredReports] = useState<Report[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [priorityFilter, setPriorityFilter] = useState<string | null>(null)
   const [sortOption, setSortOption] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [reportToDelete, setReportToDelete] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const fetchReports = async () => {
+    try {
+      const token = await getCookie("session");
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Session token is missing. Redirecting to login...",
+          variant: "destructive",
+        });
+        return;
+      }
+  
+      // Construct query parameters
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("search", searchQuery);
+      if (statusFilter) params.append("status", statusFilter);
+      if (priorityFilter) params.append("priority", priorityFilter);
+      if (sortOption) {
+        if (sortOption === "dateAsc") params.append("sortOrder", "asc");
+        if (sortOption === "dateDesc") params.append("sortOrder", "desc");
+        if (sortOption === "priorityAsc") params.append("sortPriority", "asc");
+        if (sortOption === "priorityDesc") params.append("sortPriority", "desc");
+      }
+  
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch reports");
+      }
+  
+      const data = await response.json();
+      console.log("Fetched Reports:", data);
+  
+      // Update state with fetched data
+      setReports(data);
+      setFilteredReports(data);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
-    filterAndSortReports()
-  }, [searchQuery, statusFilter, priorityFilter, sortOption, reports])
+    fetchReports();
+  }, [searchQuery, statusFilter, priorityFilter, sortOption]);
 
-  const filterAndSortReports = () => {
-    let result = reports
-    if (searchQuery) {
-      const lowerCaseQuery = searchQuery.toLowerCase()
-      result = result.filter(report => 
-        report.userName.toLowerCase().includes(lowerCaseQuery) ||
-        report.icNumber.toLowerCase().includes(lowerCaseQuery)
-      )
-    }
-    if (statusFilter) {
-      result = result.filter(report => report.status === statusFilter)
-    }
-    if (priorityFilter) {
-      result = result.filter(report => report.priority === priorityFilter)
-    }
-
-    if (sortOption) {
-      result.sort((a, b) => {
-        if (sortOption === 'dateAsc') {
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        } else if (sortOption === 'dateDesc') {
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        } else if (sortOption === 'priorityAsc') {
-          return priorityOrder[a.priority] - priorityOrder[b.priority]
-        } else if (sortOption === 'priorityDesc') {
-          return priorityOrder[b.priority] - priorityOrder[a.priority]
-        }
-        return 0
-      })
-    }
-
-    setFilteredReports(result)
-  }
 
   const handleDeleteReport = () => {
     if (!reportToDelete) return
@@ -201,34 +215,44 @@ export default function ReportManagementPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredReports.map((report) => (
-            <TableRow key={report.id}>
-              <TableCell>{report.id}</TableCell>
-              <TableCell>{report.reportType}</TableCell>
-              <TableCell>{report.createdAt}</TableCell>
-              <TableCell>{report.status}</TableCell>
-              <TableCell>{report.priority}</TableCell>
-              <TableCell>{report.userName}</TableCell>
-              <TableCell>{report.icNumber}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => handleViewReport(report.id)}>
-                    <Eye className="h-4 w-4 mr-2" /> View
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      setReportToDelete(report.id)
-                      setIsDeleteDialogOpen(true)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+          {loading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="flex flex-row justify-center">
+                  <Loader className="h-8 w-8 animate-spin text-blue-600" />
+                  Loading Users...
+                </TableCell>
+              </TableRow>
+          ) : (
+            filteredReports.map((report) => (
+              <TableRow key={report.id}>
+                <TableCell>{report.id}</TableCell>
+                <TableCell>{report.reportType}</TableCell>
+                <TableCell>{report.createdAt}</TableCell>
+                <TableCell>{report.status}</TableCell>
+                <TableCell>{report.priority}</TableCell>
+                <TableCell>{report.userName}</TableCell>
+                <TableCell>{report.icNumber}</TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => handleViewReport(report.id)}>
+                      <Eye className="h-4 w-4 mr-2" /> View
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setReportToDelete(report.id)
+                        setIsDeleteDialogOpen(true)
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+          
         </TableBody>
       </Table>
 

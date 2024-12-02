@@ -8,16 +8,25 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FileTextIcon, MicIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from './ui/input';
 
-const CreateNewReport = () => {
+interface SearchSuggestions {
+    icNumber: string;
+    userId: string;
+}
+
+const CreateNewReport = ({ type }: { type: string }) => {
     const router = useRouter();
     const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
     const [selectedReportType, setSelectedReportType] = useState<number>(0);
-    const [icNumber, setIcNumber] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState<SearchSuggestions[]>([]);
+    const [selectedUserId, setselectedUserId] = useState("");
     const currentRoute = usePathname();
 
     async function fetchReportType() {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype?isOnline=true`, {
+        const isOnlineParam = type === 'user' ? '?isOnline=true' : '';
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype${isOnlineParam}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,10 +35,37 @@ const CreateNewReport = () => {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data); // Check the fetched data in the console
-            setReportTypes(data); // Directly set the report types
+            setReportTypes(data);
         } else {
             console.error('Failed to fetch report types');
+        }
+    }
+
+    const fetchSuggestions = async (query: string) => {
+        if (query.length < 2) {
+            setSuggestions([]);
+            return;
+        }
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/getIcNumber?icnumber=${query}`);
+        if (response.ok) {
+            const data = await response.json();
+            setSuggestions(data);
+        } else {
+            setSuggestions([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchSuggestions(searchQuery);
+    }, [searchQuery]);
+
+    function handleSearchChange(value: string) {
+        setSearchQuery(value);
+        if (value.length >= 2) {
+            fetchSuggestions(value);
+        } else {
+            setSuggestions([]);
         }
     }
 
@@ -43,81 +79,103 @@ const CreateNewReport = () => {
             });
             return;
         } else {
-            // Check the current route    
             if (currentRoute.includes('police')) {
-                // If in the police route, navigate to the police-specific route
-                router.push(`/police/create-report/${selectedReportType}`);
+                router.push(`/police/create-report/${selectedReportType}?userId=${selectedUserId}`);
             } else {
-                // If in the user route, navigate to the user-specific route
-            router.push(`/user/reports/new/${selectedReportType}`);
+                router.push(`/user/reports/new/${selectedReportType}`);
             }
         }
     }
 
     useEffect(() => {
         fetchReportType();
-    }, []);
+    }, [type]);
 
-  return (
-    <section className='pt-16'>
-        <div className=" flex justify-center items-center font-bold text-6xl  text-center text-7 my-12">
-            <h1>Reporting Submission</h1>
-        </div>
-        {/* MAIN CONTAINER */}
-        <div className=" flex flex-col justify-center items-center">
-            <Card className="bg-white shadow-lg">
-            <CardHeader>
-                <CardTitle className="text-2xl font-semibold text-gray-800">Create a New Report</CardTitle>
-                <CardDescription>The following features will be available when you start your report</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-2">
-                <div className="flex flex-col items-start p-4 border rounded-lg">
-                <FileTextIcon className="mb-2 h-6 w-6 text-blue-600" />
-                <div className="font-semibold">Text Report</div>
-                <p className="mt-1 text-sm text-gray-600">Type your report using our guided form</p>
-                </div>
-                <div className="flex flex-col items-start p-4 border rounded-lg">
-                <MicIcon className="mb-2 h-6 w-6 text-blue-600" />
-                <div className="font-semibold">Voice Report</div>
-                <p className="mt-1 text-sm text-gray-600">Use speech-to-text to dictate your report</p>
-                </div>
-            </CardContent>
-            <CardFooter className="flex-col items-start">
-                <p className="mb-4 text-sm text-gray-600">
-                Our speech-to-text feature allows you to speak your report, which will be automatically transcribed. 
-                You can review and edit the text before submission.
-                </p>
-                <div className="w-full space-y-4">
-                    
-                    <Select onValueChange={(value) => setSelectedReportType(Number(value))} required>
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select report type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="0" disabled>
-                                Type of reports {/* placeholder */}
-                            </SelectItem>
-                            {reportTypes.map((reportType) => (
-                                <SelectItem key={reportType.id} value={reportType.id.toString()}>
-                                    {reportType.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {/* {currentRoute.includes('police') && (
-                        <Input type="text" placeholder="Enter the IC Number of User" onChange={(e) => setIcNumber(e.target.value)}/>
-                    )} */}
-                    <Button className="w-full sm:w-auto bg-[#0044cc]  text-white rounded-lg font-bold hover:bg-[#0022aa]" onClick={newReportButton}>
-                        Start New Report
-                    </Button>
+    return (
+        <section className="pt-16">
+            <div className="flex justify-center items-center font-bold text-6xl text-center text-7 my-12">
+                <h1>Reporting Submission</h1>
+            </div>
+            <div className="flex flex-col justify-center items-center">
+                <Card className="bg-white shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-semibold text-gray-800">Create a New Report</CardTitle>
+                        <CardDescription>The following features will be available when you start your report</CardDescription>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 md:grid-cols-2">
+                        <div className="flex flex-col items-start p-4 border rounded-lg">
+                            <FileTextIcon className="mb-2 h-6 w-6 text-blue-600" />
+                            <div className="font-semibold">Text Report</div>
+                            <p className="mt-1 text-sm text-gray-600">Type your report using our guided form</p>
+                        </div>
+                        <div className="flex flex-col items-start p-4 border rounded-lg">
+                            <MicIcon className="mb-2 h-6 w-6 text-blue-600" />
+                            <div className="font-semibold">Voice Report</div>
+                            <p className="mt-1 text-sm text-gray-600">Use speech-to-text to dictate your report</p>
+                        </div>
+                    </CardContent>
+                    <CardFooter className="flex-col items-start">
+                        <p className="mb-4 text-sm text-gray-600">
+                            Our speech-to-text feature allows you to speak your report, which will be automatically transcribed. 
+                            You can review and edit the text before submission.
+                        </p>
+                        <div className="w-full space-y-4">
+                            <Select onValueChange={(value) => setSelectedReportType(Number(value))} required>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select report type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="0" disabled>
+                                        Type of reports
+                                    </SelectItem>
+                                    {reportTypes.map((reportType) => (
+                                        <SelectItem key={reportType.id} value={reportType.id.toString()}>
+                                            {reportType.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {type === 'police' && (
+                                <div className="relative">
+                                    <Input
+                                        type="text"
+                                        placeholder="Search for a user by IC Number"
+                                        value={searchQuery}
+                                        onChange={(e) => handleSearchChange(e.target.value)}
+                                        className="w-full"
+                                    />
+                                    {suggestions.length > 0 && (
+                                        <ul className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                                            {suggestions.map((suggestion, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => {
+                                                        setselectedUserId(suggestion.userId);
+                                                        setSearchQuery(suggestion.icNumber);
+                                                        setSuggestions([]);
+                                                    }}
+                                                >
+                                                    {suggestion.icNumber}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            )}
+                            <Button
+                                className="w-full sm:w-auto bg-[#0044cc] text-white rounded-lg font-bold hover:bg-[#0022aa]"
+                                onClick={newReportButton}
+                            >
+                                Start New Report
+                            </Button>
+                        </div>
+                    </CardFooter>
+                </Card>
+            </div>
+        </section>
+    );
+};
 
-                </div>
-            </CardFooter>
-            </Card>
-            
-        </div>
-    </section>
-  )
-}
+export default CreateNewReport;
 
-export default CreateNewReport

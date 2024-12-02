@@ -6,7 +6,7 @@ import React from 'react'
 const PoliceCreateReportPage = () => {
   return (
     <div>
-        <ReportContent />
+        <ReportContent type={"police"}/>
     </div>
   )
 }

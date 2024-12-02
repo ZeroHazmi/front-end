@@ -1,41 +1,49 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Check, Search } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
-const containerStyle = {
-  width: '100%',
-  height: '400px',
-};
-
-const center = {
-  lat: 3.139,  // Kuala Lumpur latitude
-  lng: 101.6869,  // Kuala Lumpur longitude
-};
+interface HeatmapDataPoint {
+  lat: number;
+  lng: number;
+  weight?: number;
+}
 
 function IncidentHeatmap() {
-  const [heatMapData, setHeatMapData] = useState<any[]>([]);
+  const [heatMapData, setHeatMapData] = useState<HeatmapDataPoint[]>([]);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [selectedType, setSelectedType] = useState('Incident Type');
   const [selectedSeverity, setSelectedSeverity] = useState('Severity');
   const [searchQuery, setSearchQuery] = useState('');
   const [heatmapLayer, setHeatmapLayer] = useState<google.maps.visualization.HeatmapLayer | null>(null);
+  const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
+  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
+  const placesService = useRef<google.maps.places.PlacesService | null>(null);
 
   // Fetch the heatmap data from the API
   useEffect(() => {
     const fetchHeatmapData = async () => {
       try {
-
         const params = new URLSearchParams();
-        if (selectedSeverity) params.append("priority", selectedSeverity);
-        if (selectedType) params.append("reportTypeId", selectedType);
+        if (selectedSeverity !== 'Severity') params.append("priority", selectedSeverity);
+        if (selectedType !== 'Incident Type') params.append("reportTypeId", selectedType);
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}incident/heatmap?${params.toString()}`);
         const data = await response.json();
-        console.log(data);
-        setHeatMapData(data); // Assuming the data is in the expected format
+        setHeatMapData(data);
       } catch (error) {
         console.error('Error fetching heatmap data:', error);
       }
@@ -49,18 +57,22 @@ function IncidentHeatmap() {
     const initMap = async () => {
       const loader = new Loader({
         apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API as string,
-        version: 'weekly'
+        version: 'weekly',
+        libraries: ['places', 'visualization']
       });
 
       const { Map } = await loader.importLibrary('maps');
-      const geocoder = new google.maps.Geocoder();
+      const { HeatmapLayer } = await loader.importLibrary('visualization') as google.maps.VisualizationLibrary;
+      const { PlacesService, AutocompleteService } = await loader.importLibrary('places') as google.maps.PlacesLibrary;
+
+      const center = { lat: 3.139, lng: 101.6869 };
       const malaysiaBounds = new google.maps.LatLngBounds(
         { lat: 0.8538, lng: 99.6042 },
         { lat: 7.3634, lng: 119.2676 }
       );
 
       const mapOptions: google.maps.MapOptions = {
-        zoom: 18,
+        zoom: 10,
         center,
         mapId: 'PRAS_MAP',
         mapTypeControl: false,
@@ -73,57 +85,76 @@ function IncidentHeatmap() {
       const mapInstance = new Map(mapRef.current as HTMLDivElement, mapOptions);
       setMap(mapInstance);
 
-      // Create or update the heatmap layer when data is fetched
-      if (heatMapData.length > 0) {
-        const newHeatmapLayer = new google.maps.visualization.HeatmapLayer({
-          data: heatMapData.map((incident: any) => new google.maps.LatLng(incident.lat, incident.lng)),
-        });
-        newHeatmapLayer.setMap(mapInstance);
-        setHeatmapLayer(newHeatmapLayer);
-      }
+      autocompleteService.current = new AutocompleteService();
+      placesService.current = new PlacesService(mapInstance);
+
+      const newHeatmapLayer = new HeatmapLayer({
+        map: mapInstance,
+        data: heatMapData
+          .filter(point => !isNaN(point.lat) && !isNaN(point.lng) && typeof point.lat === 'number' && typeof point.lng === 'number')
+          .map((point) => new google.maps.LatLng(point.lat, point.lng)),
+      });
+      setHeatmapLayer(newHeatmapLayer);
     };
 
     if (!map) {
       initMap();
     }
-  }, [heatMapData, map]);
+  }, [map, heatMapData]);
 
   // Update heatmap layer when heatmap data changes
   useEffect(() => {
     if (heatmapLayer && heatMapData.length > 0) {
-      heatmapLayer.setData(heatMapData.map((incident: any) => new google.maps.LatLng(incident.lat, incident.lng)));
+      const validData = heatMapData.filter(point =>
+        !isNaN(point.lat) && !isNaN(point.lng) && typeof point.lat === 'number' && typeof point.lng === 'number'
+      );
+      
+      heatmapLayer.setData(
+        validData.map((point) => ({
+          location: new google.maps.LatLng(point.lat, point.lng),
+          weight: point.weight ?? 0  // Default to 0 if weight is undefined
+        }))
+      );
     }
   }, [heatMapData, heatmapLayer]);
 
-  // Function to search for a location
-  const searchLocation = async (query: string) => {
-    if (query && map) {
-      const geocoder = new google.maps.Geocoder();
+  const searchLocation = useCallback(async (placeId: string) => {
+    if (placeId && map && placesService.current) {
       try {
-        const results = await geocoder.geocode({ address: query });
-        if (results.results[0]) {
-          const location = results.results[0].geometry.location;
-          map.panTo(location);
-          map.setZoom(18);
-        } else {
-          alert('No results found for this location');
-        }
+        placesService.current.getDetails(
+          { placeId: placeId, fields: ['geometry', 'formatted_address'] },
+          (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry && place.geometry.location) {
+              const location = place.geometry.location;
+              map.panTo(location);
+              map.setZoom(14);
+            } else {
+              console.error('Place details not found or invalid');
+            }
+          }
+        );
       } catch (error) {
-        console.error('Geocoding error:', error);
-        alert('Failed to get location');
+        console.error('Error fetching place details:', error);
       }
     }
-  };
+  }, [map]);
 
-  // Handle search input change
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  // Handle search button click
-  const handleSearchClick = () => {
-    searchLocation(searchQuery);
-  };
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    if (value.length > 1 && autocompleteService.current) {
+      const request: google.maps.places.AutocompletionRequest = {
+        input: value,
+        componentRestrictions: { country: 'my' },
+      };
+      autocompleteService.current.getPlacePredictions(request, (predictions, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+          setPredictions(predictions.slice(0, 5));
+        }
+      });
+    } else {
+      setPredictions([]);
+    }
+  }, []);
 
   return (
     <div className="p-4 bg-white rounded-md shadow">
@@ -133,7 +164,7 @@ function IncidentHeatmap() {
             <SelectValue placeholder="Incident Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Incident Type</SelectItem>
+            <SelectItem value="Incident Type">Incident Type</SelectItem>
             <SelectItem value="Theft">Theft</SelectItem>
             <SelectItem value="Assault">Assault</SelectItem>
             <SelectItem value="Burglary">Burglary</SelectItem>
@@ -154,23 +185,49 @@ function IncidentHeatmap() {
         </Select>
       </div>
 
-      <div className="mb-4 flex items-center">
-        <input
+      <div className="relative mb-4">
+        <Input
           type="text"
-          className="w-full p-2 border rounded"
           placeholder="Search for a location"
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          className="w-full pr-10"
         />
-        <button
-          onClick={handleSearchClick}
-          className="ml-2 p-2 bg-blue-500 text-white rounded"
-        >
-          Search
-        </button>
+        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        {predictions.length > 0 && (
+          <Command className="absolute z-50 w-full mt-1 border rounded-md shadow-md">
+            <CommandList className="max-h-[300px] overflow-y-auto">
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup>
+                {predictions.map((prediction) => (
+                  <CommandItem
+                    key={prediction.place_id}
+                    onSelect={() => {
+                      if (prediction && prediction.description) {
+                        setSearchQuery(prediction.description);
+                        setPredictions([]);
+                        if (prediction.place_id) {
+                          searchLocation(prediction.place_id);
+                        }
+                      }
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        searchQuery === prediction.description ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {prediction.description}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        )}
       </div>
 
-      <div className="w-[1120px] h-[450px] rounded-lg shadow-top-custom-blue border-double border-2 border-sky-500 mb-5">
+      <div className="w-full h-[450px] rounded-lg shadow-lg border-2 border-sky-500 mb-5">
         <div ref={mapRef} className="w-full h-full rounded-lg" />
       </div>
     </div>
@@ -178,3 +235,4 @@ function IncidentHeatmap() {
 }
 
 export default IncidentHeatmap;
+

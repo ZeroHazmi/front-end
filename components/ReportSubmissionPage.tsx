@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import GoogleMap, { LatLng } from "./GoogleMap";
 import { Input } from "./ui/input";
 import { states } from "@/types/constants";
+import { getCookie } from "@/app/lib/auth";
 
 type Message = {
   sender: string;
@@ -32,7 +33,7 @@ const initialState = {
   message: "",
 };
 
-export default function SubmitReportPage() {
+export default function SubmitReportPage({ userId, userAccess }: { userId?: string, userAccess: string }) {
     const [reportType, setReportType] = useState<ReportType | null>(null);
     const [templateFields, setTemplateFields] = useState<[string, string][]>([]);
     const [loading, setLoading] = useState(true);
@@ -122,6 +123,13 @@ export default function SubmitReportPage() {
 
     // Create report
     const createReport = async () => {
+
+        let token;
+        if(!userId){
+            token = await getCookie("userId");
+            console.log('Token:', token);
+        }
+
       try {
           setSubmitting(true);
 
@@ -137,13 +145,17 @@ export default function SubmitReportPage() {
               console.error('Location is required');
           }
 
+          // Assign userId based on userAccess
+          const finalUserId = userAccess === 'police' ? userId : token;
+
           const reportData = {
+            userId: finalUserId,
             reportTypeID,
             reportContent: textareaContent,
             reportTypeName,
-            address: location?.geocodeObject.formatted_address,
             latitue: location?.coordinates.lat,
             longitude: location?.coordinates.lng,
+            address: location?.geocodeObject.formatted_address,
             state: location?.geocodeObject.address_components.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '',
             date: date,
             time: time,
@@ -237,8 +249,7 @@ export default function SubmitReportPage() {
         if (location) {
             splitAddress();
         }
-        console.log('Location:', addressFields);
-    }, [location, addressFields]);
+    }, [location?.geocodeObject]);
 
 
     // Split template fields into two columns

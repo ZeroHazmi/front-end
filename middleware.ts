@@ -18,9 +18,6 @@ export default function middleware(req: NextRequest) {
 	const sessionCookie = req.cookies.get("session")?.value;
 	const rolesCookie = req.cookies.get("roles")?.value;
 
-	console.log("Roles:", rolesCookie);
-	console.log("Session:", sessionCookie);
-
 	if (isProtectedRoute && (!sessionCookie || !rolesCookie)) {
 		return NextResponse.redirect(new URL("/login", req.url));
 	}

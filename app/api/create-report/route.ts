@@ -3,11 +3,12 @@ import {cookies} from "next/headers";
 
 // Type definitions
 type ReportRequest = {
+	userId: string;
 	reportTypeID: string;
 	reportContent: string;
 	reportTypeName: string;
 	address: string;
-	latitute: number;
+	latitude: number;
 	longitude: number;
 	state: string;
 	date: string;
@@ -15,6 +16,7 @@ type ReportRequest = {
 };
 
 type ReportData = {
+	userId?: string;
 	icNumber?: string;
 	reportTypeId: string;
 	status: string;
@@ -24,7 +26,7 @@ type ReportData = {
 		date: string;
 		time: number;
 		address: string;
-		latitute: number;
+		latitude: number;
 		longitude: number;
 		state: string;
 		fieldValue: string;
@@ -39,11 +41,12 @@ export async function POST(request: Request) {
 		// Get request body and parse it
 		const body: ReportRequest = await request.json();
 		const {
+			userId,
 			reportTypeID,
 			reportContent,
 			reportTypeName,
 			address,
-			latitute,
+			latitude,
 			longitude,
 			state,
 			date,
@@ -72,6 +75,7 @@ export async function POST(request: Request) {
 
 		// Prepare report data
 		const reportData: ReportData = {
+			userId: userId,
 			reportTypeId: reportTypeID,
 			status: "Open",
 			priority: randomPriority,
@@ -80,7 +84,7 @@ export async function POST(request: Request) {
 				date: dateTimestamp,
 				time: time,
 				address: address,
-				latitute: latitute,
+				latitude: latitude,
 				longitude: longitude,
 				state: state,
 				fieldValue: "{}",
