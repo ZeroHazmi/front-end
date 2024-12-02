@@ -6,7 +6,7 @@ import CreateNewReport from '@/components/CreateNewReport';
 const UserMainPage = () => {
   return (
     <div>
-      <CreateNewReport />
+      <CreateNewReport type="user"/>
     </div>
   )
 }

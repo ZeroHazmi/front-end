@@ -4,7 +4,7 @@ import React from 'react'
 const ViewReportPage = () => {
   return (
     <div>
-        <ReportContent/>
+        <ReportContent type='user'/>
     </div>
   )
 }

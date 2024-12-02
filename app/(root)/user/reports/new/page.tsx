@@ -6,7 +6,7 @@ import React from 'react'
 const page = () => {
   return (
     <div>
-      <CreateNewReport />
+      <CreateNewReport type='user'/>
     </div>
   )
 }
