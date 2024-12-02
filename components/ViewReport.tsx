@@ -24,6 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { getCookie } from '@/app/lib/auth';
+import { mapPriority, mapStatus } from '@/lib/utils';
 
 interface ReportData {
   reportId: string;
@@ -31,9 +32,9 @@ interface ReportData {
   status: string;
   priority: string;
   incidentDateTime: string;
-  address: string;
+  location: string;
   transcript: string;
-  policeNotes: string;
+  extraInformation: string;
 }
 
 type UserType = 'user' | 'police' | 'admin';
@@ -55,9 +56,25 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
 
   const canEdit = userType === 'police';
 
-  const isValidDate = (date: string) => {
-    const parsedDate = new Date(date);
-    return !isNaN(parsedDate.getTime());
+  // Consistent date formatting to prevent hydration issues
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      // Use UTC methods to ensure consistency
+      return date.toISOString(); // ISO string ensures consistent formatting
+    } catch {
+      return '';
+    }
+  };
+
+  // Client-side only date rendering
+  const renderFormattedDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'PPP p');
+    } catch {
+      return 'Invalid date';
+    }
   };
 
   useEffect(() => {
@@ -70,18 +87,11 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
           throw new Error('Failed to fetch report data');
         }
         const data: ReportData = await response.json();
-        console.log('Fetched Report Data:', data);
 
-        // Ensure date validation before setting state
-        setReportData({
-          ...data,
-          dateCreated: isValidDate(data.dateCreated) ? data.dateCreated : '',
-          incidentDateTime: isValidDate(data.incidentDateTime) ? data.incidentDateTime : '',
-        });
-
-        setStatus(data.status);
-        setPriority(data.priority);
-        setPoliceNotes(data.policeNotes);
+        setReportData(data);
+        setStatus(mapStatus(Number(data.status)));
+        setPriority(mapPriority(Number(data.priority)));
+        setPoliceNotes(data.extraInformation || '');
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('An error occurred while fetching the report data.');
@@ -186,10 +196,8 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
               </div>
               <div>
                 <Label className="font-bold">Date Created</Label>
-                <p>
-                  {isValidDate(reportData.dateCreated)
-                    ? format(new Date(reportData.dateCreated), 'PPP')
-                    : 'Invalid date'}
+                <p suppressHydrationWarning>
+                  {renderFormattedDate(reportData.dateCreated)}
                 </p>
               </div>
             </div>
@@ -226,16 +234,14 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
 
             <div>
               <Label className="font-bold">Date and Time of Incident</Label>
-              <p>
-                {isValidDate(reportData.incidentDateTime)
-                  ? format(new Date(reportData.incidentDateTime), 'PPP p')
-                  : 'Invalid date'}
+              <p suppressHydrationWarning>
+                {renderFormattedDate(reportData.incidentDateTime)}
               </p>
             </div>
 
             <div>
               <Label className="font-bold">Address</Label>
-              <p>{reportData.address}</p>
+              <p>{reportData.location}</p>
             </div>
 
             <div>
@@ -258,11 +264,10 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline">Back to Reports</Button>
+          <Button variant="outline" onClick={() => router.back()}>Back to Reports</Button>
           {isEditing && canEdit && <Button onClick={handleSaveChanges}>Save Changes</Button>}
         </CardFooter>
       </Card>
     </div>
   );
 }
-

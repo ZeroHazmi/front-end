@@ -192,3 +192,22 @@ export const convertBirthdayFormat = (birthday: string): string => {
 export function getStreetFromAddress(address: string) {
 	return address.split(",")[0];
 }
+
+export function mapStatus(status: number): string {
+	const statusMap: Record<number, string> = {
+		0: "Open",
+		1: "In Progress",
+		2: "Closed",
+	};
+	return statusMap[status] || "Unknown";
+}
+
+export function mapPriority(priority: number): string {
+	const priorityMap: Record<number, string> = {
+		0: "Low",
+		1: "Medium",
+		2: "High",
+		3: "Critical",
+	};
+	return priorityMap[priority] || "Unknown";
+}

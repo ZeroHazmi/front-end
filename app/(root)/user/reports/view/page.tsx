@@ -24,43 +24,30 @@ import { toast } from "@/hooks/use-toast"
 import { getCookie } from '@/app/lib/auth'
 import { useRouter } from 'next/navigation'
 
-// Enum for Status mapping
-enum StatusEnum {
-  Open = 0,
-  InProgress = 1,
-  Completed = 2
-}
-
-// Reverse mapping for display
-const StatusDisplay: { [key: number]: string } = {
-  [StatusEnum.Open]: 'Open',
-  [StatusEnum.InProgress]: 'In Progress',
-  [StatusEnum.Completed]: 'Completed'
-}
-
 type Report = {
   id: string
   reportId: string
-  userId: string
   reportTypeName: string
-  createAt: string
-  status: number
+  createdAt: string
+  status: 'Low' | 'Medium' | 'High' | 'Critical'
 }
 
 export default function UserReportTable() {
   const [reports, setReports] = useState<Report[]>([])
   const [filteredReports, setFilteredReports] = useState<Report[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState<number | null>(null)
-  const [sortOption, setSortOption] = useState<string>("asc")
+  const [statusFilter, setStatusFilter] = useState<string | null>(null)
+  const [priorityFilter, setPriorityFilter] = useState<string | null>(null)
+  const [sortOption, setSortOption] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const fetchReports = async () => {
-    setLoading(true)
     try {
+      setLoading(true);
       const token = await getCookie("session");
       const userId = await getCookie("userId");
+      console.log("Token:", userId);
       
       if (!token) {
         toast({
@@ -71,34 +58,58 @@ export default function UserReportTable() {
         router.push('/login')
         return;
       }
-  
+
+      // Construct query parameters
       const params = new URLSearchParams();
+      
+      // Add search parameter
       if (searchQuery) params.append("search", searchQuery);
       
-      // Convert status filter to string for API
-      if (statusFilter !== null) {
-        params.append("status", statusFilter.toString());
-      }
+      // Add status filter
+      if (statusFilter) params.append("status", statusFilter);
       
-      if (userId) params.append("userId", userId);
-      params.append("sortOrder", sortOption);
-  
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report?${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || "Failed to fetch reports");
+      // Add priority filter
+      if (priorityFilter) params.append("priority", priorityFilter);
+      
+      // Add sorting parameters
+      switch (sortOption) {
+        case "dateAsc":
+          params.append("sortOrder", "asc");
+          break;
+        case "dateDesc":
+          params.append("sortOrder", "desc");
+          break;
+        case "priorityAsc":
+          params.append("sortOrder", "asc");
+          break;
+        case "priorityDesc":
+          params.append("sortOrder", "desc");
+          break;
       }
-  
+
+      // Add userId if available
+      if (userId) params.append("userId", userId);
+
+      // Construct the full URL
+      const url = `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report?${params.toString()}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch reports");
+      }
+
       const data = await response.json();
-      console.log(data)
+      console.log("Fetched Reports:", data);
+
+      // Update state with fetched data
       setReports(data);
       setFilteredReports(data);
     } catch (error: any) {
@@ -108,13 +119,13 @@ export default function UserReportTable() {
         variant: "destructive",
       });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchReports();
-  }, [searchQuery, statusFilter, sortOption]);
+  }, [searchQuery, statusFilter, priorityFilter, sortOption]);
 
   const handleViewReport = (reportId: string) => {
     router.push(`/user/reports/${reportId}`)
@@ -127,7 +138,7 @@ export default function UserReportTable() {
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2">
           <Input
-            placeholder="Search report type"
+            placeholder="Search report type or name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-64"
@@ -142,30 +153,49 @@ export default function UserReportTable() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center">
                 <Filter className="h-4 w-4 mr-2" />
-                {statusFilter !== null ? StatusDisplay[statusFilter] : 'Status'}
+                {statusFilter || 'Status'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setStatusFilter(null)}>All Statuses</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter(StatusEnum.Open)}>Open</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter(StatusEnum.InProgress)}>In Progress</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter(StatusEnum.Completed)}>Completed</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('Open')}>Open</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('In Progress')}>In Progress</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('Completed')}>Completed</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center">
+                <Filter className="h-4 w-4 mr-2" />
+                {priorityFilter || 'Priority'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Filter by Priority</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setPriorityFilter(null)}>All Priorities</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPriorityFilter('Low')}>Low</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPriorityFilter('Medium')}>Medium</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPriorityFilter('High')}>High</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPriorityFilter('Critical')}>Critical</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="flex items-center">
                 <ArrowUpDown className="h-4 w-4 mr-2" />
-                {sortOption === 'asc' ? 'Oldest First' : 'Newest First'}
+                {sortOption ? sortOption.replace(/([A-Z])/g, ' $1').trim() : 'Sort'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>Sort Reports</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setSortOption('asc')}>Date (Oldest First)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortOption('desc')}>Date (Newest First)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOption('dateAsc')}>Date (Oldest First)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOption('dateDesc')}>Date (Newest First)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOption('priorityAsc')}>Priority (Low to High)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortOption('priorityDesc')}>Priority (High to Low)</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -174,30 +204,35 @@ export default function UserReportTable() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Report ID</TableHead>
             <TableHead>Report Type</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">
-                <Loader className="h-8 w-8 animate-spin text-blue-600 mx-auto" />
-                <span className="mt-2 block">Loading Reports...</span>
+              <TableCell colSpan={8} className="text-center">
+                <div className="flex justify-center items-center">
+                  <Loader className="h-8 w-8 animate-spin text-blue-600 mr-2" />
+                  Loading Reports...
+                </div>
               </TableCell>
             </TableRow>
           ) : filteredReports.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center">No reports found</TableCell>
+              <TableCell colSpan={8} className="text-center">
+                No reports found.
+              </TableCell>
             </TableRow>
           ) : (
             filteredReports.map((report) => (
               <TableRow key={report.id}>
+                <TableCell>{report.reportId}</TableCell>
                 <TableCell>{report.reportTypeName}</TableCell>
-                <TableCell>{new Date(report.createAt).toLocaleString()}</TableCell>
-                <TableCell>{StatusDisplay[report.status]}</TableCell>
+                <TableCell>{new Date(report.createdAt).toLocaleString()}</TableCell>
+                <TableCell>{report.status}</TableCell>
                 <TableCell>
                   <Button variant="outline" size="sm" onClick={() => handleViewReport(report.id)}>
                     <Eye className="h-4 w-4 mr-2" /> View Details
