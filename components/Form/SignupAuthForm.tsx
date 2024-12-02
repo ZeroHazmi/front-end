@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react'
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -25,11 +27,9 @@ const SignupAuthForm = () => {
     const [token, setToken] = useState("");
     const [registered, setRegistered] = useState(false);
     const [userId, setUserId] = useState("");
-    // Watch the selected state
     const router = useRouter();
     const {toast} = useToast();
 
-    // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -60,7 +60,6 @@ const SignupAuthForm = () => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log("Attempting to submit form");
         setIsLoading(true);
-        // Perform validation checks before proceeding
         const { repassword, ...filteredValues } = values;
 
         try {
@@ -94,7 +93,6 @@ const SignupAuthForm = () => {
     }
 
     const onScanComplete = (data: ICScannerFields) => {
-        console.log("Data:", data);
         const convertedBirthday = convertBirthdayFormat(data.dateOfBirth);
         form.setValue('icNumber', data.documentNumber);
         form.setValue('name', data.fullName);
@@ -103,17 +101,15 @@ const SignupAuthForm = () => {
         form.setValue('address', data.address);
         form.setValue('postcode', data.addressFields?.postalCode || '');
         
-        // Ensure state matches one of the keys in `states`
         const normalizedState = Object.keys(states).find(
             (key) => states[key as keyof typeof states].toLowerCase() === data.addressFields?.state.toLowerCase()
         );
         form.setValue('state', normalizedState || '');
         
-        form.setValue('nationality', nationality.Malaysian); // Default to Malaysian
-        form.setValue('religion', data.religion || ''); // Ensure religion matches the religion object
+        form.setValue('nationality', nationality.Malaysian);
+        form.setValue('religion', data.religion || '');
     };
     
-
     useEffect(() => {
         if (selectedState) {
             const districts = getDistricts(selectedState);
@@ -123,7 +119,6 @@ const SignupAuthForm = () => {
 
     useEffect(() => {
         if (registered && role) {
-            
             console.log("Role in useeffect", role);
             console.log("Register Success:", registered);
 
@@ -140,30 +135,26 @@ const SignupAuthForm = () => {
                 } else if (role === 'Police') {
                     router.push('/police');
                 }
-            }, 2000); // 2-second delay
+            }, 2000);
             return () => clearTimeout(redirectTimeout);
         }
     }, [registered, token, role, router, userId, toast]);
 
     return (
-        <section>
+        <section className="w-full px-4 py-8">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    {/* MAIN CONTAINER */}
-                    <div className='w-[1200px] flex flex-wrap justify-center items-center mt-[15vh]'>
-                        {/* TITLE CONTAINER */}
-                        <div className="flex justify-center items-center font-bold text-6xl  text-center text-7 mb-[10vh]">
-                            <h1>
+                    <div className='w-full max-w-[1200px] mx-auto flex flex-col items-center mt-4 md:mt-[15vh]'>
+                        <div className="text-center mb-8 md:mb-[10vh]">
+                            <h1 className="font-bold text-4xl md:text-6xl text-7">
                                 Register
                             </h1> 
                         </div>
-                        {/* CONTAINERS 1&2 */}
-                        <div className="max-w-[1200px] min-w-[550px] flex justify-center items-center flex-wrap gap-5 mb-5">
-                            <div className="w-[550px] bg-white  rounded-lg shadow-left-custom-blue p-4 flex-1">
+                        <div className="w-full flex flex-col md:flex-row justify-center items-stretch gap-5 mb-5">
+                            <div className="w-full md:w-[550px] bg-white rounded-lg shadow-left-custom-blue p-4 flex-1">
                                 <ICScanner onScanComplete={onScanComplete}/>
                                 <RegisterCustomInput control={form.control} name='icNumber' label="IC Number" placeholder='Enter your IC' id='ic-input'/>
                                 <RegisterCustomInput control={form.control} name='name' label="Name" placeholder='Enter your name' id='name-input'/>
-                                {/* add file picker beside IC input */}
                                 <RegisterCustomInput control={form.control} name='userName' label="Username" placeholder='Enter your username' id='username-input'/>
                                 <RegisterCustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' id='password-input'/>
                                 <RegisterCustomInput control={form.control} name='repassword' label="Re-enter Password" placeholder='Enter your typed password' id='repassword-input'/>
@@ -171,8 +162,7 @@ const SignupAuthForm = () => {
                                 <RegisterCustomInput control={form.control} name='housePhoneNumber' label="House Phone Number" placeholder='Enter your house phone number' id='house-phone-input'/>
                                 <RegisterCustomInput control={form.control} name='officePhoneNumber' label="Office Phone Number" placeholder='Enter your office phone number' id='office-phone-input'/>
                             </div>
-                            <div className="w-[550px] bg-white rounded-lg shadow-right-custom-blue p-4 flex-1">
-                            {/* Birthday Picker */}
+                            <div className="w-full md:w-[550px] bg-white rounded-lg shadow-right-custom-blue p-4 flex-1">
                                 <RegisterCustomInput control={form.control} name='birthday' label="Birthdate" placeholder='Enter your birthdate' id='birthday-input'/>
                                 <SelectInput control={form.control} name='gender' label="Gender" placeholder='Enter your Gender' id='gender-input' options={gender} setValue={form.setValue}/>
                                 <SelectInput control={form.control} name='nationality' label="Nationality" placeholder='Enter your nationality' id='nationality-input' options={nationality}/>
@@ -186,27 +176,24 @@ const SignupAuthForm = () => {
                             </div>
                         </div>
                     
-                        <div className=" max-w-[1200px] min-w-[550px] flex  justify-center items-center border-solid flex-wrap gap-5 ">
-                            
-                            <div className="flex justify-center items-center gap-4">
-                                <Button type='button' onClick={returnToLogin} className='btn-secondary'>Back</Button>
-                                <Button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="bg-[#0044cc] transition hover:bg-[#0022aa]"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 size={20} className="animate-spin" /> &nbsp; Loading...
-                                        </>
-                                    ) : 'Sign Up'}
-                                </Button>
-                            </div>
+                        <div className="w-full flex justify-center items-center gap-4 mt-5">
+                            <Button type='button' onClick={returnToLogin} className='btn-secondary'>Back</Button>
+                            <Button
+                                type="submit"
+                                disabled={isLoading}
+                                className="bg-[#0044cc] transition hover:bg-[#0022aa]"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 size={20} className="animate-spin mr-2" />
+                                        Loading...
+                                    </>
+                                ) : 'Sign Up'}
+                            </Button>
                         </div>
                     </div>
                 </form>
             </Form>
-
         </section>
     )
 }
