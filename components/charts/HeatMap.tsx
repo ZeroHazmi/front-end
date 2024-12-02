@@ -43,6 +43,7 @@ function IncidentHeatmap() {
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}incident/heatmap?${params.toString()}`);
         const data = await response.json();
+        console.log('Fetched Heatmap Data:', data);
         setHeatMapData(data);
       } catch (error) {
         console.error('Error fetching heatmap data:', error);

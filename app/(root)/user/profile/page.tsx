@@ -129,12 +129,6 @@ export default function UserProfile() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex flex-col items-center space-y-4">
-              <Avatar className="h-32 w-32">
-                <AvatarImage src="https://github.com/shadcn.png" alt="User Avatar" />
-                <AvatarFallback>{userData.userName.slice(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-            </div>
             <div className="flex-1 grid gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">

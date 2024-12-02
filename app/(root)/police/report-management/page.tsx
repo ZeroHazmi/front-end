@@ -30,14 +30,16 @@ import {
 import { Trash2, Eye, Search, Filter, ArrowUpDown, Loader } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import { getCookie } from '@/app/lib/auth'
+import { Router } from 'express'
+import { useRouter } from 'next/navigation'
 
 type Report = {
   id: string
-  reportType: string
+  reportTypeName: string
   createdAt: string
   status: 'Open' | 'In Progress' | 'Completed'
   priority: 'Low' | 'Medium' | 'High' | 'Critical'
-  userName: string
+  name: string
   icNumber: string
 }
 
@@ -53,10 +55,14 @@ export default function ReportManagementPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [reportToDelete, setReportToDelete] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const fetchReports = async () => {
     try {
+      setLoading(true);
       const token = await getCookie("session");
+      const policeId = await getCookie("userId");
+      
       if (!token) {
         toast({
           title: "Error",
@@ -65,36 +71,57 @@ export default function ReportManagementPage() {
         });
         return;
       }
-  
+
       // Construct query parameters
       const params = new URLSearchParams();
+      
+      // Add search parameter
       if (searchQuery) params.append("search", searchQuery);
+      
+      // Add status filter
       if (statusFilter) params.append("status", statusFilter);
+      
+      // Add priority filter
       if (priorityFilter) params.append("priority", priorityFilter);
-      if (sortOption) {
-        if (sortOption === "dateAsc") params.append("sortOrder", "asc");
-        if (sortOption === "dateDesc") params.append("sortOrder", "desc");
-        if (sortOption === "priorityAsc") params.append("sortPriority", "asc");
-        if (sortOption === "priorityDesc") params.append("sortPriority", "desc");
+      
+      // Add sorting parameters
+      switch (sortOption) {
+        case "dateAsc":
+          params.append("sortOrder", "asc");
+          break;
+        case "dateDesc":
+          params.append("sortOrder", "desc");
+          break;
+        case "priorityAsc":
+          params.append("sortOrder", "asc");
+          break;
+        case "priorityDesc":
+          params.append("sortOrder", "desc");
+          break;
       }
-  
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+
+      // Add policeId if available
+      if (policeId) params.append("policeId", policeId);
+
+      // Construct the full URL
+      const url = `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report?${params.toString()}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
-  
+      });
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to fetch reports");
       }
-  
+
       const data = await response.json();
       console.log("Fetched Reports:", data);
-  
+
       // Update state with fetched data
       setReports(data);
       setFilteredReports(data);
@@ -104,6 +131,8 @@ export default function ReportManagementPage() {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,25 +140,62 @@ export default function ReportManagementPage() {
     fetchReports();
   }, [searchQuery, statusFilter, priorityFilter, sortOption]);
 
+  const handleDeleteReport = async () => {
+    if (!reportToDelete) return;
 
-  const handleDeleteReport = () => {
-    if (!reportToDelete) return
+    try {
+      const token = await getCookie("session");
+      if (!token) {
+        toast({
+          title: "Error",
+          description: "Session token is missing.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    setReports(prev => prev.filter(report => report.id !== reportToDelete))
-    setIsDeleteDialogOpen(false)
-    setReportToDelete(null)
-    toast({
-      title: "Success",
-      description: "Report deleted successfully",
-    })
-  }
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report/${reportToDelete}`, 
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete report");
+      }
+
+      setReports(prev => prev.filter(report => report.id !== reportToDelete));
+      setFilteredReports(prev => prev.filter(report => report.id !== reportToDelete));
+      setIsDeleteDialogOpen(false);
+      setReportToDelete(null);
+      
+      toast({
+        title: "Success",
+        description: "Report deleted successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleViewReport = (reportId: string) => {
+    // Implement view report logic - could be a navigation or modal
+    router.push(`/police/report-management/view/${reportId}`);
     toast({
       title: "View Report",
       description: `Viewing report with ID: ${reportId}`,
-    })
-  }
+    });
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -143,7 +209,7 @@ export default function ReportManagementPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-64"
           />
-          <Button variant="outline" className="flex items-center">
+          <Button variant="outline" className="flex items-center" onClick={fetchReports}>
             <Search className="h-4 w-4 mr-2" />
             Search
           </Button>
@@ -209,7 +275,7 @@ export default function ReportManagementPage() {
             <TableHead>Created At</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Priority</TableHead>
-            <TableHead>User Name</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>IC Number</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -217,20 +283,28 @@ export default function ReportManagementPage() {
         <TableBody>
           {loading ? (
               <TableRow>
-                <TableCell colSpan={5} className="flex flex-row justify-center">
-                  <Loader className="h-8 w-8 animate-spin text-blue-600" />
-                  Loading Users...
+                <TableCell colSpan={8} className="text-center">
+                  <div className="flex justify-center items-center">
+                    <Loader className="h-8 w-8 animate-spin text-blue-600 mr-2" />
+                    Loading Reports...
+                  </div>
+                </TableCell>
+              </TableRow>
+          ) : filteredReports.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center">
+                  No reports found.
                 </TableCell>
               </TableRow>
           ) : (
             filteredReports.map((report) => (
               <TableRow key={report.id}>
                 <TableCell>{report.id}</TableCell>
-                <TableCell>{report.reportType}</TableCell>
-                <TableCell>{report.createdAt}</TableCell>
+                <TableCell>{report.reportTypeName}</TableCell>
+                <TableCell>{new Date(report.createdAt).toLocaleString()}</TableCell>
                 <TableCell>{report.status}</TableCell>
                 <TableCell>{report.priority}</TableCell>
-                <TableCell>{report.userName}</TableCell>
+                <TableCell>{report.name}</TableCell>
                 <TableCell>{report.icNumber}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
@@ -252,7 +326,6 @@ export default function ReportManagementPage() {
               </TableRow>
             ))
           )}
-          
         </TableBody>
       </Table>
 

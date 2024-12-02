@@ -9,19 +9,18 @@ import { addDays, format } from "date-fns";
 import { states } from "@/types/constants";
 import { toast } from "@/hooks/use-toast";
 import { 
-  ChartConfig, 
-  ChartContainer, 
-  ChartLegend, 
-  ChartLegendContent, 
-  ChartTooltip, 
-  ChartTooltipContent 
-} from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, ResponsiveContainer, YAxis, Tooltip } from "recharts"
+  Bar, 
+  BarChart, 
+  CartesianGrid, 
+  XAxis, 
+  ResponsiveContainer, 
+  YAxis, 
+  Tooltip 
+} from "recharts";
 
-// Define the type for incident data based on the updated API response
 interface IncidentData {
-  reportTypeId: number;
-  reportTypeName: string;
+  id: number;
+  name: string;
   incidentCount: number;
 }
 
@@ -32,12 +31,10 @@ const IncidentRateComponent = () => {
   const [dateFilterType, setDateFilterType] = useState("date");
   const [incidentData, setIncidentData] = useState<IncidentData[]>([]);
   const [reportTypes, setReportTypes] = useState<{id: number, name: string}[]>([]);
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>(
-    {
-      from: addDays(new Date(), -30),
-      to: new Date(),
-    }
-  );
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>({
+    from: addDays(new Date(), -30),
+    to: new Date(),
+  });
 
   async function fetchReportType() {
     try {
@@ -61,16 +58,19 @@ const IncidentRateComponent = () => {
     }
   }
 
-  const fetchIncidentData = async () => {
+  const fetchIncidentData = async (applyFilters = false) => {
     try {
       const params = new URLSearchParams();
-      if (timeRange !== "All Time") params.append("timeRange", timeRange);
-      if (location !== "All Locations") params.append("state", location);
-      if (selectedReportType !== "All Types") params.append("reportTypeId", selectedReportType);
-      params.append("dateFilterType", dateFilterType);
-      if (timeRange === "Custom" && dateRange?.from && dateRange?.to) {
-        params.append("startDate", format(dateRange.from, "yyyy-MM-dd"));
-        params.append("endDate", format(dateRange.to, "yyyy-MM-dd"));
+      
+      if (applyFilters) {
+        if (timeRange !== "All Time") params.append("timeRange", timeRange);
+        if (location !== "All Locations") params.append("state", location);
+        if (selectedReportType !== "All Types") params.append("reportTypeId", selectedReportType);
+        params.append("dateFilterType", dateFilterType);
+        if (timeRange === "Custom" && dateRange?.from && dateRange?.to) {
+          params.append("startDate", format(dateRange.from, "yyyy-MM-dd"));
+          params.append("endDate", format(dateRange.to, "yyyy-MM-dd"));
+        }
       }
 
       const url = `${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}incident/incident-rates?${params.toString()}`;
@@ -82,6 +82,7 @@ const IncidentRateComponent = () => {
       }
 
       const data = await response.json();
+      console.log(data);
       setIncidentData(Array.isArray(data) ? data : []);
     } catch (error: any) {
       toast({
@@ -95,13 +96,8 @@ const IncidentRateComponent = () => {
 
   useEffect(() => {
     fetchReportType();
+    fetchIncidentData(); // Fetch data initially without filters
   }, []);
-
-  // Prepare chart data
-  const chartData = incidentData.map((item) => ({
-    name: item.reportTypeName,
-    value: item.incidentCount,
-  }));
 
   return (
     <div className="p-4 bg-white rounded-md shadow">
@@ -161,29 +157,30 @@ const IncidentRateComponent = () => {
           </SelectContent>
         </Select>
 
-        <Button onClick={fetchIncidentData}>Apply Filters</Button>
+        <Button onClick={() => fetchIncidentData(true)}>Apply Filters</Button>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Incident Rates</CardTitle>
-          <CardDescription>Data for {timeRange}</CardDescription>
+          <CardDescription>Incidents by Report Type</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="reportTypeName"
-                angle={-45}
-                textAnchor="end"
-                height={70}
-                interval={0}
-                tick={{ fontSize: 12 }}
+            <BarChart data={incidentData} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="reportTypeName" 
+                angle={-45} 
+                textAnchor="end" 
+                interval={0} 
+                height={100} 
+                fontSize={10}
+                width={300}
               />
-              <YAxis />
+              <YAxis label={{ value: 'Incident Count', angle: -90, position: 'insideLeft' }} />
               <Tooltip />
-              <Bar dataKey="reportTypeName" fill="#8884d8" />
+              <Bar dataKey="incidentCount" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

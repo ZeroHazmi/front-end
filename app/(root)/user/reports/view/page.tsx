@@ -40,6 +40,7 @@ const StatusDisplay: { [key: number]: string } = {
 
 type Report = {
   id: string
+  reportId: string
   userId: string
   reportTypeName: string
   createAt: string
@@ -97,6 +98,7 @@ export default function UserReportTable() {
       }
   
       const data = await response.json();
+      console.log(data)
       setReports(data);
       setFilteredReports(data);
     } catch (error: any) {
