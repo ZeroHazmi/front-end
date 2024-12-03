@@ -13,18 +13,18 @@ const DataPage = () => {
           <Tabs defaultValue="incident-rate" className="space-y-4">
               <TabsList>
                 <TabsTrigger value="incident-rate">Incident Rate</TabsTrigger>
-                <TabsTrigger value="concentration-map">Crime Concentration</TabsTrigger>
-                <TabsTrigger value="demographic">Demographic</TabsTrigger>
+                {/* <TabsTrigger value="concentration-map">Crime Concentration</TabsTrigger>
+                <TabsTrigger value="demographic">Demographic</TabsTrigger> */}
               </TabsList>
               <TabsContent value="incident-rate" className="space-y-4">
                 <IncidentRateComponent />
               </TabsContent>
-              <TabsContent value="concentration-map" className="space-y-4">
+              {/* <TabsContent value="concentration-map" className="space-y-4">
                 <IncidentHeatmap />
               </TabsContent>
               <TabsContent value="demographic" className="space-y-4">
                 <DemographicsChartComponent />
-              </TabsContent>
+              </TabsContent> */}
           </Tabs>
         </div>
     </div>
