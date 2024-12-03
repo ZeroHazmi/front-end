@@ -1,17 +1,19 @@
-'use server';
-import OpenAI from 'openai';
+"use server";
+import OpenAI from "openai";
 
 async function transcribe(prevState: any, formData: FormData) {
-	const file = formData.get('audio') as File;
+	const file = formData.get("audio") as File;
 
 	if (file.size === 0) {
 		return {
-			sender: '',
-			message: 'No audio file found',
+			sender: "",
+			message: "No audio file found",
 		};
 	}
 
-	console.log('>>>', file);
+	const language = formData.get("language") as string;
+
+	console.log(">>>", file);
 
 	const openai = new OpenAI({
 		apiKey: process.env.OPENAI_API_KEY,
@@ -21,23 +23,23 @@ async function transcribe(prevState: any, formData: FormData) {
 		// Transcribe audio using OpenAI's Whisper model
 		const transcription = await openai.audio.transcriptions.create({
 			file: file, // The audio file to transcribe
-			model: 'whisper-1', // Specify the Whisper model
-			language: 'en', // Specify the language
+			model: "whisper-1", // Specify the Whisper model
+			language: language, // Specify the language
 		});
 
-		console.log('>>>', transcription);
+		console.log(">>>", transcription);
 
 		// Return the transcription result
 		return {
-			sender: 'Whisper',
+			sender: "Whisper",
 			message: transcription.text, // The transcribed text
 		};
 	} catch (error) {
 		// Handle errors
-		console.error('Error transcribing audio:', error);
+		console.error("Error transcribing audio:", error);
 		return {
-			sender: 'Whisper',
-			message: 'Error transcribing the audio file',
+			sender: "Whisper",
+			message: "Error transcribing the audio file",
 		};
 	}
 }
