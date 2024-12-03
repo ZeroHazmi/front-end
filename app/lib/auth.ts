@@ -42,3 +42,12 @@ export async function decodeToken(token: string) {
 		return null; // Return null if decoding fails
 	}
 }
+
+export async function setLanguageCookie(language: string) {
+	(await cookies()).set("language", language, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		sameSite: "strict",
+		maxAge: 30 * 24 * 60 * 60, // 30 days
+	});
+}

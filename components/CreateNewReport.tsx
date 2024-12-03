@@ -9,6 +9,7 @@ import { FileTextIcon, MicIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from './ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SearchSuggestions {
     icNumber: string;
@@ -23,6 +24,7 @@ const CreateNewReport = ({ type }: { type: string }) => {
     const [suggestions, setSuggestions] = useState<SearchSuggestions[]>([]);
     const [selectedUserId, setselectedUserId] = useState("");
     const currentRoute = usePathname();
+    const { t } = useLanguage()
 
     async function fetchReportType() {
         const isOnlineParam = type === 'user' ? '?isOnline=true' : '';
@@ -73,8 +75,8 @@ const CreateNewReport = ({ type }: { type: string }) => {
         e.preventDefault();
         if (selectedReportType === 0) {
             toast({
-                title: "Report Type",
-                description: "Please select a valid report type",
+                title: t.reportType,
+                description: t.reportTypeError,
                 variant: "destructive",
             });
             return;
@@ -94,39 +96,38 @@ const CreateNewReport = ({ type }: { type: string }) => {
     return (
         <section className="pt-16">
             <div className="flex justify-center items-center font-bold text-6xl text-center text-7 my-12">
-                <h1>Reporting Submission</h1>
+                <h1>{t.reportingSubmission}</h1>
             </div>
             <div className="flex flex-col justify-center items-center">
                 <Card className="bg-white shadow-lg">
                     <CardHeader>
-                        <CardTitle className="text-2xl font-semibold text-gray-800">Create a New Report</CardTitle>
-                        <CardDescription>The following features will be available when you start your report</CardDescription>
+                        <CardTitle className="text-2xl font-semibold text-gray-800">{t.createNewReport}</CardTitle>
+                        <CardDescription>{t.reportFeatures}</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-2">
                         <div className="flex flex-col items-start p-4 border rounded-lg">
                             <FileTextIcon className="mb-2 h-6 w-6 text-blue-600" />
-                            <div className="font-semibold">Text Report</div>
-                            <p className="mt-1 text-sm text-gray-600">Type your report using our guided form</p>
+                            <div className="font-semibold">{t.textReport}</div>
+                            <p className="mt-1 text-sm text-gray-600">{t.textReportDescription}</p>
                         </div>
                         <div className="flex flex-col items-start p-4 border rounded-lg">
                             <MicIcon className="mb-2 h-6 w-6 text-blue-600" />
-                            <div className="font-semibold">Voice Report</div>
-                            <p className="mt-1 text-sm text-gray-600">Use speech-to-text to dictate your report</p>
+                            <div className="font-semibold">{t.voiceReport}</div>
+                            <p className="mt-1 text-sm text-gray-600">{t.voiceReportDescription}</p>
                         </div>
                     </CardContent>
                     <CardFooter className="flex-col items-start">
                         <p className="mb-4 text-sm text-gray-600">
-                            Our speech-to-text feature allows you to speak your report, which will be automatically transcribed. 
-                            You can review and edit the text before submission.
+                            {t.speechToTextInfo}
                         </p>
                         <div className="w-full space-y-4">
                             <Select onValueChange={(value) => setSelectedReportType(Number(value))} required>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select report type" />
+                                    <SelectValue placeholder={t.selectReportType} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="0" disabled>
-                                        Type of reports
+                                    {t.reportType}
                                     </SelectItem>
                                     {reportTypes.map((reportType) => (
                                         <SelectItem key={reportType.id} value={reportType.id.toString()}>
@@ -167,7 +168,7 @@ const CreateNewReport = ({ type }: { type: string }) => {
                                 className="w-full sm:w-auto bg-[#0044cc] text-white rounded-lg font-bold hover:bg-[#0022aa]"
                                 onClick={newReportButton}
                             >
-                                Start New Report
+                                {t.startNewReport}
                             </Button>
                         </div>
                     </CardFooter>

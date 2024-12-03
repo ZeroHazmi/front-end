@@ -69,6 +69,9 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
         setLocation({ coordinates, geocodeObject });
     }, []);
 
+    const language = localStorage.getItem('language') || 'en';
+    
+
     useEffect(() => {
         const fetchReportType = async () => {
             try {
@@ -402,6 +405,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
             <form action={formAction}>
                 <input type="file" hidden ref={fileRef} name="audio" />
                 <button type="submit" hidden ref={submitButtonRef} name="submit" />
+                <input type="hidden" name="language" value={language} />
                 <Recorder uploadAudio={uploadAudio} />
             </form>
 

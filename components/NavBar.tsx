@@ -16,6 +16,7 @@ import { ChevronDown, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { getCookie } from "@/app/lib/auth"
 import LogoutDialog from "./dialog/LogOutDialog"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function NavBar() {
   const router = useRouter()
@@ -23,6 +24,7 @@ export default function NavBar() {
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
+  const { t, language, setLanguage } = useLanguage();
 
   const isActive = (href: string) => pathname === href
 
@@ -98,6 +100,12 @@ export default function NavBar() {
           )}
           {isUser && (
             <>
+                <button
+                    onClick={() => setLanguage(language === 'en' ? 'bm' : 'en')}
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                    {language === 'en' ? 'BM' : 'EN'}
+                </button>
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center hover:text-gray-200">
                   Reports <ChevronDown className="ml-1 h-4 w-4" />
