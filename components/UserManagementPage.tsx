@@ -199,7 +199,7 @@ export default function UserManagementPage() {
                 <TableCell>{user.gender == "0" ? "Male" : "Female"}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
-                    <Button
+                    {/* <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleViewProfile(user.id)}
@@ -212,7 +212,7 @@ export default function UserManagementPage() {
                       onClick={() => handleViewReports(user.id)}
                     >
                       <FileText className="h-4 w-4 mr-2" /> Reports
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="destructive"
                       size="sm"
