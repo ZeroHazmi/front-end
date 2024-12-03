@@ -71,7 +71,7 @@ const ICScanner: React.FC<ICScannerProps> = ({ onScanComplete }) => {
             formData.append('country', 'Malaysia');
 
             const response = await axios.post(
-                'https://cors-anywhere.herokuapp.com/https://api.pixlab.io/docscan',
+                'https://api.pixlab.io/docscan',
                 formData,
                 {
                     headers: {
