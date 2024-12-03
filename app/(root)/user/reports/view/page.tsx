@@ -23,7 +23,7 @@ import { Search, Filter, ArrowUpDown, Loader, Eye } from 'lucide-react'
 import { toast } from "@/hooks/use-toast"
 import { getCookie } from '@/app/lib/auth'
 import { useRouter } from 'next/navigation'
-import { mapStatus, renderFormattedDate } from '@/lib/utils'
+import { mapStatus} from '@/lib/utils'
 import { format } from 'date-fns'
 
 type Report = {

@@ -182,7 +182,7 @@ export default function PoliceManagementPage() {
               <TableCell>{officer.gender == "0" ? "Male" : "Female"}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
-                  <Button
+                  {/* <Button
                     variant="outline"
                     size="sm"
                     onClick={() =>
@@ -193,7 +193,7 @@ export default function PoliceManagementPage() {
                     }
                   >
                     <Eye className="h-4 w-4 mr-2" /> View Reports
-                  </Button>
+                  </Button> */}
                   <Button
                     variant="destructive"
                     size="sm"

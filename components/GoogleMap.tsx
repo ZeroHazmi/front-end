@@ -1,11 +1,9 @@
-'use client';
-
 import { Loader } from '@googlemaps/js-api-loader';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Check, Search } from 'lucide-react'
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Check, Search } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -13,7 +11,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 
 export type LatLng = {
   lat: number;
@@ -33,17 +31,19 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
   const placesService = useRef<google.maps.places.PlacesService | null>(null);
 
+  // Load Google Maps API with required libraries once
   useEffect(() => {
-    const initMap = async () => {
-      const loader = new Loader({
-        apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API as string,
-        version: 'weekly',
-        libraries: ['places']
-      });
+    const loader = new Loader({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_API as string,
+      version: 'weekly',
+      libraries: ['places'] // Only load the libraries you need
+    });
 
+    const initMap = async () => {
       try {
         const { Map } = await loader.importLibrary('maps');
         const { PlacesService, AutocompleteService } = await loader.importLibrary('places') as google.maps.PlacesLibrary;
+
         const center = { lat: 3.139, lng: 101.6869 };
         const malaysiaBounds = new google.maps.LatLngBounds(
           { lat: 0.8538, lng: 99.6042 },
@@ -72,19 +72,19 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
     };
 
     initMap();
-  }, []);
+  }, []); // This effect runs only once
 
   const searchLocation = useCallback(async (placeId: string) => {
     if (placeId && map && placesService.current) {
       const { AdvancedMarkerElement } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary;
-  
+
       try {
         placesService.current.getDetails(
           { placeId: placeId, fields: ['formatted_address', 'geometry.location'] },
           (place, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && place) {
               const location = place.geometry?.location;
-  
+
               if (location) {
                 const latLng = {
                   lat: location.lat(),
@@ -101,21 +101,21 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
                   place_id: place.place_id || '',
                   types: place.types || [],
                 };
-  
+
                 map.panTo(latLng);
                 map.setZoom(18);
-  
+
                 if (markerRef.current) {
                   markerRef.current.map = null;
                   markerRef.current = null;
                 }
-  
+
                 markerRef.current = new AdvancedMarkerElement({
                   map,
                   position: latLng,
                   title: geocoderResult.formatted_address,
                 });
-  
+
                 console.log('Location:', latLng, geocoderResult);
                 onLocationChange(latLng, geocoderResult);
                 setSearchQuery(geocoderResult.formatted_address);
@@ -139,30 +139,30 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
         console.error('No LatLng found in the click event');
         return;
       }
-    
+
       const geocoder = new google.maps.Geocoder();
       const { AdvancedMarkerElement } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary;
-    
+
       try {
         const latLng = e.latLng;
         console.log('Clicked location:', latLng.toJSON());
-    
+
         const results = await geocoder.geocode({ location: latLng });
         if (results && results.results && results.results[0]) {
           const clickedAddress = results.results[0].formatted_address;
           console.log('Geocoding results:', results.results[0]);
-    
+
           if (markerRef.current) {
             markerRef.current.map = null;
             markerRef.current = null;
           }
-    
+
           markerRef.current = new AdvancedMarkerElement({
             map,
             position: latLng,
             title: clickedAddress,
           });
-    
+
           // Pass both LatLng and GeocoderResult to the callback
           onLocationChange(
             { lat: latLng.lat(), lng: latLng.lng() },
@@ -248,12 +248,9 @@ const GoogleMap = ({ onLocationChange }: GoogleMapProps) => {
           </Command>
         )}
       </div>
-      <div className="w-full h-[450px] rounded-lg shadow-lg border-2 border-sky-500">
-        <div ref={mapRef} className="w-full h-full rounded-lg" />
-      </div>
+      <div className="w-full h-[450px]" ref={mapRef}></div>
     </div>
   );
 };
 
 export default GoogleMap;
-

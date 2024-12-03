@@ -24,7 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { getCookie } from '@/app/lib/auth';
-import { mapPriority, mapStatus, renderFormattedDate } from '@/lib/utils';
+import { mapPriority, mapStatus} from '@/lib/utils';
 
 interface ReportData {
   reportId: string;
@@ -43,6 +43,17 @@ type UserType = 'user' | 'police' | 'admin';
 interface ViewReportProps {
   reportId: string | undefined;
   userType: UserType;
+}
+
+function renderFormattedDate(date: string) {
+  const parsedDate = new Date(date);
+  
+  if (isNaN(parsedDate.getTime())) {
+    console.error('Invalid date:', date); // Log the invalid date for debugging
+    return 'Invalid Date'; // Return a fallback value or handle accordingly
+  }
+
+  return format(parsedDate, 'yyyy-MM-dd HH:mm:ss'); // Adjust date format as necessary
 }
 
 export default function ViewReport({ reportId, userType }: ViewReportProps) {

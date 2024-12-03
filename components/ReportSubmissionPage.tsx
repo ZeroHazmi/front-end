@@ -188,6 +188,8 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                 date: date,
                 time: time,
             };
+
+            console.log("Report Data:", reportData);
       
             const response = await fetch("/api/create-report", {
                 method: "POST",

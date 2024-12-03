@@ -32,7 +32,8 @@ import { toast } from "@/hooks/use-toast"
 import { getCookie } from '@/app/lib/auth'
 import { Router } from 'express'
 import { useRouter } from 'next/navigation'
-import { mapPriority, mapStatus, renderFormattedDate } from '@/lib/utils'
+import { mapPriority, mapStatus} from '@/lib/utils'
+import { format } from 'date-fns'
 
 type Report = {
   id: string
@@ -42,6 +43,17 @@ type Report = {
   priority: 'Low' | 'Medium' | 'High' | 'Critical'
   name: string
   icNumber: string
+}
+
+function renderFormattedDate(date: string) {
+  const parsedDate = new Date(date);
+  
+  if (isNaN(parsedDate.getTime())) {
+    console.error('Invalid date:', date); // Log the invalid date for debugging
+    return 'Invalid Date'; // Return a fallback value or handle accordingly
+  }
+
+  return format(parsedDate, 'yyyy-MM-dd HH:mm:ss'); // Adjust date format as necessary
 }
 
 const priorityOrder = { 'Low': 0, 'Medium': 1, 'High': 2, 'Critical': 3 }
