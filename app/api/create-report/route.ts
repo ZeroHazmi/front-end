@@ -1,5 +1,7 @@
+"use server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
+import OpenAI from "openai";
 
 // Type definitions
 type ReportRequest = {
@@ -73,6 +75,34 @@ export async function POST(request: Request) {
 		const dateObj = new Date(date); // Convert string to Date object
 		const dateTimestamp = dateObj.toISOString(); // Convert to ISO 8601 format
 
+		// Prepare OpenAI client
+		const openai = new OpenAI({
+			apiKey: process.env.OPENAI_API_KEY,
+		});
+
+		// Summarize the report content using OpenAI GPT model
+		const summaryResponse = await openai.chat.completions.create({
+			model: "gpt-3.5-turbo", // Use GPT-3.5-turbo or GPT-4 based on your preference
+			messages: [
+				{
+					role: "system",
+					content:
+						"You are an assistant that summarizes incident reports into concise and readable information.",
+				},
+				{
+					role: "user",
+					content: reportContent, // The original report content to summarize
+				},
+			],
+		});
+
+		const summarizedText =
+			summaryResponse.choices &&
+			summaryResponse.choices[0] &&
+			summaryResponse.choices[0].message
+				? (summaryResponse.choices[0].message?.content?.trim() ?? "")
+				: "";
+
 		// Prepare report data
 		const reportData: ReportData = {
 			userId: userId,
@@ -90,7 +120,7 @@ export async function POST(request: Request) {
 				fieldValue: "{}",
 				audio: "",
 				image: "",
-				transcript: reportContent,
+				transcript: summarizedText,
 			},
 		};
 
