@@ -17,6 +17,7 @@ import { Input } from "./ui/input";
 import { states } from "@/types/constants";
 import { getCookie } from "@/app/lib/auth";
 import { z } from "zod";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type Message = {
   sender: string;
@@ -53,6 +54,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
     const [state, formAction] = useActionState(transcribe, initialState);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+    const {t} = useLanguage();
 
     // State for parsed address fields and date/time
     const [addressFields, setAddressFields] = useState({
@@ -289,11 +291,11 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                     
                     {/*## need to fix the width... it looks fine on the desktop but mobile ain't ##*/}
                     <div className="font-bold text-6xl max-w-[1200px] text-center text-[500%] p-20 ">
-                        {reportTypeName} Report
+                        {reportTypeName} 
                     </div>
                     {/* INCIDENT TYPE TITLE */}
                     <div className="font-semibold text-2xl max-w-[1200px] text-center text-[300%] p-20">
-                        Location of Incident
+                        {t.locationOfIncident}
                     </div>
                     {/* GOOGLE MAPS */}
                     <div className="flex justify-center ite">
@@ -307,28 +309,28 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                         <Card>
                             <CardContent className="p-6">
                             <div className="mb-4">
-                                <Label htmlFor="lotRoomBuilding" className='w-full flex items-start mb-2'>Lot/Room/Office/Building No.</Label>
+                                <Label htmlFor="lotRoomBuilding" className='w-full flex items-start mb-2'>{t.lotRoomBuilding.label}</Label>
                                 <Input
                                 id="lotRoomBuilding"
-                                placeholder="Enter lot/room/office/building no."
+                                placeholder={t.lotRoomBuilding.placeholder}
                                 value={addressFields.lotRoomBuilding}
                                 onChange={(e) => setAddressFields({ ...addressFields, lotRoomBuilding: e.target.value })}
                                 />
                             </div>
                             <div className="mb-4">
-                                <Label htmlFor="streetName" className='w-full flex items-start mb-2'>Street Name</Label>
+                                <Label htmlFor="streetName" className='w-full flex items-start mb-2'>{t.streetName.label}</Label>
                                 <Input
-                                id="streetName"
-                                placeholder="Enter street name"
+                                id={t.streetName.label}
+                                placeholder={t.streetName.placeholder}
                                 value={addressFields.streetName}
                                 onChange={(e) => setAddressFields({ ...addressFields, streetName: e.target.value })}
                                 />
                             </div>
                             <div className="mb-4">
-                                <Label htmlFor="placeName" className='w-full flex items-start mb-2'>Park/Place Name</Label>
+                                <Label htmlFor="placeName" className='w-full flex items-start mb-2'>{t.placeName.label}</Label>
                                 <Input
-                                id="placeName"
-                                placeholder="Enter park/place name"
+                                id={t.placeName.label}
+                                placeholder={t.placeName.placeholder}
                                 value={addressFields.placeName}
                                 onChange={(e) => setAddressFields({ ...addressFields, placeName: e.target.value })}
                                 />
@@ -336,8 +338,8 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                             <div className="mb-4">
                                 <Label htmlFor="postcode" className='w-full flex items-start mb-2'>Postcode</Label>
                                 <Input
-                                id="postcode"
-                                placeholder="Enter postcode"
+                                id='postcode'
+                                placeholder={t.enterPostcode}
                                 value={addressFields.postcode}
                                 onChange={(e) => setAddressFields({ ...addressFields, postcode: e.target.value })}
                                 />
@@ -348,39 +350,39 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                             <Card>
                             <CardContent className="p-6">
                                 <div className="mb-4">
-                                <Label htmlFor="city" className='w-full flex items-start mb-2'>City</Label>
+                                <Label htmlFor="city" className='w-full flex items-start mb-2'>{t.city.label}</Label>
                                 <Input
                                     id="city"
-                                    placeholder="Enter city"
+                                    placeholder={t.city.placeholder}
                                     value={addressFields.city}
                                     onChange={(e) => setAddressFields({ ...addressFields, city: e.target.value })}
                                 />
                                 </div>
                                 <div className="mb-4">
-                                <Label htmlFor="state" className='w-full flex items-start mb-2'>State</Label>
+                                <Label htmlFor="state" className='w-full flex items-start mb-2'>{t.state.label}</Label>
                                 <Input
                                     id="state"
-                                    placeholder="Enter state"
+                                    placeholder={t.state.placeholder}
                                     value={addressFields.state}
                                     onChange={(e) => setAddressFields({ ...addressFields, state: e.target.value })}
                                 />
                                 </div>
                                 <div className="mb-4">
-                                <Label htmlFor="date" className='w-full flex items-start mb-2'>Date</Label>
+                                <Label htmlFor="date" className='w-full flex items-start mb-2'>{t.date.label}</Label>
                                 <Input
                                     id="date"
                                     type="date"
-                                    placeholder="Enter date of incident"
+                                    placeholder={t.date.placeholder}
                                     value={date}
                                     onChange={handleDateChange}
                                 />
                                 </div>
                                 <div className="mb-4">
-                                    <Label htmlFor="time" className="w-full flex items-start mb-2">Time</Label>
+                                    <Label htmlFor="time" className="w-full flex items-start mb-2">{t.time.label}</Label>
                                     <Input
                                     id="time"
                                     type="time"
-                                    placeholder="Enter time of incident"
+                                    placeholder={t.time.placeholder}
                                     value={time}
                                     onChange={handleTimeChange}
                                     />
@@ -394,13 +396,13 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                     {/* By default the textarea is not editable */}
                     <Card className="mb-8">
                         <CardContent className="p-6">
-                            <Label htmlFor="report-content">Report Content</Label>
+                            <Label htmlFor="report-content">{t.reportContent.label}</Label>
                             <textarea
                                 id="report-content"
                                 className="w-full h-64 px-3 py-2 text-gray-700 border rounded-lg focus:outline-none resize-none"
                                 value={textareaContent}
                                 onChange={(e) => setTextareaContent(e.target.value)}
-                                placeholder="Type or dictate your report here..."
+                                placeholder={t.reportContent.placeholder}
                                 disabled={!isEditable} // Disable the textarea if not editable
                             ></textarea>
                             <Button
@@ -415,10 +417,10 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
 
                     <div className="flex justify-between items-center">
                         <Button onClick={() => router.push('/user/')} className="text-white bg-police-blue hover:bg-[#0022AA]">
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Return
+                            <ArrowLeft className="mr-2 h-4 w-4" /> {t.return}
                         </Button>
                         <Button type="button" className="text-white bg-police-blue hover:bg-[#0022AA]" onClick={() => setIsConfirmDialogOpen(true)}>
-                            Confirm <ArrowRight className="ml-2 h-4 w-4" />
+                        {t.confirm} <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </div>
                 </form>
@@ -458,3 +460,7 @@ function ConfirmDialog({ isConfirmDialogOpen, setIsConfirmDialogOpen, onConfirm 
         </Dialog>
     );
 }
+function useTranslation(): { t: any; } {
+    throw new Error("Function not implemented.");
+}
+

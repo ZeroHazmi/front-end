@@ -125,6 +125,17 @@ export const translations = {
 
 		// Confirmation Dialog
 		confirmSubmission: "Are you sure you want to submit this report?",
+		faqTitle: "Frequently Asked Questions",
+		searchPlaceholder: "Type here...",
+		searchButton: "Search",
+		questionPrefix: "Q",
+		addNewQuestion: "Add new question",
+		addNewQuestionTitle: "Add New Question",
+		addNewQuestionDescription:
+			"Enter the new question and its answer here. Click save when you're done.",
+		question: "Question",
+		answer: "Answer",
+		saveChanges: "Save changes",
 	},
 	bm: {
 		username: "Nama Pengguna",
@@ -255,5 +266,16 @@ export const translations = {
 
 		// Confirmation Dialog
 		confirmSubmission: "Adakah anda pasti mahu menghantar laporan ini?",
+		faqTitle: "Soalan Lazim",
+		searchPlaceholder: "Taipkan di sini...",
+		searchButton: "Cari",
+		questionPrefix: "S",
+		addNewQuestion: "Tambah soalan baru",
+		addNewQuestionTitle: "Tambah Soalan Baru",
+		addNewQuestionDescription:
+			"Masukkan soalan baru dan jawapannya di sini. Klik simpan apabila selesai.",
+		question: "Soalan",
+		answer: "Jawapan",
+		saveChanges: "Simpan perubahan",
 	},
 };
