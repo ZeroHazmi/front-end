@@ -59,37 +59,35 @@ const ICScanner: React.FC<ICScannerProps> = ({ onScanComplete }) => {
             setError('Please select a file first');
             return;
         }
-
+    
         setIsLoading(true);
         setError(null);
-
+    
         try {
             const formData = new FormData();
             formData.append('file', selectedFile);
-            formData.append('type', 'idcard');
-            formData.append('key', PIXLAB_API_KEY!);
-            formData.append('country', 'Malaysia');
-
+    
             const response = await axios.post(
-                'https://api.pixlab.io/docscan',
+                '/api/pixLabProxy', 
                 formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                    },
+                    }
                 }
             );
-
+    
             const data = response.data;
             if (data.status !== 200) {
                 throw new Error(data.error || 'Failed to scan IC');
             }
             console.log(data);
-
-            onScanComplete(data.fields); // Pass scanned fields to callback
-
-        } catch (err) {
-            setError('An error occurred while scanning.');
+    
+            onScanComplete(data.fields);
+    
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'An error occurred while scanning.');
+            console.error(err);
         } finally {
             setIsLoading(false);
         }
