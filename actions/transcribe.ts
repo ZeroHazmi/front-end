@@ -11,7 +11,12 @@ async function transcribe(prevState: any, formData: FormData) {
 		};
 	}
 
-	const language = formData.get("language") as string;
+	let language = formData.get("language") as string;
+	if (language == "bm") {
+		language = "ms";
+	} else {
+		language = "en";
+	}
 
 	console.log(">>>", file);
 
