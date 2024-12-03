@@ -31,7 +31,8 @@ interface ReportData {
   dateCreated: string;
   status: string;
   priority: string;
-  incidentDateTime: string;
+  incidentDate: string;
+  incidentTime: string;
   location: string;
   transcript: string;
   extraInformation: string;
@@ -214,7 +215,7 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
             <div>
               <Label className="font-bold">Date and Time of Incident</Label>
               <p suppressHydrationWarning>
-                {renderFormattedDate(reportData.incidentDateTime)}
+                {renderFormattedDate(reportData.incidentDate)} at {reportData.incidentTime}
               </p>
             </div>
 
@@ -224,7 +225,7 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
             </div>
 
             <div>
-              <Label className="font-bold">Transcript</Label>
+              <Label className="font-bold">Summary</Label>
               <p className="mt-2 whitespace-pre-wrap">{reportData.transcript}</p>
             </div>
 

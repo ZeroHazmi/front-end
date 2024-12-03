@@ -66,11 +66,6 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Generate random priority (Low, Medium, High, Critical)
-		const priorities = ["Low", "Medium", "High", "Critical"];
-		const randomPriority =
-			priorities[Math.floor(Math.random() * priorities.length)];
-
 		// Convert the date string to a Date object and get the Unix timestamp (in seconds)
 		const dateObj = new Date(date); // Convert string to Date object
 		const dateTimestamp = dateObj.toISOString(); // Convert to ISO 8601 format
@@ -80,18 +75,35 @@ export async function POST(request: Request) {
 			apiKey: process.env.OPENAI_API_KEY,
 		});
 
-		// Summarize the report content using OpenAI GPT model
+		// Create a detailed transcription and priority prompt for OpenAI
+		const transcriptionPrompt = `
+			You are an assistant that summarizes incident reports into concise and readable information.
+			Please summarize the incident and assign a priority (Low, Medium, High, Critical) based on the provided details.
+
+			Report Type: ${reportTypeName}
+			Address: ${address}
+			State: ${state}
+			Date: ${dateTimestamp}
+			Time: ${time}
+			Latitude: ${latitude}
+			Longitude: ${longitude}
+			Report Content: ${reportContent}
+
+			Keep the original report content and display it below the summary. You don't need to include priority in the summary. Also don't need to include Summary title. Only include Report Content title.
+		`;
+
+		// Get both summary and priority from OpenAI
 		const summaryResponse = await openai.chat.completions.create({
 			model: "gpt-3.5-turbo", // Use GPT-3.5-turbo or GPT-4 based on your preference
 			messages: [
 				{
 					role: "system",
 					content:
-						"You are an assistant that summarizes incident reports into concise and readable information.",
+						"You are an assistant that summarizes incident reports into concise and readable information and assigns a priority level. If the response for the report content is in Bahasa Melayu then keep it in Bahasa Melayu. If the response for the report content is in English then keep it in English.",
 				},
 				{
 					role: "user",
-					content: reportContent, // The original report content to summarize
+					content: transcriptionPrompt, // The detailed transcription prompt for the report
 				},
 			],
 		});
@@ -103,12 +115,17 @@ export async function POST(request: Request) {
 				? (summaryResponse.choices[0].message?.content?.trim() ?? "")
 				: "";
 
+		// Parse the priority from OpenAI's response
+		const priorityPattern = /(Low|Medium|High|Critical)/i;
+		const match = summarizedText.match(priorityPattern);
+		const assignedPriority = match ? match[0] : "Low"; // Default to Low if no match
+
 		// Prepare report data
 		const reportData: ReportData = {
 			userId: userId,
 			reportTypeId: reportTypeID,
 			status: "Open",
-			priority: randomPriority,
+			priority: assignedPriority, // Use the priority assigned by OpenAI
 			reportDetail: {
 				reportTypeId: reportTypeID,
 				date: dateTimestamp,

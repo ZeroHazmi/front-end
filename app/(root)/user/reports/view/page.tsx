@@ -173,7 +173,7 @@ export default function UserReportTable() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setStatusFilter(null)}>All Statuses</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setStatusFilter('Open')}>Open</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter('In Progress')}>In Progress</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('InProgress')}>In Progress</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setStatusFilter('Completed')}>Completed</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

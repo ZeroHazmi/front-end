@@ -16,6 +16,7 @@ import GoogleMap, { LatLng } from "./GoogleMap";
 import { Input } from "./ui/input";
 import { states } from "@/types/constants";
 import { getCookie } from "@/app/lib/auth";
+import { z } from "zod";
 
 type Message = {
   sender: string;
@@ -32,7 +33,7 @@ const initialState = {
   sender: "",
   message: "",
 };
-
+  
 export default function SubmitReportPage({ userId, userAccess }: { userId?: string, userAccess: string }) {
     const [reportType, setReportType] = useState<ReportType | null>(null);
     const [templateFields, setTemplateFields] = useState<[string, string][]>([]);
@@ -126,73 +127,95 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
 
     // Create report
     const createReport = async () => {
-
         let token;
-        if(!userId){
+        if (!userId) {
             token = await getCookie("userId");
-            console.log('Token:', token);
+            console.log("Token:", token);
         }
-
-      try {
-          setSubmitting(true);
-
-          if (!reportTypeID || !reportTypeName) {
-              console.error('Missing report type information');
-          }
-
-          if (!textareaContent.trim()) {
-              console.error('Report content cannot be empty');
-          }
-
-          if (!location) {
-              console.error('Location is required');
-          }
-
-          // Assign userId based on userAccess
-          const finalUserId = userAccess === 'police' ? userId : token;
-
-          const reportData = {
-            userId: finalUserId,
-            reportTypeID,
-            reportContent: textareaContent,
-            reportTypeName,
-            latitue: location?.coordinates.lat,
-            longitude: location?.coordinates.lng,
-            address: location?.geocodeObject.formatted_address,
-            state: location?.geocodeObject.address_components.find(component => component.types.includes('administrative_area_level_1'))?.long_name || '',
-            date: date,
-            time: time,
-        };
-
-          const response = await fetch('/api/create-report', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(reportData),
-          });
-
-          if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || 'Failed to create report');
-          }
-
-          toast({
-              title: "Success",
-              description: "Report submitted successfully",
-          });
-
-          setIsConfirmDialogOpen(false);
-          router.push(currentPath.includes('police') ? '/police' : '/user/reports/view');
-      } catch (error: any) {
-        toast({
-            title: "Error",
-            description: error.message || 'Error creating report',
-            variant: "destructive",
-        });
-      } finally {
-          setSubmitting(false);
-      }
+      
+        const errors: string[] = []; // Array to hold error messages
+    
+        try {
+            setSubmitting(true);
+      
+            // Check if all required fields are filled
+            if (!reportTypeID || !reportTypeName) {
+                errors.push("Report type is missing.\n");
+            }
+      
+            if (!textareaContent.trim()) {
+                errors.push("Report content cannot be empty.\n");
+            }
+      
+            if (!location) {
+                errors.push("Location is required.\n");
+            }
+      
+            if (!date) {
+                errors.push("Date is required.\n");
+            }
+      
+            if (!time) {
+                errors.push("Time is required.\n");
+            }
+    
+            // If there are errors, display them and return early
+            if (errors.length > 0) {
+                toast({
+                    title: "Error",
+                    description: errors.join("\n"),
+                    variant: "destructive",
+                });
+                return;
+            }
+      
+            // Assign userId based on userAccess
+            const finalUserId = userAccess === "police" ? userId : token;
+      
+            const reportData = {
+                userId: finalUserId,
+                reportTypeID,
+                reportContent: textareaContent,
+                reportTypeName,
+                latitue: location?.coordinates.lat,
+                longitude: location?.coordinates.lng,
+                address: location?.geocodeObject.formatted_address,
+                state: location?.geocodeObject.address_components.find(
+                    (component) => component.types.includes("administrative_area_level_1")
+                )?.long_name || "",
+                date: date,
+                time: time,
+            };
+      
+            const response = await fetch("/api/create-report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(reportData),
+            });
+      
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Failed to create report");
+            }
+      
+            toast({
+                title: "Success",
+                description: "Report submitted successfully",
+            });
+      
+            setIsConfirmDialogOpen(false);
+            router.push(currentPath.includes("police") ? "/police" : "/user/reports/view");
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error.message || "Error creating report",
+                variant: "destructive",
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     
