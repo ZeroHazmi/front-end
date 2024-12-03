@@ -73,7 +73,7 @@ export default function ViewReport({ reportId, userType }: ViewReportProps) {
 
     const fetchReportData = async () => {
       try {
-        const response = await fetch(`http://localhost:5035/api/report/${reportId}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}report/${reportId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch report data');
         }
