@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DashboardHeader } from "@/components/header/dashboard-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -67,8 +66,6 @@ export default function CetakReportPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <DashboardHeader />
-
       <main className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           {/* Header Section */}

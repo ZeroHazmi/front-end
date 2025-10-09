@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function DashboardHeader() {
@@ -91,12 +90,6 @@ export function DashboardHeader() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <div className="relative" aria-hidden="false" title="Security status">
-              <Lock className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 bg-yellow-400 text-[#1a2470] text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                0
-              </span>
-            </div>
             <Button
               onClick={handleLogout}
               className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-6 py-2"

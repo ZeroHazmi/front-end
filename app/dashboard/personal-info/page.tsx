@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { DashboardHeader } from "@/components/header/dashboard-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -58,8 +57,6 @@ export default function ButiranPeribadiPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader />
-
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-8">Kemas kini Pengguna</h1>

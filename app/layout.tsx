@@ -5,10 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { LanguageWrapper } from "@/components/LanguageWrapper";
-import { cookies } from 'next/headers'
 import { Header } from '@/components/header/header'
-import { DashboardHeader } from '@/components/header/dashboard-header'
-import { decodeToken } from '@/app/lib/auth'
 
 //"@/components/ui/toaster"
 
@@ -24,26 +21,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Await cookies() per Next.js synchronous dynamic API guidance
-  const cookieStore: any = await cookies()
-  const session = cookieStore?.get?.('session')?.value || ""
-
-  // Validate token payload before showing DashboardHeader
-  let HeaderToUse = Header
-  if (session) {
-    try {
-      const payload: any = await decodeToken(session)
-      // Only treat token as valid if it contains an expiry and is not expired
-      // (payload.exp is in seconds)
-      const now = Math.floor(Date.now() / 1000)
-      if (payload && typeof payload.exp === "number" && payload.exp > now) {
-        HeaderToUse = DashboardHeader
-      }
-    } catch (err) {
-      // invalid token -> fall back to public header
-      HeaderToUse = Header
-    }
-  }
+  // Root layout always renders the public Header. Dashboard pages use their own
+  // nested layout in `app/dashboard/layout.tsx` which renders the
+  // `DashboardHeader`. This avoids toggling the header purely based on cookie
+  // presence and keeps header selection deterministic via Next.js layout nesting.
 
   return (
     <html lang="en">
@@ -52,8 +33,7 @@ export default async function RootLayout({
         <main>
           <LanguageProvider>
             <LanguageWrapper>
-              {/* Render the appropriate header for public vs authenticated pages */}
-              <HeaderToUse />
+              <Header />
               {children}
             </LanguageWrapper>
           </LanguageProvider>
