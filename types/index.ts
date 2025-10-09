@@ -1,5 +1,7 @@
 export interface AppUser {
 	userName: string;
+	// Some backends expect a 'Name' field; keep it optional to allow both shapes
+	Name?: string;
 	password: string;
 	email: string;
 	icNumber: string;
@@ -82,21 +84,29 @@ export interface FieldValue {
 	[key: string]: string; // Key-value pairs as strings
 }
 
-interface CustomInput {
-	control?: Control<z.infer<typeof formSchema>>;
-	name: FieldPath<z.infer<typeof formSchema>>;
-	label: string;
-	placeholder: string;
-	id?: string;
+export interface CustomInput {
+	control?: any
+	name: string
+	label: string
+	placeholder: string
+	id?: string
 }
 
-interface CustomSelectInput {
-	control: Control<z.infer<typeof formSchema>>;
-	name: FieldPath<z.infer<typeof formSchema>>;
+// interface CustomInput {
+// 	control?: Control<z.infer<typeof formSchema>>;
+// 	name: FieldPath<z.infer<typeof formSchema>>;
+// 	label: string;
+// 	placeholder: string;
+// 	id?: string;
+// }
+
+export interface CustomSelectInput {
+	control?: any;
+	name: string;
 	label: string;
-	placeholder: string;
-	options: Record<string, string> | string[];
-	setValue?: UseFormSetValue<z.infer<typeof formSchema>>;
-	// setValue?: Record<string, string> | string[];
+	placeholder?: string;
+	options?: Record<string, string> | string[];
+		// setValue can be the react-hook-form setValue which accepts multiple args
+		setValue?: (...args: any[]) => void;
 	id?: string;
 }

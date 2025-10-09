@@ -46,7 +46,7 @@ const SelectInput = ({
                           {item}
                         </SelectItem>
                       ))
-                    : Object.entries(options).map(([key, value]) => (
+                    : Object.entries(options || {}).map(([key, value]) => (
                         <SelectItem key={key} value={key}>
                           {value}
                         </SelectItem>

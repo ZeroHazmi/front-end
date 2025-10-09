@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import LoginAuthForm from '@/components/Form/LoginAuthForm';
+import { LoginCard } from '@/components/user/login-card'
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function LoginPage() {
@@ -44,7 +44,7 @@ export default function LoginPage() {
                             {t.systemDescription}
                         </div>
                         <div className="flex flex-col justify-center items-center">     
-                            <LoginAuthForm type="sign-in" />
+                            <LoginCard />
                         </div>
                     </div>
                 </div>

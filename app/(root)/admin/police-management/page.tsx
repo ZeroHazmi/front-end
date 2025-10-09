@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -45,14 +45,14 @@ export default function PoliceManagementPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const fetchOfficers = async () => {
+  const fetchOfficers = useCallback(async (): Promise<void> => {
     setLoading(true)
 
     try {
       const token = await getCookie("session")
       if (!token) {
         toast({
-          title: "Error",
+          title: "Error", 
           description: "Session token is missing. Redirecting to login...",
           variant: "destructive",
         })
@@ -87,11 +87,11 @@ export default function PoliceManagementPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, genderFilter, sortOrder])
 
   useEffect(() => {
     fetchOfficers()
-  }, [genderFilter, sortOrder])
+  }, [fetchOfficers])
 
   const handleOfficerAdded = () => {
     setIsAddDialogOpen(false)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -70,7 +70,7 @@ export default function ReportManagementPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       const token = await getCookie("session");
@@ -147,11 +147,11 @@ export default function ReportManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, statusFilter, priorityFilter, sortOption]);
 
   useEffect(() => {
     fetchReports();
-  }, [searchQuery, statusFilter, priorityFilter, sortOption]);
+  }, [fetchReports]);
 
   const handleDeleteReport = async () => {
     if (!reportToDelete) return;

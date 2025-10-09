@@ -130,7 +130,7 @@ const SignupAuthForm = () => {
             const redirectTimeout = setTimeout(() => {
                 if (role === 'User') {
                     console.log("Route:", "Within Role User Checker")
-                    router.push('/user')
+                    router.push('/dashboard')
                 } else if (role === 'Police') {
                     router.push('/police')
                 }

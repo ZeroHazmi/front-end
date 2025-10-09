@@ -1,6 +1,6 @@
 'use client'
 
-import SignupAuthForm from '@/components/Form/SignupAuthForm';
+import { RegistrationForm } from '@/components/user/registration-form';
 
 export default function SignUpPage(){
     return (
@@ -8,7 +8,7 @@ export default function SignUpPage(){
         <div className="user-signup-main-container">
                 <div className="user-signup-container">
                     <div>
-                        <SignupAuthForm />
+                        <RegistrationForm />
                     </div>   
                 </div>
             </div>

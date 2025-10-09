@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ const IncidentRateComponent = () => {
     to: new Date(),
   });
 
-  async function fetchReportType() {
+  const fetchReportType = useCallback(async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype`, {
         method: "GET",
@@ -56,9 +56,9 @@ const IncidentRateComponent = () => {
         variant: "destructive",
       });
     }
-  }
+  }, []);
 
-  const fetchIncidentData = async (applyFilters = false) => {
+  const fetchIncidentData = useCallback(async (applyFilters = false) => {
     try {
       const params = new URLSearchParams();
       
@@ -92,12 +92,12 @@ const IncidentRateComponent = () => {
       });
       setIncidentData([]);
     }
-  };
+  }, [timeRange, location, selectedReportType, dateFilterType, dateRange]);
 
   useEffect(() => {
     fetchReportType();
     fetchIncidentData(); // Fetch data initially without filters
-  }, []);
+  }, [fetchReportType, fetchIncidentData]);
 
   return (
     <div className="p-4 bg-white rounded-md shadow">

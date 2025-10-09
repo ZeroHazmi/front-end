@@ -30,38 +30,30 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            icNumber: "",
             password: "",
         },
     })
    
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log("Attempting to submit form");
-        console.log("Form submitted with values:", values);
         setIsLoading(true);
         try {
-            console.log(process.env.NEXT_PUBLIC_API_URL);
-            const response = await login(values.username, values.password);
-            console.log("Response:", response);
+            const response = await login(values.icNumber, values.password);
 
             if (response){
                 setToken(response.token);
                 const decodedToken = await decodeToken(response.token);
-                console.log("Decoded Token:", decodedToken);
                 if (decodedToken.role) {
                     const decodedRole = decodedToken.role.toString();
-                    console.log("Role:", decodedRole);
                     setRole(decodedRole);
                     setUserId(decodedToken.nameid);
                 }
                 setLoginSuccess(true);
                 toast({ title: t.loginSuccess, description: t.loginSuccessDesc });
 
-                console.log("Login Successful:", response);
             }
           
         } catch (error: any) {
-            console.error("Login Failed:", error);
             toast({ title: t.loginFailed, description: t.loginFailedDesc, variant: "destructive" });
 
         } finally {
@@ -71,9 +63,6 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
 
     useEffect(() => {
         if (loginSuccess && role) {
-            console.log("Role in useeffect", role);
-            console.log("Login Success:", loginSuccess);
-
             setCookie('session', token);
             setCookie('roles', role);
             setCookie('userId', userId);
@@ -81,7 +70,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
             const redirectTimeout = setTimeout(() => {
                 if (role === 'User') {
                     console.log("Route:", "Within Role User Checker");
-                    router.push('/user');
+                    router.push('/dashboard');
                 } else if (role === 'Police') {
                     router.push('/police');
                 } else if (role === 'Admin') {
@@ -101,10 +90,10 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <LoginCustomInput 
                         control={form.control} 
-                        name='username' 
-                        label={t.username} 
-                        placeholder={t.enterUsername} 
-                        id='username-input'
+                        name='icNumber' 
+                        label={t.icNumber || t.username} 
+                        placeholder={t.enterIC || t.enterUsername} 
+                        id='ic-input'
                     />
 
                     <LoginCustomInput 

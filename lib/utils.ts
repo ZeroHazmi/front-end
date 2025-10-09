@@ -29,7 +29,7 @@ export const libs: Library[] = ["core", "maps", "places", "marker"];
 
 export const loginFormSchema = () =>
 	z.object({
-		username: z.string().min(1, {message: "Username is required."}),
+		icNumber: z.string().min(1, {message: "IC Number is required."}),
 		password: z.string().min(1, {message: "Password is required."}),
 	});
 

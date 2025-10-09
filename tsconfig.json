@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "app/dashboard/print-report/page.tss"  ],
   "exclude": [
     "node_modules"
   ]

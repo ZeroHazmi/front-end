@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useActionState } from "react";
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
-import { ReportType } from "@/types/index.d";
+import { ReportType } from "@/types";
 import Recorder, { mimeType } from "@/components/Recorder";
 import transcribe from "@/actions/transcribe";
 import { Card, CardContent } from '@/components/ui/card';
@@ -179,7 +179,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                 reportTypeID,
                 reportContent: textareaContent,
                 reportTypeName,
-                latitue: location?.coordinates.lat,
+                latitude: location?.coordinates.lat,
                 longitude: location?.coordinates.lng,
                 address: location?.geocodeObject.formatted_address,
                 state: location?.geocodeObject.address_components.find(
@@ -279,7 +279,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
         if (location) {
             splitAddress();
         }
-    }, [location?.geocodeObject]);
+    }, [location]);
 
 
     // Split template fields into two columns
@@ -462,7 +462,5 @@ function ConfirmDialog({ isConfirmDialogOpen, setIsConfirmDialogOpen, onConfirm 
         </Dialog>
     );
 }
-function useTranslation(): { t: any; } {
-    throw new Error("Function not implemented.");
-}
+
 

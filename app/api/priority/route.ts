@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { OpenAI } from 'openai'; // Import OpenAI SDK
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY, // Ensure the key is in your environment
-});
+import OpenAI from 'openai';
 
 export async function POST(req: NextRequest) {
 	try {
@@ -17,6 +12,14 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		const apiKey = process.env.OPENAI_API_KEY;
+		if (!apiKey) {
+			console.error('OPENAI_API_KEY is missing');
+			return NextResponse.json({ error: 'OPENAI_API_KEY is not configured on the server.' }, { status: 500 });
+		}
+
+		const openai = new OpenAI({ apiKey });
+
 		const prompt = `Analyze the following report content and determine a priority level from Low, Medium, High, and Critical (where Low is lowest priority and Critical is highest priority) and provide only the value of the priority level which can be Low, Medium, High or Critical.\n\nReport: "${reportContent}/n/n${reportTypeName}"`;
 
 		const response = await openai.chat.completions.create({
@@ -24,8 +27,7 @@ export async function POST(req: NextRequest) {
 			messages: [
 				{
 					role: 'system',
-					content:
-						'You are an assistant helping to prioritize police reports based on content analysis.',
+					content: 'You are an assistant helping to prioritize police reports based on content analysis.',
 				},
 				{
 					role: 'user',
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
 			temperature: 0.5,
 		});
 
-		const priority = response.choices[0].message?.content?.trim() ?? 'Low';
+		const priority = response.choices?.[0]?.message?.content?.trim() ?? 'Low';
 		return NextResponse.json({ priority }, { status: 200 });
 	} catch (error) {
 		console.error('Error analyzing report content:', error);

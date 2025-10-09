@@ -1,9 +1,9 @@
-'use client'
+ 'use client'
 
 import { toast } from '@/hooks/use-toast';
 import { ReportType } from '@/types';
 import { useRouter, usePathname } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileTextIcon, MicIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -26,7 +26,7 @@ const CreateNewReport = ({ type }: { type: string }) => {
     const currentRoute = usePathname();
     const { t } = useLanguage()
 
-    async function fetchReportType() {
+    const fetchReportType = useCallback(async () => {
         const isOnlineParam = type === 'user' ? '?isOnline=true' : '';
         const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype${isOnlineParam}`, {
             method: 'GET',
@@ -41,9 +41,9 @@ const CreateNewReport = ({ type }: { type: string }) => {
         } else {
             console.error('Failed to fetch report types');
         }
-    }
+    }, [type]);
 
-    const fetchSuggestions = async (query: string) => {
+    const fetchSuggestions = useCallback(async (query: string) => {
         if (query.length < 2) {
             setSuggestions([]);
             return;
@@ -56,11 +56,11 @@ const CreateNewReport = ({ type }: { type: string }) => {
         } else {
             setSuggestions([]);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchSuggestions(searchQuery);
-    }, [searchQuery]);
+    }, [searchQuery, fetchSuggestions]);
 
     function handleSearchChange(value: string) {
         setSearchQuery(value);
@@ -91,7 +91,7 @@ const CreateNewReport = ({ type }: { type: string }) => {
 
     useEffect(() => {
         fetchReportType();
-    }, [type]);
+    }, [fetchReportType]);
 
     return (
         <section className="pt-16">

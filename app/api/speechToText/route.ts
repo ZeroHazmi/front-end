@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
-import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
-
-dotenv.config();
-
-const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function POST(req: NextRequest) {
 	const body = await req.json();
@@ -17,11 +10,27 @@ export async function POST(req: NextRequest) {
 	// Convert the base64 audio data to a Buffer
 	const audio = Buffer.from(base64Audio, 'base64');
 
-	// Define the file path for storing the temporary WAV file
-	const filePath = 'tmp/input.wav';
+	// Define the file path for storing the temporary audio file (webm from client)
+	const filePath = 'tmp/input.webm';
+
+	// Ensure API key is available at runtime
+	const apiKey = process.env.OPENAI_API_KEY;
+	if (!apiKey) {
+		console.error('OPENAI_API_KEY is missing');
+		return NextResponse.json({ error: 'OPENAI_API_KEY is not configured on the server.' }, { status: 500 });
+	}
+
+	const openai = new OpenAI({ apiKey });
 
 	try {
-		// Write the audio data to a temporary WAV file synchronously
+		// Ensure tmp directory exists
+		try {
+			fs.mkdirSync('tmp', { recursive: true });
+		} catch (e) {
+			// ignore
+		}
+
+		// Write the audio data to a temporary WAV file
 		fs.writeFileSync(filePath, audio);
 
 		// Create a readable stream from the temporary WAV file
@@ -33,11 +42,15 @@ export async function POST(req: NextRequest) {
 		});
 
 		// Remove the temporary file after successful processing
-		fs.unlinkSync(filePath);
+		try {
+			fs.unlinkSync(filePath);
+		} catch (e) {
+			// ignore
+		}
 
 		return NextResponse.json(data);
 	} catch (error) {
 		console.error('Error processing audio:', error);
-		return NextResponse.error();
+		return NextResponse.json({ error: 'Failed to process audio' }, { status: 500 });
 	}
 }
