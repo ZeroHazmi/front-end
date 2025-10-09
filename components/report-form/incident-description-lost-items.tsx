@@ -12,7 +12,7 @@ import Recorder from "@/components/Recorder"
 interface IncidentDescriptionLostItemsProps {
   onNext: () => void
   onBack: () => void
-  onChange?: (data: { itemDescription?: string; reportContent?: string }) => void
+  onChange?: (data: any) => void
 }
 
 export function IncidentDescriptionLostItems({ onNext, onBack, onChange }: IncidentDescriptionLostItemsProps) {
@@ -23,13 +23,13 @@ export function IncidentDescriptionLostItems({ onNext, onBack, onChange }: Incid
   const handleTranscript = (text: string) => {
     const newDesc = description ? `${description}\n${text}` : text
     setDescription(newDesc)
-    if (onChange) onChange({ itemDescription, reportContent: newDesc })
+    if (onChange) onChange({ reportContent: newDesc, fieldValue: JSON.stringify({ item: itemDescription || "", value: "lost" }), transcript: newDesc })
   }
 
   // notify parent when item description changes
   const handleItemChange = (value: string) => {
     setItemDescription(value)
-    if (onChange) onChange({ itemDescription: value, reportContent: description })
+    if (onChange) onChange({ reportContent: description, fieldValue: JSON.stringify({ item: value, value: "lost" }) })
   }
 
   const handleSubmit = (e: React.FormEvent) => {

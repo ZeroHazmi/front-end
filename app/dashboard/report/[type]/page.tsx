@@ -28,17 +28,26 @@ export default function ReportPage() {
     (async () => {
       try {
         // Build payload matching the API route's expected ReportRequest
+        // Build ReportCreateDto with nested ReportDetail
         const payload = {
-          userId: aggregate.userId || undefined,
-          reportTypeID: params?.type || '',
-          reportContent: aggregate.reportContent || '',
-          reportTypeName: params?.type || '',
-          address: aggregate.address || aggregate.placeName || '',
-          latitude: aggregate.latitude || aggregate.lat || 0,
-          longitude: aggregate.longitude || aggregate.lng || 0,
-          state: aggregate.state || '',
-          date: aggregate.date || '',
-          time: aggregate.time || aggregate.masa || '',
+          UserId: aggregate.userId || undefined,
+          ReportTypeId: Number(params?.type) || 0,
+          Status: aggregate.status || 'Open',
+          Priority: aggregate.priority || 'Low',
+          AppUserId: aggregate.appUserId || '',
+          ReportDetail: {
+            ReportTypeId: Number(params?.type) || 0,
+            Date: aggregate.date || '',
+            Time: aggregate.time || aggregate.masa || '',
+            Address: aggregate.address || aggregate.placeName || '',
+            Latitude: aggregate.latitude || aggregate.lat || 0,
+            Longitude: aggregate.longitude || aggregate.lng || 0,
+            State: aggregate.state || '',
+            FieldValue: typeof aggregate.fieldValue === 'string' ? aggregate.fieldValue : JSON.stringify(aggregate.fieldValue || {}),
+            Audio: aggregate.audio || '',
+            Image: aggregate.image || '',
+            Transcript: aggregate.transcript || aggregate.reportContent || '',
+          },
         }
 
         console.log('[v0] Submitting payload', payload)
