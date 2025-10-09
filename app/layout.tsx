@@ -33,9 +33,10 @@ export default async function RootLayout({
   if (session) {
     try {
       const payload: any = await decodeToken(session)
-      // Check expiry if present (payload.exp is in seconds)
+      // Only treat token as valid if it contains an expiry and is not expired
+      // (payload.exp is in seconds)
       const now = Math.floor(Date.now() / 1000)
-      if (payload && (payload.exp ? payload.exp > now : true)) {
+      if (payload && typeof payload.exp === "number" && payload.exp > now) {
         HeaderToUse = DashboardHeader
       }
     } catch (err) {
