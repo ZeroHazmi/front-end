@@ -34,7 +34,7 @@ export default async function RootLayout({
           <LanguageProvider>
             <LanguageWrapper>
               <Header />
-              {children}
+              <div id="site-content">{children}</div>
             </LanguageWrapper>
           </LanguageProvider>
         </main>
