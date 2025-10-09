@@ -140,10 +140,10 @@ export function IncidentSelection() {
         <h1 className="text-2xl font-semibold text-[#1a2470]">
           Jawab soalan-soalan berikut sebelum membuat laporan polis :
         </h1>
-        <Link href="/panduan" className="flex items-center gap-2 text-[#3b82f6] hover:text-[#2563eb] font-medium">
+        {/* <Link href="/panduan" className="flex items-center gap-2 text-[#3b82f6] hover:text-[#2563eb] font-medium">
           <Info className="w-5 h-5" />
           Panduan Pengguna
-        </Link>
+        </Link> */}
       </div>
 
       <div className="mb-8">
