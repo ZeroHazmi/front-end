@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast'
 import { registerUser } from '@/actions/user'
 import SelectInput from '../input/SelectInput'
 import { gender, nationality, descendants, religion, states } from '@/types/constants'
-import ICScanner, { ICScannerFields } from './ImageAnalysisForm'
+import { IcScanner } from '@/components/user/ic-scanner'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 const SignupAuthForm = () => {
@@ -33,9 +33,10 @@ const SignupAuthForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            userName: "",
             password: "",
-            repassword: "",
+            passwordConfirm: "",
+            phoneNumberConfirm: "",
+            emailConfirm: "",
             birthday: "",
             gender: "",
             nationality: "",
@@ -44,7 +45,7 @@ const SignupAuthForm = () => {
             phoneNumber: "",
             housePhoneNumber: "",
             officePhoneNumber: "",
-            address: "",
+            address1: "",
             postcode: "",
             state: "",
             region: "",
@@ -60,10 +61,64 @@ const SignupAuthForm = () => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log("Attempting to submit form")
         setIsLoading(true)
-        const { repassword, ...filteredValues } = values
+        const { passwordConfirm, phoneNumberConfirm, emailConfirm, ...filteredValues } = values as any
+
+        // Confirm fields
+        if ((filteredValues.phoneNumber || '') !== (phoneNumberConfirm || '')) {
+            toast({ variant: 'destructive', description: 'Nombor telefon bimbit tidak sepadan.' })
+            setIsLoading(false)
+            return
+        }
+        if ((filteredValues.email || '') !== (emailConfirm || '')) {
+            toast({ variant: 'destructive', description: 'Emel tidak sepadan.' })
+            setIsLoading(false)
+            return
+        }
+        if ((filteredValues.password || '') !== (passwordConfirm || '')) {
+            toast({ variant: 'destructive', description: 'Kata laluan tidak sepadan.' })
+            setIsLoading(false)
+            return
+        }
+
+        // Age >= 18
+        if (filteredValues.birthday) {
+            const dob = new Date(filteredValues.birthday)
+            if (!Number.isNaN(dob.getTime())) {
+                const today = new Date()
+                let age = today.getFullYear() - dob.getFullYear()
+                const m = today.getMonth() - dob.getMonth()
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--
+                if (age < 18) {
+                    toast({ variant: 'destructive', description: 'Umur mesti 18 tahun ke atas.' })
+                    setIsLoading(false)
+                    return
+                }
+            }
+        }
+
+        // Build AppUser payload: join address lines into one string (we only use address1 from this UI)
+        const userPayload = {
+            userName: filteredValues.icNumber || '',
+            Name: filteredValues.name || '',
+            password: filteredValues.password || '',
+            email: filteredValues.email || '',
+            icNumber: filteredValues.icNumber || '',
+            birthday: filteredValues.birthday || '',
+            gender: filteredValues.gender || '',
+            nationality: filteredValues.nationality || '',
+            descendants: filteredValues.descendants || '',
+            religion: filteredValues.religion || '',
+            phoneNumber: filteredValues.phoneNumber || '',
+            housePhoneNumber: filteredValues.housePhoneNumber || '',
+            officePhoneNumber: filteredValues.officePhoneNumber || '',
+            address: (filteredValues.address1 || '').toString(),
+            postcode: filteredValues.postcode || '',
+            region: filteredValues.region || filteredValues.region || '',
+            state: filteredValues.state || '',
+        }
 
         try {
-            const response = await registerUser(filteredValues)
+            const response = await registerUser(userPayload)
             console.log("Register Info:", response)
             
             if(response){
@@ -91,13 +146,13 @@ const SignupAuthForm = () => {
         router.push('/login')
     }
 
-    const onScanComplete = (data: ICScannerFields) => {
+    const onScanComplete = (data: any) => {
         const convertedBirthday = convertBirthdayFormat(data.dateOfBirth)
         form.setValue('icNumber', data.documentNumber)
         form.setValue('name', data.fullName)
         form.setValue('birthday', convertedBirthday)
         form.setValue('gender', data.gender)
-        form.setValue('address', data.address)
+    form.setValue('address1', data.address)
         form.setValue('postcode', data.addressFields?.postalCode || '')
         
         const normalizedState = Object.keys(states).find(
@@ -151,10 +206,10 @@ const SignupAuthForm = () => {
                         </div>
                         <div className="w-full flex flex-col md:flex-row justify-center items-stretch gap-5 mb-5">
                             <div className="w-full md:w-[550px] bg-white rounded-lg shadow-left-custom-blue p-4 flex-1">
-                                <ICScanner onScanComplete={onScanComplete}/>
+                                <IcScanner onScanComplete={onScanComplete}/>
                                 <RegisterCustomInput control={form.control} name='icNumber' label={t.icNumber} placeholder={t.enterIC} id='ic-input'/>
                                 <RegisterCustomInput control={form.control} name='name' label={t.name} placeholder={t.enterName} id='name-input'/>
-                                <RegisterCustomInput control={form.control} name='userName' label={t.username} placeholder={t.enterUsername} id='username-input'/>
+                                {/* username removed - using icNumber as primary identifier */}
                                 <RegisterCustomInput control={form.control} name='password' label={t.password} placeholder={t.enterPassword} id='password-input'/>
                                 <RegisterCustomInput control={form.control} name='repassword' label={t.reenterPassword} placeholder={t.enterRePassword} id='repassword-input'/>
                                 <RegisterCustomInput control={form.control} name='phoneNumber' label={t.phoneNumber} placeholder={t.enterPhoneNumber} id='phone-input'/>

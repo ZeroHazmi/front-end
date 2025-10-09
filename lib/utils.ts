@@ -36,63 +36,75 @@ export const loginFormSchema = () =>
 export const signUpFormSchema = () => {
 	return z
 		.object({
-			userName: z
-				.string()
-				.min(3, {
-					message: "Username must be at least 3 characters long.",
-				})
-				.max(20, {
-					message: "Username must be at most 20 characters long.",
-				}),
+			// Use IC number as primary identifier; no separate username field
 			password: z
 				.string()
-				.min(8, {
-					message: "Password must be at least 8 characters long.",
-				})
-				.max(20, {
-					message: "Password must be at most 20 characters long.",
-				}),
-			name: z.string().min(1, {message: "Name is required."}),
-			email: z.string().email({message: "Invalid email address."}),
-			icNumber: z.string().min(1, {message: "IC Number is required."}),
-			// Birthday field without refine validation
-			birthday: z.string().min(10, {message: "Birthdate is required"}),
-			gender: z.string().min(1, {message: "Gender is required."}),
-			nationality: z
-				.string()
-				.min(1, {message: "Nationality is required."}),
-			descendants: z
-				.string()
-				.min(1, {message: "Descendants information is required."}),
-			religion: z.string().min(1, {message: "Religion is required."}),
-			phoneNumber: z.string().min(10, {
-				message: "Phone number must be at least 10 digits.",
-			}),
-			housePhoneNumber: z.string().optional(),
-			officePhoneNumber: z.string().optional(),
-			address: z.string().min(5, {
-				message: "Address must be at least 5 characters long.",
-			}),
+				.min(8, { message: "Password must be at least 8 characters long." })
+				.max(20, { message: "Password must be at most 20 characters long." }),
+			passwordConfirm: z.string().optional(),
+			name: z.string().min(1, { message: "Name is required." }),
+			email: z.string().email({ message: "Invalid email address." }),
+			emailConfirm: z.string().optional(),
+			icNumber: z.string().min(1, { message: "IC Number is required." }),
+			// Date of Birth field (expecting YYYY-MM-DD or similar)
+			dateOfBirth: z.string().min(1, { message: "Birthdate is required" }),
+			gender: z.string().min(1, { message: "Gender is required." }),
+			citizenship: z.string().min(1, { message: "Citizenship is required." }),
+			race: z.string().min(1, { message: "Race is required." }),
+			religion: z.string().min(1, { message: "Religion is required." }),
+			mobilePhone: z.string().min(7, { message: "Mobile phone must be at least 7 digits." }),
+			mobilePhoneConfirm: z.string().optional(),
+			homePhone: z.string().optional(),
+			officePhone: z.string().optional(),
+			// Support multi-line address fields (RegistrationForm uses address1..address5)
+			address1: z.string().min(1, { message: "Address is required." }),
+			address2: z.string().optional(),
+			address3: z.string().optional(),
+			address4: z.string().optional(),
+			address5: z.string().optional(),
 			postcode: z
 				.string()
-				.min(5, {
-					message: "Postcode must be at least 5 characters long.",
-				})
-				.max(10, {
-					message: "Postcode must be at most 10 characters long.",
-				}),
-			region: z.string().min(1, {message: "Region is required."}),
-			state: z.string().min(1, {message: "State is required."}),
-			repassword: z.string().optional(),
+				.min(3, { message: "Postcode must be at least 3 characters long." })
+				.max(10, { message: "Postcode must be at most 10 characters long." }),
+			region: z.string().min(1, { message: "Region is required." }),
+			state: z.string().min(1, { message: "State is required." }),
+			// district is optional
+			district: z.string().optional(),
 		})
-		.refine(schema => {
-			if (schema.password !== schema.repassword) {
-				toast({
-					variant: "destructive",
-					description: "Password do not match",
-				});
+		.superRefine((data, ctx) => {
+			// ensure password match
+			if ((data as any).password !== (data as any).passwordConfirm) {
+				ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['passwordConfirm'], message: 'Passwords do not match' })
 			}
-			return true;
+
+			// ensure email match if provided
+			if ((data as any).email !== (data as any).emailConfirm) {
+				ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['emailConfirm'], message: 'Emails do not match' })
+			}
+
+			// ensure mobile phone match if provided
+			if ((data as any).mobilePhone !== (data as any).mobilePhoneConfirm) {
+				ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['mobilePhoneConfirm'], message: 'Mobile phone numbers do not match' })
+			}
+
+			// check age >= 18 from dateOfBirth (expecting YYYY-MM-DD)
+			try {
+				const bd = (data as any).dateOfBirth
+				if (bd) {
+					const d = new Date(bd)
+					if (!Number.isNaN(d.getTime())) {
+						const today = new Date()
+						let age = today.getFullYear() - d.getFullYear()
+						const m = today.getMonth() - d.getMonth()
+						if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--
+						if (age < 18) {
+							ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['dateOfBirth'], message: 'You must be at least 18 years old' })
+						}
+					}
+				}
+			} catch (e) {
+				// ignore parsing issues here
+			}
 		});
 };
 
@@ -115,25 +127,25 @@ export const AddPoliceSchema = () => {
 				.max(20, {
 					message: "Password must be at most 20 characters long.",
 				}),
-			name: z.string().min(1, {message: "Name is required."}),
-			email: z.string().email({message: "Invalid email address."}),
-			icNumber: z.string().min(1, {message: "IC Number is required."}),
-			gender: z.string().min(1, {message: "Gender is required."}),
+			name: z.string().min(1, { message: "Name is required." }),
+			email: z.string().email({ message: "Invalid email address." }),
+			icNumber: z.string().min(1, { message: "IC Number is required." }),
+			gender: z.string().min(1, { message: "Gender is required." }),
 			repassword: z.string().optional(),
 			phoneNumber: z.string().min(10, {
 				message: "Phone number must be at least 10 digits.",
 			}),
 		})
-		.refine(schema => {
-			if (schema.password !== schema.repassword) {
+		.refine((schema) => {
+			if ((schema as any).password !== (schema as any).repassword) {
 				toast({
 					variant: "destructive",
 					description: "Password do not match",
-				});
+				})
 			}
-			return true;
-		});
-};
+			return true
+		})
+}
 
 export const getDistricts = (state: string) => {
 	switch (state) {
