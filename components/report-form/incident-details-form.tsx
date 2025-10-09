@@ -57,10 +57,29 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
         bandar: city,
         negeri: stateFromAPI,
       }))
-      if (onChange) onChange({ latitude: location.lat, longitude: location.lng, address: geocodeObject.formatted_address })
+      if (onChange) onChange({
+        latitude: location.lat,
+        longitude: location.lng,
+        address: geocodeObject.formatted_address,
+        state: stateFromAPI,
+      })
     } catch (error) {
       console.error('Error parsing geocodeObject:', error)
     }
+  }
+
+  // helper to emit current address/date/time data to parent
+  const emitChange = (override: any = {}) => {
+    const composedAddress = `${formData.noLot ? formData.noLot + ', ' : ''}${formData.namaJalan ? formData.namaJalan + ', ' : ''}${formData.namaTaman ? formData.namaTaman + ', ' : ''}${formData.bandar ? formData.bandar + ', ' : ''}${formData.poskod ? formData.poskod + ', ' : ''}${formData.negeri ? formData.negeri : ''}`.replace(/,\s*$/, '')
+    if (onChange) onChange({
+      address: composedAddress,
+      latitude: override.latitude ?? undefined,
+      longitude: override.longitude ?? undefined,
+      state: formData.negeri || override.state || '',
+      date: formData.tarikh || override.date || '',
+      time: formData.masa || override.time || '',
+      ...override,
+    })
   }
 
   return (
@@ -181,12 +200,12 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
             </Label>
             <div className="mt-1">
               <div className="relative">
-                      <Input
-                        type="date"
-                        value={formData.tarikh}
-                        onChange={(e) => { setFormData({ ...formData, tarikh: e.target.value }); if (onChange) onChange({ date: e.target.value }) }}
-                        required
-                      />
+                              <Input
+                                type="date"
+                                value={formData.tarikh}
+                                onChange={(e) => { setFormData({ ...formData, tarikh: e.target.value }); emitChange({ date: e.target.value }) }}
+                                required
+                              />
                 <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
@@ -201,7 +220,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
                 <Input
                   type="time"
                   value={formData.masa}
-                  onChange={(e) => { setFormData({ ...formData, masa: e.target.value }); if (onChange) onChange({ time: e.target.value }) }}
+                  onChange={(e) => { setFormData({ ...formData, masa: e.target.value }); emitChange({ time: e.target.value }) }}
                   required
                 />
                 <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />

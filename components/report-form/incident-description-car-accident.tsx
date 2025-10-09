@@ -109,7 +109,15 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange }: Inc
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (onChange) onChange({ formData })
+    // Emit selected images and description as reportContent/fieldValue/image
+    if (onChange) onChange({
+      reportContent: formData.keterangan,
+      fieldValue: JSON.stringify({ vehicle: formData.jenisKenderaan, brand: formData.jenamaKenderaan, model: formData.modelKenderaan }),
+      incidentImages,
+      selfieImage,
+      dashboardImage,
+      vehicleImage,
+    })
     onNext()
   }
 
