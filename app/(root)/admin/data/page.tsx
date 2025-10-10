@@ -3,7 +3,7 @@
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import IncidentRateComponent from '@/components/charts/IncidentRateChart'
-import IncidentHeatmap from '@/components/charts/HeatMap'
+// IncidentHeatmap removed — placeholder shown instead.
 import DemographicsChartComponent from '@/components/charts/DemographicChart'
 
 const DataPage = () => {
@@ -20,7 +20,9 @@ const DataPage = () => {
                 <IncidentRateComponent />
               </TabsContent>
               {/* <TabsContent value="concentration-map" className="space-y-4">
-                <IncidentHeatmap />
+                <div className="w-full h-[500px] rounded-lg border-2 border-dashed border-sky-400 flex items-center justify-center text-gray-500">
+                  Heatmap removed. Reinstall maps to restore this view.
+                </div>
               </TabsContent>
               <TabsContent value="demographic" className="space-y-4">
                 <DemographicsChartComponent />

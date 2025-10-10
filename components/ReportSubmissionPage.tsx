@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback, useActionState } from "react";
 import { useParams, usePathname, useRouter } from 'next/navigation';
-// importing leaflet CSS as a side-effect
-import 'leaflet/dist/leaflet.css';
+// Leaflet CSS import removed in this build; include it only if leaflet is installed.
+// import 'leaflet/dist/leaflet.css';
 import { ReportType } from "@/types/index.d";
 import Recorder, { mimeType } from "@/components/Recorder";
 import transcribe from "@/actions/transcribe";
@@ -13,7 +13,11 @@ import { ArrowLeft, ArrowRight} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import GoogleMap, { LatLng } from "./GoogleMap";
+// GoogleMap removed — placeholder will be shown instead.
+export type LatLng = {
+    lat: number;
+    lng: number;
+};
 import { Input } from "./ui/input";
 import { states } from "@/types/constants";
 import { getCookie } from "@/app/lib/auth";
@@ -27,9 +31,9 @@ type Message = {
 };
 
 interface LocationWithAddress {
-    coordinates: LatLng;
-    geocodeObject: google.maps.GeocoderResult;
-  }
+        coordinates: LatLng;
+        geocodeObject: any;
+    }
 
 const initialState = {
   sender: "",
@@ -69,7 +73,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [location, setLocation] = useState<LocationWithAddress | null>(null);
-    const handleLocationChange = useCallback((coordinates: LatLng, geocodeObject: google.maps.GeocoderResult) => {
+    const handleLocationChange = useCallback((coordinates: LatLng, geocodeObject: any) => {
         setLocation({ coordinates, geocodeObject });
     }, []);
 
@@ -196,8 +200,8 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                 latitude: location?.coordinates.lat,
                 longitude: location?.coordinates.lng,
                 address: location?.geocodeObject.formatted_address,
-                state: location?.geocodeObject.address_components.find(
-                    (component) => component.types.includes("administrative_area_level_1")
+                state: location?.geocodeObject.address_components?.find(
+                    (component: any) => component?.types?.includes("administrative_area_level_1")
                 )?.long_name || "",
                 date: date,
                 time: time,
@@ -264,7 +268,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
             
               try {
                 const geocodeObject = location.geocodeObject;
-                const addressComponents: google.maps.GeocoderAddressComponent[] = geocodeObject.address_components;
+                const addressComponents: any[] = geocodeObject.address_components;
             
                 // Extract address components
                 const lotRoomBuilding = addressComponents.find(component => component.types.includes('street_number'))?.long_name || '';
@@ -316,10 +320,11 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                         {t.locationOfIncident}
                     </div>
                     {/* GOOGLE MAPS */}
-                    <div className="flex justify-center ite">
-                        <GoogleMap onLocationChange={handleLocationChange}  />                    
-
-                    </div>
+                                        <div className="flex justify-center ite">
+                                                <div className="w-full max-w-[1120px] h-[450px] rounded-lg border-2 border-dashed border-sky-400 flex items-center justify-center text-gray-500">
+                                                    Map functionality removed. Please use the address fields or re-install the maps package to restore interactive maps.
+                                                </div>
+                                        </div>
 
                     <form action="">
 

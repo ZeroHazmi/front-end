@@ -15,7 +15,9 @@ import {
 	selangorDistricts,
 	terengganuDistricts,
 } from "@/types/constants";
-import {Library} from "@googlemaps/js-api-loader";
+// Removed direct dependency on @googlemaps/js-api-loader. If you re-add that package,
+// replace the following alias with the real import.
+type Library = any;
 import {clsx, type ClassValue} from "clsx";
 import {twMerge} from "tailwind-merge";
 import {z} from "zod";

@@ -1,6 +1,6 @@
 'use client'
 
-import 'leaflet/dist/leaflet.css';
+// Leaflet CSS import removed. Add the CSS back if you re-install leaflet.
 import SubmitReportPage from "@/components/ReportSubmissionPage";
 
 
