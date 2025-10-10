@@ -2,11 +2,12 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { states } from "@/types/constants"
 import { Camera, X, Upload, Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import FileUploadScanner from '@/components/Form/ImageAnalysisForm'
 import { useToast } from "@/hooks/use-toast"
 
 interface IcScannerProps {
@@ -16,27 +17,55 @@ interface IcScannerProps {
 export function IcScanner({ onScanComplete }: IcScannerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isCameraActive, setIsCameraActive] = useState(false)
+  const [isCameraDenied, setIsCameraDenied] = useState(false)
+  const [permissionState, setPermissionState] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [stream, setStream] = useState<MediaStream | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const { toast } = useToast()
   const [rawResponse, setRawResponse] = useState<any>(null)
   const [showRawResponse, setShowRawResponse] = useState(false)
+  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null)
+  const [previewBlob, setPreviewBlob] = useState<Blob | null>(null)
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
 
   const startCamera = async () => {
     try {
+      if (!navigator?.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera API not supported')
+      }
+      // Try to request the environment-facing camera. On some browsers autoplay
+      // will be blocked unless the video is muted; we'll mute programmatically
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
       })
       setStream(mediaStream)
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream
+        // set muted to allow autoplay in some browsers
+        try { videoRef.current.muted = true } catch (e) {}
+        // Try to play the video to satisfy autoplay policies
+        try {
+          await videoRef.current.play()
+        } catch (playErr) {
+          // ignore; user may need to interact before playback
+          console.debug('video play() failed:', playErr)
+        }
       }
       setIsCameraActive(true)
+      setIsCameraDenied(false)
     } catch (error) {
       console.error("[v0] Error accessing camera:", error)
-      toast({ title: "Akses Kamera Gagal", description: "Tidak dapat mengakses kamera. Sila pastikan kebenaran kamera telah diberikan.", variant: "destructive" })
+      // detect denied/permission errors
+      const name = (error as any)?.name || ''
+      if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') {
+        setIsCameraDenied(true)
+        toast({ title: "Camera permission denied", description: "Please allow camera access in your browser settings and try again, or upload an image as an alternative.", variant: "destructive" })
+      } else {
+        toast({ title: "Camera access failed", description: "Unable to access the camera. Please ensure camera permission is granted or use Upload Image on mobile devices.", variant: "destructive" })
+      }
     }
   }
 
@@ -49,40 +78,55 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
   }
 
   const captureImage = () => {
+    // capture from video into canvas and open preview for confirm
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current
       const canvas = canvasRef.current
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
+      const vw = video.videoWidth || video.clientWidth || 1280
+      const vh = video.videoHeight || video.clientHeight || Math.round(vw * 0.75)
+      canvas.width = vw
+      canvas.height = vh
       const ctx = canvas.getContext("2d")
       if (ctx) {
-        ctx.drawImage(video, 0, 0)
-        processIcScan()
+        try {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+        } catch (e) {
+          ctx.drawImage(video, 0, 0)
+        }
+        // create preview and blob
+        canvas.toBlob((b) => {
+          if (b) {
+            const url = URL.createObjectURL(b)
+            setPreviewDataUrl(url)
+            setPreviewBlob(b)
+            setIsPreviewMode(true)
+            // stop camera preview but keep dialog open so user can confirm/retake
+            stopCamera()
+          }
+        }, "image/jpeg", 0.92)
       }
     }
   }
 
-  const processIcScan = async () => {
-    if (!canvasRef.current) return
+  const processIcScan = async (blobArg?: Blob | null) => {
     try {
       setIsProcessing(true)
-      const canvas = canvasRef.current
-
-      // convert canvas to blob
-      const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.95))
+      let blob: Blob | null = blobArg || null
       if (!blob) {
-        throw new Error("Gagal menghasilkan imej daripada kanvas")
+        if (!canvasRef.current) throw new Error('Tiada imej untuk diproses')
+        blob = await new Promise<Blob | null>((resolve) => canvasRef.current!.toBlob(resolve, 'image/jpeg', 0.95))
       }
+      if (!blob) throw new Error('Gagal menghasilkan imej daripada sumber')
 
       // create a File so fetch/FormData includes a filename
-      const file = new File([blob], "ic.jpg", { type: "image/jpeg" })
+      const file = new File([blob], 'ic.jpg', { type: 'image/jpeg' })
 
       const formData = new FormData()
-      formData.append("file", file)
+      formData.append('file', file)
 
       // call pixlab proxy
-      const resp = await fetch("/api/pixLabProxy", {
-        method: "POST",
+      const resp = await fetch('/api/pixLabProxy', {
+        method: 'POST',
         body: formData,
       })
 
@@ -98,7 +142,7 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
 
       if (!resp.ok) {
         console.error("Pixlab proxy error:", data)
-        toast({ title: "Ralat Pengimbasan", description: data?.error || "Ralat daripada perkhidmatan pengimbasan. Sila cuba lagi.", variant: "destructive" })
+        toast({ title: "Scan error", description: data?.error || "Scanner service returned an error. Please try again.", variant: "destructive" })
         return
       }
 
@@ -227,8 +271,8 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
         state: detectedStateKey || "",
       }
 
-      // Pass the mapped result back to the parent form
-      onScanComplete(result)
+  // Pass the mapped result back to the parent form
+  onScanComplete(result)
 
       // log mapped result for debugging
       try {
@@ -237,14 +281,21 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
         console.log("PixLab mapped result:", result)
       }
 
-      // show success toast
-      toast({ title: "Imbasan Berjaya", description: "Maklumat telah diisi secara automatik.", variant: "default" })
+  // show success toast
+  toast({ title: "Scan successful", description: "Fields have been filled automatically.", variant: "default" })
 
       // stop camera and close dialog after successful scan
+      // revoke preview URL
+      if (previewDataUrl) {
+        try { URL.revokeObjectURL(previewDataUrl) } catch (e) {}
+      }
+      setPreviewDataUrl(null)
+      setPreviewBlob(null)
+      setIsPreviewMode(false)
       handleClose()
     } catch (error) {
-      console.error("[v1] Error processing IC scan:", error)
-      toast({ title: "Ralat", description: "Ralat semasa memproses imbasan. Sila cuba lagi atau isi maklumat secara manual.", variant: "destructive" })
+  console.error("[v1] Error processing IC scan:", error)
+  toast({ title: "Error", description: "An error occurred while processing the scan. Please try again or enter details manually.", variant: "destructive" })
     } finally {
       setIsProcessing(false)
     }
@@ -258,65 +309,96 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Instead of immediately uploading, create a preview (fix orientation), then let user confirm
       ;(async () => {
         setIsProcessing(true)
         try {
-          const formData = new FormData()
-          formData.append("file", file)
-
-          const resp = await fetch("/api/pixLabProxy", {
-            method: "POST",
-            body: formData,
-          })
-
-          const data = await resp.json()
-          // store raw response for debugging and log
-          setRawResponse(data)
-          console.debug("PixLab raw response (upload):", data)
-          try {
-            console.log("PixLab raw response (upload, formatted):", JSON.stringify(data, null, 2))
-          } catch (e) {
-            console.log("PixLab raw response (upload):", data)
-          }
-          if (!resp.ok) {
-            console.error("Pixlab proxy error:", data)
-            toast({ title: "Ralat Pengimbasan", description: data?.error || "Ralat daripada perkhidmatan pengimbasan. Sila cuba lagi.", variant: "destructive" })
-            return
-          }
-
-          const payload: any = data || {}
-          const extracted = data?.extractedFields || data?.fields || payload
-          const result: any = {
-            name: payload.name || extracted.fullName || data?.fullName || "",
-            icNumber: payload.icNumber || extracted.documentNumber || data?.documentNumber || "",
-            dateOfBirth: payload.dateOfBirth || extracted.dateOfBirth || "",
-            gender: payload.gender || extracted.sex || extracted.gender || "",
-            nationality: payload.nationality || extracted.nationality || "",
-            address: payload.address || [extracted.address, extracted.fullAddress, data?.address].filter(Boolean).join(" "),
-            postcode: payload.postcode || (data?.fullAddress || "").match(/\b(\d{5})\b/)?.[1] || "",
-            state: payload.state || "",
-          }
-
-          // try detect state similar to processIcScan
-          const lower = (result.address || "").toLowerCase()
-          for (const [k, label] of Object.entries(states)) {
-            if (label && lower.includes(String(label).toLowerCase())) {
-              result.state = k
-              break
+          // read file ArrayBuffer to detect EXIF orientation
+          const arr = await file.arrayBuffer()
+          const orientedBlob = await (async function applyOrientation(buf: ArrayBuffer, srcFile: File) {
+            // helper to read orientation
+            const getOrientation = (arrayBuffer: ArrayBuffer) => {
+              const view = new DataView(arrayBuffer)
+              if (view.getUint16(0, false) !== 0xffd8) return -2
+              let offset = 2
+              const length = view.byteLength
+              while (offset < length) {
+                const marker = view.getUint16(offset, false)
+                offset += 2
+                if (marker === 0xffe1) {
+                  if (view.getUint32(offset += 2, false) !== 0x45786966) return -1
+                  const little = view.getUint16(offset += 6, false) === 0x4949
+                  offset += view.getUint32(offset + 4, little)
+                  const tags = view.getUint16(offset, little)
+                  offset += 2
+                  for (let i = 0; i < tags; i++) {
+                    if (view.getUint16(offset + (i * 12), little) === 0x0112) {
+                      return view.getUint16(offset + (i * 12) + 8, little)
+                    }
+                  }
+                } else if ((marker & 0xff00) !== 0xff00) break
+                else offset += view.getUint16(offset, false)
+              }
+              return -1
             }
-          }
 
-          onScanComplete(result)
-          try {
-            console.log("PixLab mapped result (upload):", JSON.stringify(result, null, 2))
-          } catch (e) {
-            console.log("PixLab mapped result (upload):", result)
-          }
-          toast({ title: "Imbasan Berjaya", description: "Maklumat telah diisi secara automatik.", variant: "default" })
-          handleClose()
+            const orientation = getOrientation(buf)
+
+            // If no orientation to fix, return original file as blob
+            if (!srcFile.type.includes('jpeg') && !srcFile.type.includes('jpg')) {
+              return srcFile
+            }
+
+            // load image into HTMLImageElement
+            const blob = new Blob([buf], { type: srcFile.type })
+            const url = URL.createObjectURL(blob)
+            const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+              const i = document.createElement('img') as HTMLImageElement
+                i.onload = () => resolve(i)
+                i.onerror = reject
+                i.src = url
+            })
+
+            // draw into canvas with rotation if needed
+            const cvs = document.createElement('canvas')
+            const ctx = cvs.getContext('2d')!
+            const w = img.naturalWidth
+            const h = img.naturalHeight
+            if (orientation >= 5 && orientation <= 8) {
+              cvs.width = h
+              cvs.height = w
+            } else {
+              cvs.width = w
+              cvs.height = h
+            }
+            // transform context
+            switch (orientation) {
+              case 2: ctx.transform(-1, 0, 0, 1, w, 0); break
+              case 3: ctx.transform(-1, 0, 0, -1, w, h); break
+              case 4: ctx.transform(1, 0, 0, -1, 0, h); break
+              case 5: ctx.transform(0, 1, 1, 0, 0, 0); break
+              case 6: ctx.transform(0, 1, -1, 0, h, 0); break
+              case 7: ctx.transform(0, -1, -1, 0, h, w); break
+              case 8: ctx.transform(0, -1, 1, 0, 0, w); break
+              default: break
+            }
+            ctx.drawImage(img, 0, 0)
+            const outBlob: Blob | null = await new Promise((res) => cvs.toBlob(res, 'image/jpeg', 0.92))
+            URL.revokeObjectURL(url)
+            return outBlob || srcFile
+          })(arr, file)
+
+          // create preview URL to let user confirm
+          const b = orientedBlob instanceof Blob ? orientedBlob : new Blob([orientedBlob], { type: file.type })
+          const url = URL.createObjectURL(b)
+          setPreviewDataUrl(url)
+          setPreviewBlob(b)
+          setIsPreviewMode(true)
+          // if camera was active, stop it to show preview
+          stopCamera()
         } catch (err) {
-          console.error("Error uploading file for IC scan:", err)
-          toast({ title: "Ralat Muat Naik", description: "Ralat semasa memuat naik gambar. Sila cuba lagi.", variant: "destructive" })
+          console.error('Error preparing preview for upload:', err)
+          toast({ title: 'Error', description: 'An error occurred while preparing the image preview. Please try again.', variant: 'destructive' })
         } finally {
           setIsProcessing(false)
         }
@@ -324,13 +406,70 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
     }
   }
 
+  const handleConfirmPreview = async () => {
+    // User confirmed preview; process upload using previewBlob
+    if (!previewBlob) return
+    try {
+      setIsProcessing(true)
+      await processIcScan(previewBlob)
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleRetake = () => {
+    // clear preview and reactivate camera (if supported)
+    if (previewDataUrl) {
+      try { URL.revokeObjectURL(previewDataUrl) } catch (e) {}
+    }
+    setPreviewDataUrl(null)
+    setPreviewBlob(null)
+    setIsPreviewMode(false)
+    // attempt to restart camera if available
+    startCamera().catch(() => {})
+  }
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  // Optional: query permission status when component mounts / when dialog opens
+  const checkPermission = async () => {
+    try {
+      if ((navigator as any).permissions && (navigator as any).permissions.query) {
+        // "camera" name is not supported in all browsers; try "camera" then fallback to "microphone" or generic
+        try {
+          const p = await (navigator as any).permissions.query({ name: 'camera' })
+          setPermissionState(p.state)
+          p.onchange = () => setPermissionState(p.state)
+        } catch (_) {
+          // some browsers don't support camera permission query; ignore
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      checkPermission()
+    }
+    // if dialog closed, reset denied hint
+    if (!isOpen) {
+      setIsCameraDenied(false)
+    }
+  }, [isOpen])
+
   return (
     <>
       <div className="flex gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 mb-1">Imbas Kad Pengenalan (IC)</h3>
+          <h3 className="font-semibold text-gray-900 mb-1">Scan Identity Card (IC)</h3>
           <p className="text-sm text-gray-600">
-            Gunakan kamera untuk mengimbas kad pengenalan anda. Maklumat akan diisi secara automatik.
+            Use your camera to scan your identity card. Fields will be filled automatically.
           </p>
         </div>
         <Button
@@ -339,7 +478,7 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
           className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white gap-2"
         >
           <Camera className="w-4 h-4" />
-          Imbas IC
+          Scan ID
         </Button>
       </div>
 
@@ -349,37 +488,78 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
       }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Imbas Kad Pengenalan</DialogTitle>
+            <DialogTitle>Scan Identity Card</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
-            {!isCameraActive ? (
+                {isPreviewMode && previewDataUrl ? (
+              <div className="space-y-4 text-center">
+                <div className="bg-gray-100 p-2 rounded">
+                  <div className="relative w-full flex items-center justify-center" style={{ minHeight: 200 }}>
+                    {/* use native img for blob/data URLs (Next Image doesn't support blob: URLs reliably) */}
+                    <img src={previewDataUrl} alt="IC Preview" className="object-contain max-h-[320px] w-auto" />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={handleConfirmPreview} className="flex-1 bg-[#2563eb] hover:bg-[#1d4ed8]" disabled={isProcessing}>
+                    {isProcessing ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Camera className="w-5 h-5 mr-2" />}
+                    {isProcessing ? 'Processing...' : 'Confirm & Scan'}
+                  </Button>
+                  <Button onClick={handleRetake} variant="outline" className="flex-1 bg-transparent" disabled={isProcessing}>
+                    <X className="w-5 h-5 mr-2" />
+                    Retake
+                  </Button>
+                </div>
+              </div>
+            ) : !isCameraActive ? (
               <div className="space-y-4">
                 <div className="flex flex-col gap-3">
                   <Button onClick={startCamera} className="w-full gap-2 bg-[#2563eb] hover:bg-[#1d4ed8]">
                     <Camera className="w-5 h-5" />
-                    Buka Kamera
+                    Open Camera
                   </Button>
 
                   <div className="relative">
-                    <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" id="ic-upload" />
-                    <label htmlFor="ic-upload">
-                      <Button type="button" variant="outline" className="w-full gap-2 bg-transparent" asChild>
-                        <span>
-                          <Upload className="w-5 h-5" />
-                          Muat Naik Gambar IC
-                        </span>
-                      </Button>
-                    </label>
+                    <input
+                      ref={fileInputRef as any}
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      id="ic-upload"
+                    />
+                    <Button type="button" variant="outline" className="w-full gap-2 bg-transparent" onClick={triggerFileInput}>
+                      <Upload className="w-5 h-5" />
+                      Upload ID Image
+                    </Button>
                   </div>
                 </div>
 
+                {isCameraDenied && (
+                  <div className="bg-yellow-50 border border-yellow-200 p-3 rounded">
+                    <div className="font-semibold text-sm text-yellow-800">Camera permission required</div>
+                    <div className="text-sm text-yellow-700 mt-1">Please allow camera access in your browser settings to use the scanner. You can try again with the button below or upload an image instead.</div>
+                    <div className="mt-3 flex gap-2">
+                      <Button onClick={() => { setIsCameraDenied(false); startCamera(); }} className="bg-yellow-600 text-white">Request Permission Again</Button>
+                      <Button variant="outline" onClick={triggerFileInput}>Upload Instead</Button>
+                    </div>
+                  </div>
+                )}
+
+                {isCameraDenied && (
+                  <div className="mt-4">
+                    {/* render the robust file-upload based scanner as a fallback */}
+                    <FileUploadScanner onScanComplete={onScanComplete} />
+                  </div>
+                )}
+
                 <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-sm mb-2">Panduan:</h4>
+                  <h4 className="font-semibold text-sm mb-2">Guidelines:</h4>
                   <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
-                    <li>Pastikan kad pengenalan berada dalam keadaan terang dan jelas</li>
-                    <li>Letakkan kad pengenalan pada permukaan rata</li>
-                    <li>Pastikan semua maklumat dapat dilihat dengan jelas</li>
+                    <li>Make sure the ID card is well-lit and clear</li>
+                    <li>Place the ID card on a flat surface</li>
+                    <li>Ensure all information is visible</li>
                   </ul>
                 </div>
               </div>
@@ -393,16 +573,16 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
                 <div className="flex gap-3">
                   <Button onClick={captureImage} className="flex-1 bg-[#2563eb] hover:bg-[#1d4ed8]" disabled={isProcessing}>
                     {isProcessing ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Camera className="w-5 h-5 mr-2" />}
-                    {isProcessing ? "Memproses..." : "Ambil Gambar"}
+                    {isProcessing ? "Processing..." : "Capture Image"}
                   </Button>
                   <Button onClick={stopCamera} variant="outline" className="flex-1 bg-transparent" disabled={isProcessing}>
                     <X className="w-5 h-5 mr-2" />
-                    Batal
+                    Cancel
                   </Button>
                 </div>
 
                 <p className="text-sm text-center text-gray-600">
-                  Letakkan kad pengenalan dalam kotak biru dan tekan butang untuk mengambil gambar
+                  Place the ID card inside the blue box and press the button to capture the image
                 </p>
               </div>
             )}

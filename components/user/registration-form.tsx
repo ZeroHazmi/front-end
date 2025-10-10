@@ -11,6 +11,7 @@ import { Calendar } from "lucide-react"
 import { registerUser } from "@/actions/user"
 import {AppUser} from "@/types";
 import { states, stateDistrictsMap, gender as genderConst, races as racesConst, religion as religionConst } from "@/types/constants"
+import { useLanguage } from '@/contexts/LanguageContext'
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -44,6 +45,7 @@ interface FormData {
 }
 
 export function RegistrationForm() {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState<FormData>({
     icNumber: "",
     name: "",
@@ -216,14 +218,14 @@ export function RegistrationForm() {
       // compute which fields were auto-filled (keys present in mapped and non-empty)
       const filled = Object.keys(mapped).filter((k) => mapped[k as keyof typeof mapped])
       const labelMap: Record<string, string> = {
-        icNumber: "No. Kad Pengenalan",
-        name: "Nama Penuh",
-        dateOfBirth: "Tarikh Lahir",
-        gender: "Jantina",
-        citizenship: "Warganegara",
-        address1: "Alamat",
-        postcode: "Poskod",
-        state: "Negeri",
+        icNumber: t.icNumber || 'IC Number',
+        name: t.name || 'Name',
+        dateOfBirth: t.birthdate || 'Birthdate',
+        gender: t.gender || 'Gender',
+        citizenship: t.nationality || 'Nationality',
+        address1: t.address || 'Address',
+        postcode: t.postcode || 'Postcode',
+        state: t.states || 'State',
       }
       const friendly = filled.map((k) => labelMap[k] || k)
       if (friendly.length) setAutoFilledFields(friendly)
@@ -231,7 +233,20 @@ export function RegistrationForm() {
     })
   }
 
-  const handleSubmit = form.handleSubmit(() => setShowWarningModal(true))
+  const handleSubmit = form.handleSubmit(
+    () => {
+      console.log('[registration] validation passed, opening warning modal')
+      setShowWarningModal(true)
+    },
+    (errors) => {
+      console.log('[registration] validation failed', errors)
+      // pick first error to show to user
+      const firstKey = Object.keys(errors || {})[0]
+      const firstErr = firstKey ? (errors as any)[firstKey] : null
+      const message = firstErr?.message || 'Sila semak medan yang diperlukan.'
+      toast({ variant: 'destructive', description: String(message) })
+    }
+  )
 
   // New helper: check age >= 18
   const isAtLeast18 = (dateStr: string) => {
@@ -327,8 +342,8 @@ export function RegistrationForm() {
     const userData: AppUser = {
       // Use IC number as the primary username/identifier (no separate username field)
       userName: formData.icNumber,
-      // Preserve human-readable name in the Name field if backend expects it
-      Name: formData.name,
+  // Preserve human-readable name in the name field
+  name: formData.name,
       password: formData.password,
       email: formData.email,
       icNumber: formData.icNumber,
@@ -351,7 +366,7 @@ export function RegistrationForm() {
     try {
       const response = await registerUser(userData)
       console.log("✅ Registration successful:", response)
-      toast({ title: "Pendaftaran berjaya!", description: "Akaun anda telah didaftarkan dengan jayanya." })
+  toast({ title: "Pendaftaran berjaya", description: "Akaun berjaya didaftarkan. Sila log masuk." })
       // After successful registration, send user back to login so they can sign in manually
       router.push("/login")
     } catch (error: any) {
@@ -378,14 +393,14 @@ export function RegistrationForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-[1200px]">
-        <div className="bg-white rounded-lg shadow-lg p-6 md:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-3 py-6">
+      <div className="w-full max-w-[1100px]">
+        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-10">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold">Pendaftaran Pengguna</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">{t.registrationTitle || 'User Registration'}</h2>
             <div className="flex items-center gap-3">
               <Button type="button" variant="outline" onClick={() => router.push('/login')} className="text-sm">
-                Kembali ke Log Masuk
+                {t.back || 'Back'}
               </Button>
             </div>
           </div>
@@ -394,8 +409,8 @@ export function RegistrationForm() {
             <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-md">
               <div className="flex justify-between items-start">
                 <div>
-                  <div className="font-semibold">Maklumat Diisi Automatik</div>
-                  <div className="text-sm text-gray-700">Kedua-dua medan berikut telah diisi berdasarkan imbasan:</div>
+                  <div className="font-semibold">{t.autoFilledTitle || 'Auto-filled information'}</div>
+                  <div className="text-sm text-gray-700">{t.autoFilledDesc || 'The following fields were filled from the scan:'}</div>
                   <ul className="mt-2 list-disc list-inside text-sm text-gray-800">
                     {autoFilledFields.map((f) => (
                       <li key={f}>{f}</li>
@@ -415,12 +430,12 @@ export function RegistrationForm() {
               <IcScanner onScanComplete={handleIcScanComplete} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               {/* Left Column */}
               <div className="space-y-6">
             {/* IC Number */}
             <div className="space-y-2">
-              <Label htmlFor="icNumber">No. Kad Pengenalan Baru <span className="text-red-600">*</span></Label>
+              <Label htmlFor="icNumber">{t.icNumber || 'IC Number'} <span className="text-red-600">*</span></Label>
               <Input
                 id="icNumber"
                 type="text"
@@ -437,7 +452,7 @@ export function RegistrationForm() {
 
             {/* Date of Birth */}
             <div className="space-y-2">
-              <Label htmlFor="dateOfBirth">Tarikh Lahir <span className="text-red-600">*</span></Label>
+              <Label htmlFor="dateOfBirth">{t.birthdate || 'Birthdate'} <span className="text-red-600">*</span></Label>
               <div className="relative">
                 <Input
                   id="dateOfBirth"
@@ -455,15 +470,15 @@ export function RegistrationForm() {
 
             {/* Gender */}
             <div className="space-y-2">
-              <Label>Jantina <span className="text-red-600">*</span></Label>
+              <Label>{t.gender || 'Gender'} <span className="text-red-600">*</span></Label>
               <Select value={formData.gender} onValueChange={(v) => handleInputChange("gender", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sila Pilih..." />
+                  <SelectValue placeholder={t.enterGender || 'Select...'} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(genderConst).map(([key, label]) => (
+                  {Object.entries(genderConst).map(([key]) => (
                     <SelectItem key={key} value={key}>
-                      {label}
+                      {key === 'male' ? ((t as any).gender_male || 'Male') : key === 'female' ? ((t as any).gender_female || 'Female') : String((genderConst as any)[key])}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -472,43 +487,43 @@ export function RegistrationForm() {
 
             {/* Citizenship */}
             <div className="space-y-2">
-              <Label>Warganegara <span className="text-red-600">*</span></Label>
+              <Label>{t.nationality || 'Nationality'} <span className="text-red-600">*</span></Label>
               <Select value={formData.citizenship} onValueChange={(v) => handleInputChange("citizenship", v)}>
-                <SelectTrigger><SelectValue placeholder="Sila Pilih..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t.enterNationality || 'Select...'} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="malaysian">Warganegara Malaysia</SelectItem>
-                  <SelectItem value="pr">Pemastautin Tetap</SelectItem>
-                  <SelectItem value="foreigner">Warga Asing</SelectItem>
+                  <SelectItem value="malaysian">{(t as any).nationality_Malaysian || 'Malaysian'}</SelectItem>
+                  <SelectItem value="pr">{(t as any).nationality_PermenantResident || 'Permanent Resident'}</SelectItem>
+                  <SelectItem value="foreigner">{(t as any).foreignerLabel || 'Foreigner'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Religion */}
             <div className="space-y-2">
-              <Label>Agama <span className="text-red-600">*</span></Label>
+              <Label>{t.religion || 'Religion'} <span className="text-red-600">*</span></Label>
               <Select value={formData.religion} onValueChange={(v) => handleInputChange("religion", v)}>
-                <SelectTrigger><SelectValue placeholder="Sila Pilih..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t.enterReligion || 'Select...'} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="islam">Islam</SelectItem>
-                  <SelectItem value="buddhism">Buddha</SelectItem>
-                  <SelectItem value="christianity">Kristian</SelectItem>
-                  <SelectItem value="hinduism">Hindu</SelectItem>
-                  <SelectItem value="other">Lain-lain</SelectItem>
+                  <SelectItem value="islam">{(t as any).religion_Islam || 'Islam'}</SelectItem>
+                  <SelectItem value="buddhism">{(t as any).religion_Buddhism || 'Buddhism'}</SelectItem>
+                  <SelectItem value="christianity">{(t as any).religion_Christianity || 'Christianity'}</SelectItem>
+                  <SelectItem value="hinduism">{(t as any).religion_Hinduism || 'Hinduism'}</SelectItem>
+                  <SelectItem value="other">{(t as any).religion_Others || 'Others'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Race / Descendants */}
             <div className="space-y-2">
-              <Label>Bangsa <span className="text-red-600">*</span></Label>
+              <Label>{t.descendants || 'Descendants'} <span className="text-red-600">*</span></Label>
               <Select value={formData.race} onValueChange={(v) => handleInputChange("race", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sila Pilih..." />
+                  <SelectValue placeholder={t.enterDescendants || 'Select...'} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(racesConst).map(([key, label]) => (
+                  {Object.keys(racesConst).map((key) => (
                     <SelectItem key={key} value={key}>
-                      {label}
+                      { (t as any)[`race_${key}`] || (racesConst as any)[key] }
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -623,7 +638,7 @@ export function RegistrationForm() {
                   handleInputChange("district", "")
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Sila Pilih Negeri" />
+                    <SelectValue placeholder="Please select a state" />
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(states).map(([key, label]) => (
@@ -644,7 +659,7 @@ export function RegistrationForm() {
               <Label>Daerah <span className="text-red-600">*</span></Label>
               <Select value={formData.district} onValueChange={(v) => handleInputChange("district", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Sila Pilih Daerah" />
+                  <SelectValue placeholder="Please select a district" />
                 </SelectTrigger>
                 <SelectContent>
                   {(stateDistrictsMap[formData.state as keyof typeof stateDistrictsMap]?.districts || []).map((d) => (
@@ -661,7 +676,7 @@ export function RegistrationForm() {
 
             <div className="flex justify-end">
               <Button type="submit" className="bg-police-blue" disabled={isSubmitting}>
-                {isSubmitting ? "Memproses..." : "Daftar"}
+                {isSubmitting ? "Processing..." : "Register"}
               </Button>
             </div>
           </div>

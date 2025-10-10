@@ -1,5 +1,7 @@
 export interface AppUser {
 	userName: string;
+	// Human-readable name (optional)
+	name?: string;
 	password: string;
 	email: string;
 	icNumber: string;

@@ -5,16 +5,21 @@ import OpenAI from "openai";
 
 // Type definitions
 type ReportRequest = {
-	userId: string;
+	userId?: string;
 	reportTypeID: string;
-	reportContent: string;
-	reportTypeName: string;
-	address: string;
-	latitude: number;
-	longitude: number;
-	state: string;
-	date: string;
-	time: number;
+	reportContent?: string;
+	reportTypeName?: string;
+	address?: string;
+	latitude?: number;
+	longitude?: number;
+	state?: string;
+	date?: string;
+	time?: number | string;
+	// optional media/extra fields
+	audio?: string; // base64 data URL or URL
+	image?: string; // single image data URL or URL
+	incidentImages?: string[];
+	fieldValue?: string;
 };
 
 type ReportData = {
@@ -53,6 +58,10 @@ export async function POST(request: Request) {
 			state,
 			date,
 			time,
+			audio,
+			image,
+			incidentImages,
+			fieldValue,
 		} = body;
 
 		// Get authentication token from cookies
@@ -67,8 +76,9 @@ export async function POST(request: Request) {
 		}
 
 		// Convert the date string to a Date object and get the Unix timestamp (in seconds)
-		const dateObj = new Date(date); // Convert string to Date object
-		const dateTimestamp = dateObj.toISOString(); // Convert to ISO 8601 format
+	// Convert provided date string to ISO timestamp if present, otherwise use now
+	const dateObj = date ? new Date(String(date)) : new Date();
+	const dateTimestamp = dateObj.toISOString(); // Convert to ISO 8601 format
 
 		// Prepare OpenAI client
 		const openai = new OpenAI({
@@ -129,14 +139,15 @@ export async function POST(request: Request) {
 			reportDetail: {
 				reportTypeId: reportTypeID,
 				date: dateTimestamp,
-				time: time,
-				address: address,
-				latitude: latitude,
-				longitude: longitude,
-				state: state,
-				fieldValue: "{}",
-				audio: "",
-				image: "",
+				time: typeof time === 'number' ? time : (time ? Number(time) : 0),
+				address: address || '',
+				latitude: typeof latitude === 'number' ? latitude : (latitude ? Number(latitude) : 0),
+				longitude: typeof longitude === 'number' ? longitude : (longitude ? Number(longitude) : 0),
+				state: state || '',
+				fieldValue: fieldValue || "{}",
+				// prefer explicit audio/image fields, then incidentImages[0]
+				audio: audio || (incidentImages && incidentImages.length ? incidentImages[0] : ""),
+				image: image || (incidentImages && incidentImages.length ? incidentImages[0] : ""),
 				transcript: summarizedText,
 			},
 		};

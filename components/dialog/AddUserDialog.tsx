@@ -38,6 +38,9 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
 
   const form = useForm<AddUserFormValues>({
     resolver: zodResolver(signUpFormSchema()),
+    // defaultValues cast to any because the signUpFormSchema has evolved to use
+    // different field names (icNumber / dateOfBirth / mobilePhone, etc.).
+    // Casting avoids a type error while keeping the form initial state defined.
     defaultValues: {
       userName: "",
       password: "",
@@ -57,7 +60,7 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
       region: "",
       state: "",
       repassword: "",
-    },
+    } as any,
   })
 
   const { watch, reset } = form
@@ -74,10 +77,10 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
     console.log('Submitting Form Values:', values);
     setIsLoading(true)
     try {
-      const { repassword, ...userDataToSubmit } = values
+      const userDataToSubmit = values as any
       const response = await registerUser(userDataToSubmit)
       console.log("API Response:", response);
-      
+
       if (response) {
         onOpenChange(false)
         onUserAdded(userDataToSubmit)
@@ -91,7 +94,7 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
       }
     } catch (error: any) {
       console.error("Add user error:", error.message);
-    
+
       // Check for error details in the response, assuming the response might contain more details
       if (error?.response?.data?.message) {
         // Retrieve and show the error message from the response

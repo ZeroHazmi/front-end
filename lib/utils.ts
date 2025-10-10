@@ -66,10 +66,12 @@ export const signUpFormSchema = () => {
 				.string()
 				.min(3, { message: "Postcode must be at least 3 characters long." })
 				.max(10, { message: "Postcode must be at most 10 characters long." }),
-			region: z.string().min(1, { message: "Region is required." }),
+			// registration form uses 'district' as the region selector; require district for validation
+			district: z.string().min(1, { message: "District is required." }),
+			// keep legacy 'region' optional for backward compatibility
+			region: z.string().optional(),
 			state: z.string().min(1, { message: "State is required." }),
-			// district is optional
-			district: z.string().optional(),
+			// (no duplicate district entry)
 		})
 		.superRefine((data, ctx) => {
 			// ensure password match

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useActionState } from "react";
 import { useParams, usePathname, useRouter } from 'next/navigation';
+// importing leaflet CSS as a side-effect
 import 'leaflet/dist/leaflet.css';
 import { ReportType } from "@/types/index.d";
 import Recorder, { mimeType } from "@/components/Recorder";
@@ -174,12 +175,25 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
             // Assign userId based on userAccess
             const finalUserId = userAccess === "police" ? userId : token;
       
-            const reportData = {
+            // Attempt to read uploaded audio file (Recorder writes into hidden file input)
+            let audioData: string | undefined = undefined;
+            try {
+                const audioFile = fileRef.current?.files?.[0];
+                if (audioFile) {
+                    // We won't convert to base64 here to avoid blocking; if needed, the server expects a data URL or a URL
+                    // For now, include the file name so backend can log it; you can expand to upload to storage and send URL.
+                    audioData = audioFile.name;
+                }
+            } catch (err) {
+                console.warn('Error reading audio file:', err);
+            }
+
+            const reportData: any = {
                 userId: finalUserId,
                 reportTypeID,
                 reportContent: textareaContent,
                 reportTypeName,
-                latitue: location?.coordinates.lat,
+                latitude: location?.coordinates.lat,
                 longitude: location?.coordinates.lng,
                 address: location?.geocodeObject.formatted_address,
                 state: location?.geocodeObject.address_components.find(
@@ -188,6 +202,8 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                 date: date,
                 time: time,
             };
+
+            if (audioData) reportData.audio = audioData;
 
             console.log("Report Data:", reportData);
       
@@ -279,7 +295,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
         if (location) {
             splitAddress();
         }
-    }, [location?.geocodeObject]);
+    }, [location]);
 
 
     // Split template fields into two columns

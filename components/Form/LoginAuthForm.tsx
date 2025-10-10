@@ -78,10 +78,10 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
             setCookie('roles', role);
             setCookie('userId', userId);
             
-            const redirectTimeout = setTimeout(() => {
+                const redirectTimeout = setTimeout(() => {
                 if (role === 'User') {
-                    console.log("Route:", "Within Role User Checker");
-                    router.push('/user');
+                    // Redirect users to the dashboard landing page
+                    router.push('/dashboard');
                 } else if (role === 'Police') {
                     router.push('/police');
                 } else if (role === 'Admin') {

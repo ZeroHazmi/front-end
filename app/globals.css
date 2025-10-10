@@ -401,6 +401,37 @@ body {
 	padding: 0 13px;
 }
 
+/* Mobile-friendly overrides to prevent legacy absolute positioning from overflowing */
+@media (max-width: 768px) {
+	.user-signup-container,
+	.user-signup-left-form,
+	.user-signup-left-form-bg,
+	.user-signup-title,
+	.user-signup-username,
+	.user-signup-username-textfield,
+	.user-signup-password,
+	.user-signup-password-textfield,
+	.user-signup-repassword,
+	.user-signup-repassword-textfield {
+		position: static !important;
+		width: 100% !important;
+		left: auto !important;
+		top: auto !important;
+		transform: none !important;
+	}
+
+	.user-signup-container {
+		padding: 12px !important;
+		box-sizing: border-box !important;
+	}
+
+	.user-signup-title {
+		font-size: 28px !important;
+		position: relative !important;
+		margin-bottom: 8px !important;
+	}
+}
+
 .user-signup-birthday {
 	width: 230px;
 	left: 25px;

@@ -24,6 +24,7 @@ export const translations = {
 		enterPassword: "Enter your password",
 		// New translations for signup form
 		register: "Register",
+		registrationTitle: "User Registration",
 		icNumber: "IC Number",
 		enterIC: "Enter your IC number",
 		name: "Name",
@@ -40,6 +41,8 @@ export const translations = {
 		enterBirthdate: "Enter your birthdate",
 		gender: "Gender",
 		enterGender: "Select your gender",
+		gender_male: "Male",
+		gender_female: "Female",
 		nationality: "Nationality",
 		enterNationality: "Select your nationality",
 		descendants: "Descendants",
@@ -120,6 +123,24 @@ export const translations = {
 		// Report Creation Page
 		reportSubmissionTitle: "{reportType} Report",
 		locationOfIncident: "Location of Incident",
+		autoFilledTitle: "Auto-filled information",
+		autoFilledDesc: "The following fields were filled from the scan:",
+		// Header / nav
+		home: "Home",
+		printReport: "Print Report",
+		personalInfo: "Personal Info",
+		logout: "Logout",
+		// Report stepper
+		step_title_personal: "Personal Details",
+		step_desc_personal: "Review your personal information.",
+		step_title_incident: "Incident Details",
+		step_desc_incident: "Enter incident information.",
+		step_title_description: "Incident Description",
+		step_desc_description: "Describe what happened.",
+		step_title_declaration: "Declaration",
+		step_desc_declaration: "Confirm that your information is correct.",
+		step_title_print: "Print Report",
+		step_desc_print: "Print your report for your records.",
 		// Police User Search
 		searchUserByICNumber: "Search for a user by IC Number",
 
@@ -162,6 +183,7 @@ export const translations = {
 		enterPassword: "Masukkan kata laluan anda",
 		// New translations for signup form
 		register: "Daftar",
+		registrationTitle: "Pendaftaran Pengguna",
 		icNumber: "Nombor IC",
 		enterIC: "Masukkan nombor IC anda",
 		name: "Nama",
@@ -178,6 +200,8 @@ export const translations = {
 		enterBirthdate: "Masukkan tarikh lahir anda",
 		gender: "Jantina",
 		enterGender: "Pilih jantina anda",
+		gender_male: "Lelaki",
+		gender_female: "Perempuan",
 		nationality: "Kewarganegaraan",
 		enterNationality: "Pilih kewarganegaraan anda",
 		descendants: "Keturunan",
@@ -260,6 +284,24 @@ export const translations = {
 		// Report Creation Page
 		reportSubmissionTitle: "Laporan {reportType}",
 		locationOfIncident: "Lokasi Kejadian",
+		autoFilledTitle: "Maklumat Diisi Automatik",
+		autoFilledDesc: "Medan berikut telah diisi berdasarkan imbasan:",
+		// Header / nav
+		home: "Laman Utama",
+		printReport: "Cetak Laporan",
+		personalInfo: "Butiran Peribadi",
+		logout: "Keluar",
+		// Report stepper
+		step_title_personal: "Butiran Peribadi",
+		step_desc_personal: "Semak maklumat peribadi anda.",
+		step_title_incident: "Butiran Kejadian",
+		step_desc_incident: "Masukkan maklumat kejadian.",
+		step_title_description: "Keterangan Kejadian",
+		step_desc_description: "Terangkan apa yang berlaku.",
+		step_title_declaration: "Perakuan",
+		step_desc_declaration: "Sahkan bahawa maklumat anda betul.",
+		step_title_print: "Cetak Repot",
+		step_desc_print: "Cetak laporan anda untuk simpanan.",
 
 		// Police User Search
 		searchUserByICNumber: "Cari pengguna dengan Nombor IC",

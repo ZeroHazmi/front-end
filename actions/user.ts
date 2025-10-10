@@ -45,8 +45,13 @@ export async function login(username: string, password: string) {
 
 export async function registerUser(registerData: AppUser) {
 	try {
+		const base = process.env.NEXT_PUBLIC_PRAS_API_BASE_URL
+		if (!base) {
+			console.error('[registerUser] NEXT_PUBLIC_PRAS_API_BASE_URL is not set')
+			throw new Error('Server configuration missing: NEXT_PUBLIC_PRAS_API_BASE_URL')
+		}
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}user/register`,
+			`${base}user/register`,
 			{
 				method: "POST",
 				headers: {
@@ -56,16 +61,21 @@ export async function registerUser(registerData: AppUser) {
 			}
 		);
 
+		const text = await response.text().catch(() => '')
+		let jsonBody: any = null
+		try { jsonBody = text ? JSON.parse(text) : null } catch (e) { jsonBody = null }
+
 		if (!response.ok) {
-			// Extract error details from the API response
-			const errorResponse = await response.json();
-			const errorMessage =
-				errorResponse?.message ||
-				"Registration failed. Please try again.";
-			throw new Error(errorMessage);
+			console.error('[registerUser] API error', response.status, response.statusText, jsonBody || text)
+			const errorMessage = jsonBody?.message || jsonBody?.error || text || `Registration failed (${response.status})`
+			throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage))
 		}
 
-		return await response.json();
+		try {
+			return jsonBody || JSON.parse(text || '{}')
+		} catch (e) {
+			return text
+		}
 	} catch (error: any) {
 		// Handle fetch errors (e.g., network issues)
 		const errorMessage = error.message || "An unknown error occurred.";
