@@ -21,6 +21,7 @@ export type LatLng = {
 import { Input } from "./ui/input";
 import { states } from "@/types/constants";
 import { getCookie } from "@/app/lib/auth";
+import reportPersister from '@/lib/reportPersister'
 import { z } from "zod";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -79,6 +80,29 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
 
     const language = localStorage.getItem('language') || 'en';
     
+
+    useEffect(() => {
+        // restore persisted aggregate into submission fields where appropriate
+        try {
+            const agg = reportPersister.getAggregate()
+            if (agg) {
+                // Use functional updates to avoid referencing external state variables in the effect
+                if (agg.keterangan) setTextareaContent(prev => prev || agg.keterangan)
+                setAddressFields(prev => ({
+                    lotRoomBuilding: agg.noLot || prev.lotRoomBuilding,
+                    streetName: agg.namaJalan || prev.streetName,
+                    placeName: agg.namaTaman || prev.placeName,
+                    postcode: agg.poskod || prev.postcode,
+                    city: agg.bandar || prev.city,
+                    state: agg.negeri || agg.state || prev.state,
+                }))
+                if (agg.date) setDate(prev => prev || agg.date)
+                if (agg.time) setTime(prev => prev || agg.time)
+            }
+        } catch (e) {
+            // ignore restore failures
+        }
+    }, [])
 
     useEffect(() => {
         const fetchReportType = async () => {
@@ -150,19 +174,26 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                 errors.push("Report type is missing.\n");
             }
       
-            if (!textareaContent.trim()) {
+            // Accept textareaContent from persisted aggregate as fallback
+            const finalContent = textareaContent?.trim() || reportPersister.getAggregate()?.keterangan || ''
+            if (!finalContent) {
                 errors.push("Report content cannot be empty.\n");
             }
-      
-            if (!location) {
+
+            // Location/date/time can be supplied from aggregate when map was removed — use as fallback
+            const finalLocation = location || (reportPersister.getAggregate()?.address ? { coordinates: { lat: undefined, lng: undefined }, geocodeObject: { formatted_address: reportPersister.getAggregate()?.address, address_components: [] } } : null)
+            const finalDate = date || reportPersister.getAggregate()?.date || ''
+            const finalTime = time || reportPersister.getAggregate()?.time || ''
+
+            if (!finalLocation) {
                 errors.push("Location is required.\n");
             }
-      
-            if (!date) {
+
+            if (!finalDate) {
                 errors.push("Date is required.\n");
             }
-      
-            if (!time) {
+
+            if (!finalTime) {
                 errors.push("Time is required.\n");
             }
     
@@ -192,19 +223,23 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                 console.warn('Error reading audio file:', err);
             }
 
+            const finalContentToSend = textareaContent?.trim() || reportPersister.getAggregate()?.keterangan || ''
+            const finalAddress = location?.geocodeObject?.formatted_address || reportPersister.getAggregate()?.address || `${addressFields.lotRoomBuilding ? addressFields.lotRoomBuilding + ', ' : ''}${addressFields.streetName ? addressFields.streetName + ', ' : ''}${addressFields.placeName ? addressFields.placeName + ', ' : ''}${addressFields.city ? addressFields.city + ', ' : ''}${addressFields.postcode ? addressFields.postcode + ', ' : ''}${addressFields.state ? addressFields.state : ''}`.replace(/,\s*$/, '')
+            const finalState = location?.geocodeObject?.address_components?.find(
+                (component: any) => component?.types?.includes("administrative_area_level_1")
+            )?.long_name || reportPersister.getAggregate()?.state || addressFields.state || ""
+
             const reportData: any = {
                 userId: finalUserId,
                 reportTypeID,
-                reportContent: textareaContent,
+                reportContent: finalContentToSend,
                 reportTypeName,
-                latitude: location?.coordinates.lat,
-                longitude: location?.coordinates.lng,
-                address: location?.geocodeObject.formatted_address,
-                state: location?.geocodeObject.address_components?.find(
-                    (component: any) => component?.types?.includes("administrative_area_level_1")
-                )?.long_name || "",
-                date: date,
-                time: time,
+                latitude: location?.coordinates?.lat,
+                longitude: location?.coordinates?.lng,
+                address: finalAddress,
+                state: finalState,
+                date: date || reportPersister.getAggregate()?.date || '',
+                time: time || reportPersister.getAggregate()?.time || '',
             };
 
             if (audioData) reportData.audio = audioData;
@@ -230,6 +265,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
             });
       
             setIsConfirmDialogOpen(false);
+            try { reportPersister.clearAll() } catch (e) {}
             router.push(currentPath.includes("police") ? "/police" : "/user/reports/view");
         } catch (error: any) {
             toast({
@@ -359,7 +395,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                                 />
                             </div>
                             <div className="mb-4">
-                                <Label htmlFor="postcode" className='w-full flex items-start mb-2'>Postcode</Label>
+                                <Label htmlFor="postcode" className='w-full flex items-start mb-2'>{t.postcode}</Label>
                                 <Input
                                 id='postcode'
                                 placeholder={t.enterPostcode}
@@ -433,7 +469,7 @@ export default function SubmitReportPage({ userId, userAccess }: { userId?: stri
                                 className={`w-[20%] text-white ${isEditable ? 'bg-red-500 hover:bg-red-600' : 'bg-police-blue hover:bg-[#0022AA]'} mt-4`}
                                 onClick={() => setIsEditable(!isEditable)}
                             >
-                                {isEditable ? 'Stop Editing' : 'Edit'}
+                                {isEditable ? t.stopEditing : t.edit}
                             </Button>
                         </CardContent>
                     </Card>

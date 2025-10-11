@@ -67,17 +67,17 @@ const SignupAuthForm = () => {
 
         // Confirm fields
         if ((filteredValues.phoneNumber || '') !== (phoneNumberConfirm || '')) {
-            toast({ variant: 'destructive', description: 'Nombor telefon bimbit tidak sepadan.' })
+            toast({ variant: 'destructive', description: t.mobileMismatch || 'Mobile numbers do not match.' })
             setIsLoading(false)
             return
         }
         if ((filteredValues.email || '') !== (emailConfirm || '')) {
-            toast({ variant: 'destructive', description: 'Emel tidak sepadan.' })
+            toast({ variant: 'destructive', description: t.emailMismatch || 'Emails do not match.' })
             setIsLoading(false)
             return
         }
         if ((filteredValues.password || '') !== (passwordConfirm || '')) {
-            toast({ variant: 'destructive', description: 'Kata laluan tidak sepadan.' })
+            toast({ variant: 'destructive', description: t.passwordMismatch || 'Passwords do not match.' })
             setIsLoading(false)
             return
         }
@@ -203,8 +203,8 @@ const SignupAuthForm = () => {
                     <div className='w-full max-w-[1200px] mx-auto flex flex-col items-center mt-4 md:mt-[15vh]'>
                         <div className="text-center mb-8 md:mb-[10vh]">
                             <h1 className="font-bold text-4xl md:text-6xl text-7">
-                                {t.register}
-                            </h1> 
+                                        {t.register}
+                                    </h1> 
                         </div>
                         <div className="w-full flex flex-col md:flex-row justify-center items-stretch gap-5 mb-5">
                             <div className="w-full md:w-[550px] bg-white rounded-lg shadow-left-custom-blue p-4 flex-1">

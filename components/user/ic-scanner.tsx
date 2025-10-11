@@ -113,10 +113,10 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
       setIsProcessing(true)
       let blob: Blob | null = blobArg || null
       if (!blob) {
-        if (!canvasRef.current) throw new Error('Tiada imej untuk diproses')
+        if (!canvasRef.current) throw new Error('No image available to process')
         blob = await new Promise<Blob | null>((resolve) => canvasRef.current!.toBlob(resolve, 'image/jpeg', 0.95))
       }
-      if (!blob) throw new Error('Gagal menghasilkan imej daripada sumber')
+      if (!blob) throw new Error('Failed to generate image from source')
 
       // create a File so fetch/FormData includes a filename
       const file = new File([blob], 'ic.jpg', { type: 'image/jpeg' })

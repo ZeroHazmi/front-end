@@ -26,22 +26,7 @@ const CreateNewReport = ({ type }: { type: string }) => {
     const currentRoute = usePathname();
     const { t } = useLanguage()
 
-    async function fetchReportType() {
-        const isOnlineParam = type === 'user' ? '?isOnline=true' : '';
-        const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype${isOnlineParam}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            setReportTypes(data);
-        } else {
-            console.error('Failed to fetch report types');
-        }
-    }
+    // fetchReportType moved inside useEffect to satisfy lint rules
 
     const fetchSuggestions = async (query: string) => {
         if (query.length < 2) {
@@ -90,7 +75,29 @@ const CreateNewReport = ({ type }: { type: string }) => {
     }
 
     useEffect(() => {
+        let cancelled = false
+        const fetchReportType = async () => {
+            const isOnlineParam = type === 'user' ? '?isOnline=true' : '';
+            const response = await fetch(`${process.env.NEXT_PUBLIC_PRAS_API_BASE_URL}reporttype${isOnlineParam}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!cancelled) {
+                if (response.ok) {
+                    const data = await response.json();
+                    setReportTypes(data);
+                } else {
+                    console.error('Failed to fetch report types');
+                }
+            }
+        }
+
         fetchReportType();
+
+        return () => { cancelled = true }
     }, [type]);
 
     return (
@@ -140,7 +147,7 @@ const CreateNewReport = ({ type }: { type: string }) => {
                                 <div className="relative">
                                     <Input
                                         type="text"
-                                        placeholder="Search for a user by IC Number"
+                                        placeholder={t.searchUserByIcNumber}
                                         value={searchQuery}
                                         onChange={(e) => handleSearchChange(e.target.value)}
                                         className="w-full"

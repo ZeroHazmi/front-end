@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { Info } from "lucide-react"
+import { useLanguage } from '@/contexts/LanguageContext'
 import Recorder from "@/components/Recorder"
 import { setDraft, getDraft } from "@/lib/draftStorage"
+import reportPersister from '@/lib/reportPersister'
 
 interface IncidentDescriptionCarAccidentProps {
   onNext: () => void
@@ -26,6 +28,7 @@ interface UploadedImage {
 }
 
 export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data }: IncidentDescriptionCarAccidentProps) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     jenisKenderaan: "",
     jenamaKenderaan: "",
@@ -46,7 +49,7 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
 
   useEffect(() => {
     try {
-      const draft = getDraft('aggregate')
+      const draft = reportPersister.getAggregate()
       if (draft) {
         setFormData((prev) => ({ ...prev, ...draft }))
       }
@@ -79,7 +82,7 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
     if (onChange) {
       // merge existing fieldValue draft if present
       let fv = {}
-      try { fv = typeof getDraft('aggregate')?.fieldValue === 'string' ? JSON.parse(getDraft('aggregate').fieldValue || '{}') : (getDraft('aggregate')?.fieldValue || {}) } catch(e) { fv = {} }
+      try { const agg = reportPersister.getAggregate(); fv = typeof agg?.fieldValue === 'string' ? JSON.parse(agg.fieldValue || '{}') : (agg?.fieldValue || {}) } catch(e) { fv = {} }
       fv = { ...fv, vehicle: formData.jenisKenderaan, brand: formData.jenamaKenderaan, model: formData.modelKenderaan, plateNumber: formData.plateNumber }
       onChange({
         reportContent: formData.keterangan,
@@ -91,23 +94,23 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
 
   const insertDetailsIntoTextarea = () => {
     try {
-      const details = getDraft('incidentDetails') || {}
+      const details = reportPersister.getDetails?.() || getDraft('incidentDetails') || {}
       // accept multiple possible key names (tarikh/date, masa/time, tempat/tempatKejadian)
       const lines: string[] = []
       const dDate = details.date || details.tarikh || details.tarikhFormatted || ''
       const dTime = details.time || details.masa || ''
       const dTempat = details.tempat || details.tempatKejadian || ''
       const dAddress = details.address || (details.namaJalan || details.namaTaman || details.noLot ? `${details.noLot ? details.noLot + ', ' : ''}${details.namaJalan ? details.namaJalan + ', ' : ''}${details.namaTaman ? details.namaTaman + ', ' : ''}${details.bandar ? details.bandar + ', ' : ''}${details.poskod ? details.poskod + ', ' : ''}${details.negeri ? details.negeri : ''}`.replace(/,\s*$/, '') : '')
-      if (dDate) lines.push(`Tarikh: ${dDate}`)
-      if (dTime) lines.push(`Masa: ${dTime}`)
-      if (dTempat) lines.push(`Tempat: ${dTempat}`)
-      if (dAddress) lines.push(`Lokasi: ${dAddress}`)
-      const agg = getDraft('aggregate') || {}
-      if (agg?.plateNumber) lines.push(`No Plat: ${agg.plateNumber}`)
+  if (dDate) lines.push(`Date: ${dDate}`)
+  if (dTime) lines.push(`Time: ${dTime}`)
+  if (dTempat) lines.push(`Place: ${dTempat}`)
+  if (dAddress) lines.push(`Location: ${dAddress}`)
+  const agg = reportPersister.getAggregate() || {}
+  if (agg?.plateNumber) lines.push(`Plate Number: ${agg.plateNumber}`)
       const block = lines.join('\n') + '\n\n'
       const newText = formData.keterangan ? `${formData.keterangan}\n${block}` : block
       setFormData((prev) => ({ ...prev, keterangan: newText }))
-      try { setDraft('aggregate', { ...getDraft('aggregate'), keterangan: newText }) } catch(e) {}
+      try { reportPersister.setAggregatePatch({ keterangan: newText }) } catch(e) {}
       if (onChange) onChange({ reportContent: newText })
     } catch (e) {
       // ignore
@@ -136,25 +139,25 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
           </div>
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-[#1e3a8a]">Keterangan Kejadian</h2>
-          <p className="text-sm text-[#3b82f6]">Terangkan apa yang berlaku.</p>
-        </div>
+            <h2 className="text-2xl font-bold text-[#1e3a8a]">{t.step_title_description}</h2>
+            <p className="text-sm text-[#3b82f6]">{t.step_desc_description}</p>
+          </div>
       </div>
 
       {/* Summary Box — show values from Butiran Kejadian when available */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-semibold text-[#1e40af]">Tarikh:</span> {dateDisplay || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.date.label}:</span> {dateDisplay || '-'}
           </div>
           <div>
-            <span className="font-semibold text-[#1e40af]">Masa:</span> {timeDisplay || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.time.label}:</span> {timeDisplay || '-'}
           </div>
           <div className="col-span-2">
-            <span className="font-semibold text-[#1e40af]">Tempat:</span> {tempatDisplay || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.placeName?.label || 'Place'}:</span> {tempatDisplay || '-'}
           </div>
           <div className="col-span-2">
-            <span className="font-semibold text-[#1e40af]">Lokasi Kemalangan:</span> {lokasiDisplay || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.locationOfIncident || 'Accident Location'}:</span> {lokasiDisplay || '-'}
           </div>
           {/* Butir-Butir Kenderaan removed — Plate Number input follows below */}
         </div>
@@ -163,7 +166,7 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
       {/* Plate number input (persisted) */}
       <div className="mb-6">
         <Label htmlFor="plateNumber" className="text-sm font-normal text-[#1e40af]">
-          No. Plat Kenderaan <span className="text-red-500">*</span> :
+          {t.plateNumberLabel} <span className="text-red-500">*</span> :
         </Label>
         <Input
           id="plateNumber"
@@ -171,21 +174,21 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
             onChange={(e) => {
               const v = e.target.value.toUpperCase()
               setFormData({ ...formData, plateNumber: v })
-              try { setDraft('aggregate', { ...getDraft('aggregate'), plateNumber: v }) } catch (err) {}
+              try { reportPersister.setAggregatePatch({ plateNumber: v }) } catch (err) {}
               if (onChange) onChange({ plateNumber: v })
             }}
           className="mt-1"
-            placeholder="Contoh: WAW1234"
+            placeholder={t.plateNumberPlaceholder}
           required
         />
-          <p className="text-xs text-gray-500 mt-1">Sila masukkan nombor plat tanpa ruang, huruf akan ditukar kepada HURUF BESAR.</p>
+          <p className="text-xs text-gray-500 mt-1">{t.plateNumberHelp}</p>
       </div>
 
       {/* Vehicle Details */}
       <div className="grid grid-cols-3 gap-6 mb-6">
         <div>
           <Label htmlFor="jenisKenderaan" className="text-sm font-normal">
-            Jenis Kenderaan <span className="text-red-500">*</span> :
+            {t.vehicleTypeLabel} <span className="text-red-500">*</span> :
           </Label>
           <Select
             value={formData.jenisKenderaan}
@@ -195,37 +198,37 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Motosikal/Wagen">Motosikal/Wagen</SelectItem>
-              <SelectItem value="Kereta">Kereta</SelectItem>
-              <SelectItem value="Lori">Lori</SelectItem>
-              <SelectItem value="Bas">Bas</SelectItem>
+              <SelectItem value="Motorcycle">Motorcycle</SelectItem>
+              <SelectItem value="Car">Car</SelectItem>
+              <SelectItem value="Truck">Truck</SelectItem>
+              <SelectItem value="Bus">Bus</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label htmlFor="jenamaKenderaan" className="text-sm font-normal">
-            Jenama Kenderaan <span className="text-red-500">*</span> :
+            {t.vehicleBrandLabel} <span className="text-red-500">*</span> :
           </Label>
           <Select
             value={formData.jenamaKenderaan}
-            onValueChange={(value) => setFormData({ ...formData, jenamaKenderaan: value })}
+            onValueChange={(value) => { setFormData({ ...formData, jenamaKenderaan: value }); try { reportPersister.setAggregatePatch({ brand: value }) } catch {} }}
           >
             <SelectTrigger className="mt-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="HONDA">HONDA</SelectItem>
-              <SelectItem value="TOYOTA">TOYOTA</SelectItem>
-              <SelectItem value="PERODUA">PERODUA</SelectItem>
-              <SelectItem value="PROTON">PROTON</SelectItem>
+                <SelectItem value="TOYOTA">TOYOTA</SelectItem>
+                <SelectItem value="PERODUA">PERODUA</SelectItem>
+                <SelectItem value="PROTON">PROTON</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label htmlFor="modelKenderaan" className="text-sm font-normal">
-            Model Kenderaan <span className="text-red-500">*</span> :
+            {t.vehicleModelLabel} <span className="text-red-500">*</span> :
           </Label>
           <Input
             id="modelKenderaan"
@@ -240,10 +243,10 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
       {/* Cause and Damage Information */}
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div>
-          <Label className="text-sm font-semibold">Punca Kejadian</Label>
+          <Label className="text-sm font-semibold">{t.causeOfIncidentLabel}</Label>
           <div className="mt-2">
             <Label htmlFor="puncaKejadian" className="text-sm font-normal">
-              Punca / Sebab <span className="text-red-500">*</span> :
+              {t.causeOfIncidentLabel} <span className="text-red-500">*</span> :
             </Label>
             <Select
               value={formData.puncaKejadian}
@@ -253,9 +256,9 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Elak/Langgar Objek/Binatang">Elak/Langgar Objek/Binatang</SelectItem>
-                <SelectItem value="Kelajuan Tinggi">Kelajuan Tinggi</SelectItem>
-                <SelectItem value="Cuaca Buruk">Cuaca Buruk</SelectItem>
+                  <SelectItem value="collision-object-animal">Collision with object / animal</SelectItem>
+                  <SelectItem value="high-speed">High speed</SelectItem>
+                  <SelectItem value="bad-weather">Bad weather</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -264,10 +267,10 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
         </div>
 
         <div>
-          <Label className="text-sm font-semibold">Maklumat Kerosakan</Label>
+          <Label className="text-sm font-semibold">{t.damageInfoLabel}</Label>
           <div className="mt-2">
             <Label className="text-sm font-normal">
-              Bahagian Kerosakan <span className="text-red-500">*</span> :
+              {t.partsLabel} <span className="text-red-500">*</span> :
             </Label>
             <div className="mt-2 grid grid-cols-2 gap-3">
               {Object.entries(formData.bahagianKerosakan).map(([key, value]) => (
@@ -286,12 +289,12 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
                     }
                   />
                   <label htmlFor={key} className="text-sm capitalize cursor-pointer">
-                    {key === "depan" && "Depan"}
-                    {key === "belakang" && "Belakang"}
-                    {key === "kiri" && "Kiri"}
-                    {key === "kanan" && "Kanan"}
-                    {key === "atas" && "Atas"}
-                    {key === "bawah" && "Bawah"}
+                    {key === "depan" && "Front"}
+                    {key === "belakang" && "Rear"}
+                    {key === "kiri" && "Left"}
+                    {key === "kanan" && "Right"}
+                    {key === "atas" && "Top"}
+                    {key === "bawah" && "Bottom"}
                   </label>
                 </div>
               ))}
@@ -306,10 +309,10 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
       <div className="mb-6 relative">
         <Textarea
           value={formData.keterangan}
-          onChange={(e) => {
+            onChange={(e) => {
             const v = e.target.value
             setFormData({ ...formData, keterangan: v })
-            try { setDraft('aggregate', { ...getDraft('aggregate'), keterangan: v }) } catch (err) {}
+            try { reportPersister.setAggregatePatch({ keterangan: v }) } catch (err) {}
             if (onChange) onChange({ reportContent: v })
           }}
           className="min-h-[200px] text-sm"
@@ -323,7 +326,7 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
             onTranscript={(text: string) => {
               const newText = formData.keterangan ? `${formData.keterangan}\n${text}` : text
               setFormData((prev) => ({ ...prev, keterangan: newText }))
-              try { setDraft('aggregate', { ...getDraft('aggregate'), keterangan: newText }) } catch (err) {}
+              try { reportPersister.setAggregatePatch({ keterangan: newText }) } catch (err) {}
               if (onChange) onChange({ reportContent: newText, transcript: newText })
             }}
           />
@@ -332,16 +335,16 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
 
       {/* Selection Options - removed 'PILIHAN OLEH PENGADU' radio per request */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm font-semibold mb-2">BERSAMA INI SAYA MELAMPIRKAN:</p>
+        <p className="text-sm font-semibold mb-2">I HEREBY ATTACH THE FOLLOWING:</p>
         <ol className="text-sm space-y-1 ml-4">
-          <li>1. Butir-Butir Kejadian</li>
-          <li>2. Keterangan</li>
+          <li>1. Incident Details</li>
+          <li>2. Description</li>
         </ol>
       </div>
 
       {/* Mandatory Note */}
       <div className="mb-4">
-        <p className="text-red-500 text-sm">* Mandatori</p>
+        <p className="text-red-500 text-sm">{t.required}</p>
       </div>
 
       {/* Info Box removed as requested */}
@@ -355,18 +358,17 @@ export function IncidentDescriptionCarAccident({ onNext, onBack, onChange, data 
           required
         />
         <label htmlFor="agreement" className="text-sm cursor-pointer">
-          Saya berakujanji dan membenarkan pihak-pihak berkaitan menerima laporan ini sebagai salah satu dokumen lengkap
-          bagi tujuan tuntutan insurans.
+          {t.agreementInsurance}
         </label>
       </div>
 
       {/* Navigation Buttons */}
       <div className="flex justify-between">
         <Button type="button" onClick={onBack} className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          « Kembali
+          {t.back}
         </Button>
         <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          Seterusnya »
+          {t.next}
         </Button>
       </div>
     </form>

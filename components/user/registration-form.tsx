@@ -9,7 +9,7 @@ import { IcScanner } from "./ic-scanner"
 import { WarningModal } from "./warning-modal"
 import { Calendar } from "lucide-react"
 import { registerUser } from "@/actions/user"
-import {AppUser} from "@/types";
+import {AppUser} from "@/types/index.d";
 import { states, stateDistrictsMap, gender as genderConst, races as racesConst, religion as religionConst } from "@/types/constants"
 import { useLanguage } from '@/contexts/LanguageContext'
 import { useToast } from "@/hooks/use-toast"
@@ -243,8 +243,8 @@ export function RegistrationForm() {
       // pick first error to show to user
       const firstKey = Object.keys(errors || {})[0]
       const firstErr = firstKey ? (errors as any)[firstKey] : null
-      const message = firstErr?.message || 'Sila semak medan yang diperlukan.'
-      toast({ variant: 'destructive', description: String(message) })
+  const message = firstErr?.message || t.checkRequiredFields || 'Please check the required fields.'
+  toast({ variant: 'destructive', description: String(message) })
     }
   )
 
@@ -299,51 +299,51 @@ export function RegistrationForm() {
     // Required fields
     const requiredCheck = validateRequiredFields(formData)
     if (!requiredCheck.ok) {
-      toast({ variant: "destructive", description: `Sila lengkapkan medan: ${requiredCheck.field}` })
+      toast({ variant: "destructive", description: (t.completeField || 'Please complete the field: {field}').replace('{field}', String(requiredCheck.field)) })
       return
     }
 
     // IC number numeric-only check (already sanitized on input)
     if (!/^\d+$/.test(formData.icNumber)) {
-      toast({ variant: "destructive", description: "No. Kad Pengenalan mesti mengandungi nombor sahaja." })
+      toast({ variant: "destructive", description: t.icNumberNumeric || 'IC number must contain digits only.' })
       return
     }
 
     // DOB -> minimum 18
     if (!isAtLeast18(formData.dateOfBirth)) {
-      toast({ variant: "destructive", description: "Umur mesti 18 tahun ke atas." })
+      toast({ variant: "destructive", description: t.ageMustBe18 || 'Age must be 18 years or older.' })
       return
     }
 
     // Confirm fields
     if (formData.password !== formData.passwordConfirm) {
-      toast({ variant: "destructive", description: "Kata laluan tidak sepadan." })
+      toast({ variant: "destructive", description: t.passwordMismatch || 'Passwords do not match.' })
       return
     }
     if (formData.email !== formData.emailConfirm) {
-      toast({ variant: "destructive", description: "Emel tidak sepadan." })
+      toast({ variant: "destructive", description: t.emailMismatch || 'Emails do not match.' })
       return
     }
     if (formData.mobilePhone !== formData.mobilePhoneConfirm) {
-      toast({ variant: "destructive", description: "Nombor telefon bimbit tidak sepadan." })
+      toast({ variant: "destructive", description: t.mobileMismatch || 'Mobile numbers do not match.' })
       return
     }
 
     // Basic email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
-      toast({ variant: "destructive", description: "Emel tidak sah." })
+      toast({ variant: "destructive", description: t.invalidEmail || 'Invalid email address.' })
       return
     }
 
     setIsSubmitting(true)
 
     // Map FormData → AppUser
-    const userData: AppUser = {
+  const userData: AppUser = ({
       // Use IC number as the primary username/identifier (no separate username field)
       userName: formData.icNumber,
   // Preserve human-readable name in the name field
-  name: formData.name,
+      name: formData.name,
       password: formData.password,
       email: formData.email,
       icNumber: formData.icNumber,
@@ -361,18 +361,18 @@ export function RegistrationForm() {
       postcode: formData.postcode,
       region: formData.district,
       state: formData.state,
-    }
+  } as AppUser)
 
     try {
       const response = await registerUser(userData)
       console.log("✅ Registration successful:", response)
-  toast({ title: "Pendaftaran berjaya", description: "Akaun berjaya didaftarkan. Sila log masuk." })
+  toast({ title: t.registerSuccess || 'Registration Successful', description: t.registerSuccessDesc || 'You have successfully registered.' })
       // After successful registration, send user back to login so they can sign in manually
       router.push("/login")
-    } catch (error: any) {
+  } catch (error: any) {
       console.error("❌ Registration failed:", error)
       // Try to parse validation error objects thrown by registerUser
-      let message = error?.message || "Pendaftaran gagal. Sila cuba lagi.";
+  let message = error?.message || (t.registrationFailed || 'Registration failed. Please try again.');
       try {
         const parsed = JSON.parse(message)
         // If server returned an errors object, join the messages
@@ -418,7 +418,7 @@ export function RegistrationForm() {
                   </ul>
                 </div>
                 <div>
-                  <button className="text-sm text-gray-600 underline" onClick={() => setAutoFilledFields([])}>Tutup</button>
+                  <button className="text-sm text-gray-600 underline" onClick={() => setAutoFilledFields([])}>{t.close || 'Close'}</button>
                 </div>
               </div>
             </div>
@@ -532,7 +532,7 @@ export function RegistrationForm() {
 
             {/* Mobile Phone */}
             <div className="space-y-2">
-              <Label>No. Telefon Bimbit <span className="text-red-600">*</span></Label>
+              <Label>{t.phoneNumber || 'Phone Number'} <span className="text-red-600">*</span></Label>
               <Input
                 type="tel"
                 value={formData.mobilePhone}
@@ -544,7 +544,7 @@ export function RegistrationForm() {
               )}
               <Input
                 type="tel"
-                placeholder="Sahkan No. Telefon Bimbit"
+                placeholder={t.confirmMobile || 'Confirm Mobile Number'}
                 value={formData.mobilePhoneConfirm}
                 onChange={(e) => handleInputChange("mobilePhoneConfirm", e.target.value)}
                 required
@@ -553,7 +553,7 @@ export function RegistrationForm() {
 
             {/* Office Phone */}
             <div className="space-y-2">
-              <Label>No. Telefon Pejabat</Label>
+              <Label>{t.officePhoneNumber || 'Office Phone Number'}</Label>
               <Input
                 type="tel"
                 value={formData.officePhone}
@@ -563,7 +563,7 @@ export function RegistrationForm() {
 
             {/* Address */}
             <div className="space-y-2">
-              <Label>Alamat <span className="text-red-600">*</span></Label>
+              <Label>{t.address || 'Address'} <span className="text-red-600">*</span></Label>
               {[1, 2, 3, 4, 5].map((i) => (
                 <Input
                   key={i}
@@ -584,7 +584,7 @@ export function RegistrationForm() {
           <div className="space-y-6">
             {/* Name */}
             <div className="space-y-2">
-              <Label>Nama Penuh <span className="text-red-600">*</span></Label>
+              <Label>{t.name || 'Name'} <span className="text-red-600">*</span></Label>
               <Input value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} required />
               {form.formState.errors.name && (
                 <p className="text-sm text-red-600 mt-1">{String(form.formState.errors.name.message)}</p>
@@ -593,7 +593,7 @@ export function RegistrationForm() {
 
             {/* Email */}
             <div className="space-y-2">
-              <Label>Emel <span className="text-red-600">*</span></Label>
+              <Label>{t.email || 'Email'} <span className="text-red-600">*</span></Label>
               <Input type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} required />
               {form.formState.errors.email && (
                 <p className="text-sm text-red-600 mt-1">{String(form.formState.errors.email.message)}</p>
@@ -602,13 +602,13 @@ export function RegistrationForm() {
 
             {/* Confirm Email */}
             <div className="space-y-2">
-              <Label>Confirm Emel <span className="text-red-600">*</span></Label>
+              <Label>{t.confirmEmail || 'Confirm Email'} <span className="text-red-600">*</span></Label>
               <Input type="email" value={formData.emailConfirm} onChange={(e) => handleInputChange("emailConfirm", e.target.value)} required />
             </div>
 
             {/* Password */}
             <div className="space-y-2">
-              <Label>Kata Laluan <span className="text-red-600">*</span></Label>
+              <Label>{t.password || 'Password'} <span className="text-red-600">*</span></Label>
               <Input type="password" value={formData.password} onChange={(e) => handleInputChange("password", e.target.value)} required />
               {form.formState.errors.password && (
                 <p className="text-sm text-red-600 mt-1">{String(form.formState.errors.password.message)}</p>
@@ -617,29 +617,29 @@ export function RegistrationForm() {
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <Label>Confirm Kata Laluan <span className="text-red-600">*</span></Label>
+              <Label>{t.reenterPassword || 'Re-enter Password'} <span className="text-red-600">*</span></Label>
               <Input type="password" value={formData.passwordConfirm} onChange={(e) => handleInputChange("passwordConfirm", e.target.value)} required />
             </div>
 
             {/* Postcode and State */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Poskod <span className="text-red-600">*</span></Label>
+                <Label>{t.postcode || 'Postcode'} <span className="text-red-600">*</span></Label>
                 <Input value={formData.postcode} onChange={(e) => handleInputChange("postcode", e.target.value)} required />
                 {form.formState.errors.postcode && (
                   <p className="text-sm text-red-600 mt-1">{String(form.formState.errors.postcode.message)}</p>
                 )}
               </div>
               <div>
-                <Label>Negeri <span className="text-red-600">*</span></Label>
+                <Label>{t.states || 'State'} <span className="text-red-600">*</span></Label>
                 <Select value={formData.state} onValueChange={(v) => {
                   // When state changes, clear district to avoid mismatch
                   handleInputChange("state", v)
                   handleInputChange("district", "")
                 }}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Please select a state" />
-                  </SelectTrigger>
+                      <SelectValue placeholder={t.selectState || 'Please select a state'} />
+                    </SelectTrigger>
                   <SelectContent>
                     {Object.entries(states).map(([key, label]) => (
                       <SelectItem key={key} value={key}>
@@ -656,11 +656,11 @@ export function RegistrationForm() {
 
             {/* District */}
             <div className="space-y-2">
-              <Label>Daerah <span className="text-red-600">*</span></Label>
+              <Label>{t.districts || 'District'} <span className="text-red-600">*</span></Label>
               <Select value={formData.district} onValueChange={(v) => handleInputChange("district", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Please select a district" />
-                </SelectTrigger>
+                    <SelectTrigger>
+                    <SelectValue placeholder={t.selectDistrict || 'Please select a district'} />
+                  </SelectTrigger>
                 <SelectContent>
                   {(stateDistrictsMap[formData.state as keyof typeof stateDistrictsMap]?.districts || []).map((d) => (
                     <SelectItem key={d} value={d}>
@@ -676,7 +676,7 @@ export function RegistrationForm() {
 
             <div className="flex justify-end">
               <Button type="submit" className="bg-police-blue" disabled={isSubmitting}>
-                {isSubmitting ? "Processing..." : "Register"}
+                {isSubmitting ? (t.processing || 'Processing...') : (t.register || 'Register')}
               </Button>
             </div>
           </div>

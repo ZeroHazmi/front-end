@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { useLanguage } from '@/contexts/LanguageContext'
+import Recorder from '@/components/Recorder'
+import reportPersister from '@/lib/reportPersister'
 
 interface IncidentDescriptionNaturalDisasterProps {
   onNext: () => void
@@ -16,8 +19,17 @@ interface IncidentDescriptionNaturalDisasterProps {
 }
 
 export function IncidentDescriptionNaturalDisaster({ onNext, onBack, onChange, data }: IncidentDescriptionNaturalDisasterProps) {
+  const { t } = useLanguage()
   const [naturalDisasterType, setNaturalDisasterType] = useState("")
   const [description, setDescription] = useState("")
+
+  // called when inline recorder returns a transcript
+  const handleTranscript = (text: string) => {
+    const newDesc = description ? `${description}\n${text}` : text
+    setDescription(newDesc)
+    try { reportPersister.setAggregatePatch({ keterangan: newDesc }) } catch (e) {}
+    if (onChange) onChange({ reportContent: newDesc, fieldValue: JSON.stringify({ disasterType: naturalDisasterType }), transcript: newDesc })
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,8 +57,8 @@ export function IncidentDescriptionNaturalDisaster({ onNext, onBack, onChange, d
           </div>
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-[#1e3a8a]">Keterangan Kejadian</h2>
-          <p className="text-sm text-[#3b82f6]">Terangkan apa yang berlaku.</p>
+          <h2 className="text-2xl font-bold text-[#1e3a8a]">{t.step_title_description}</h2>
+          <p className="text-sm text-[#3b82f6]">{t.step_desc_description}</p>
         </div>
       </div>
 
@@ -54,16 +66,16 @@ export function IncidentDescriptionNaturalDisaster({ onNext, onBack, onChange, d
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-semibold text-[#1e40af]">Tarikh:</span> {data?.date || data?.tarikh || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.date.label}:</span> {data?.date || data?.tarikh || '-'}
           </div>
           <div>
-            <span className="font-semibold text-[#1e40af]">Masa:</span> {data?.time || data?.masa || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.time.label}:</span> {data?.time || data?.masa || '-'}
           </div>
           <div>
-            <span className="font-semibold text-[#1e40af]">Tempat:</span> {data?.tempat || data?.tempatKejadian || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.placeName?.label || 'Place'}:</span> {data?.tempat || data?.tempatKejadian || '-'}
           </div>
           <div className="col-span-2">
-            <span className="font-semibold text-[#1e40af]">Alamat:</span> {data?.address || '-'}
+            <span className="font-semibold text-[#1e40af]">{t.address || 'Address'}:</span> {data?.address || '-'}
           </div>
         </div>
       </div>
@@ -71,52 +83,57 @@ export function IncidentDescriptionNaturalDisaster({ onNext, onBack, onChange, d
       {/* Register Equipment Button */}
       <div className="mb-6">
         <Button type="button" className="bg-green-600 hover:bg-green-700 text-white">
-          Daftar Peralatan Akibat Bencana Alam
+          Register equipment affected by the natural disaster
         </Button>
       </div>
 
       {/* Natural Disaster Type Selection */}
       <div className="mb-6">
         <Label htmlFor="naturalDisasterType" className="text-sm font-semibold text-[#1e3a8a]">
-          Pilihan Jenis Bencana Alam
+          Select Natural Disaster Type
         </Label>
-  <Select value={naturalDisasterType} onValueChange={(v) => { setNaturalDisasterType(v); if (onChange) onChange({ naturalDisasterType: v, description }) }}>
+            <Select value={naturalDisasterType} onValueChange={(v) => { setNaturalDisasterType(v); if (onChange) onChange({ naturalDisasterType: v, description }) }}>
           <SelectTrigger className="mt-2">
-            <SelectValue placeholder="Sila Pilih..." />
+            <SelectValue placeholder={t.selectState || 'Please select...'} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="banjir">Banjir</SelectItem>
-            <SelectItem value="tanah-runtuh">Tanah Runtuh</SelectItem>
-            <SelectItem value="ribut">Ribut</SelectItem>
+            <SelectItem value="flood">Flood</SelectItem>
+            <SelectItem value="landslide">Landslide</SelectItem>
+            <SelectItem value="storm">Storm</SelectItem>
             <SelectItem value="tsunami">Tsunami</SelectItem>
-            <SelectItem value="gempa-bumi">Gempa Bumi</SelectItem>
+            <SelectItem value="earthquake">Earthquake</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Description Text Area */}
       <div className="mb-6">
-        <Textarea
+          <Textarea
           value={description}
           onChange={(e) => { setDescription(e.target.value); if (onChange) onChange({ naturalDisasterType, description: e.target.value }) }}
           className="min-h-[300px] text-sm"
-          placeholder="Terangkan dengan terperinci mengenai bencana alam yang berlaku..."
+          placeholder="Describe the natural disaster in detail..."
           required
         />
+
+        {/* Inline recorder in the top-right of the textarea */}
+        <div className="absolute top-3 right-3">
+          <Recorder uploadAudio={() => { /* no-op for inline */ }} inline onTranscript={handleTranscript} />
+        </div>
       </div>
 
       {/* Mandatory Note */}
       <div className="mb-6">
-        <p className="text-red-500 text-sm">* Mandatori</p>
+        <p className="text-red-500 text-sm">{t.required}</p>
       </div>
 
       {/* Navigation Buttons */}
       <div className="flex justify-between">
         <Button type="button" onClick={onBack} className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          « Kembali
+          {t.back}
         </Button>
         <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          Seterusnya »
+          {t.next}
         </Button>
       </div>
     </form>
