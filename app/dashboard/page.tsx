@@ -10,9 +10,9 @@ export default function DashboardLanding() {
   const { t } = useLanguage()
 
   const reportTypes = [
-    { title: 'Car Accidents', desc: 'Report traffic collisions and vehicle incidents', slug: 'kemalangan-jalan-raya', icon: FileTextIcon },
-    { title: 'Natural Disasters', desc: 'Report floods, storms, landslides and other natural events', slug: 'bencana-alam', icon: Zap },
-    { title: 'Lost Items', desc: 'Report lost or missing personal items', slug: 'hilang', icon: AlertTriangle },
+    { title: t.reportType_car_accidents_title, desc: t.reportType_car_accidents_desc, slug: 'kemalangan-jalan-raya', icon: FileTextIcon },
+    { title: t.reportType_natural_disasters_title, desc: t.reportType_natural_disasters_desc, slug: 'bencana-alam', icon: Zap },
+    { title: t.reportType_lost_items_title, desc: t.reportType_lost_items_desc, slug: 'hilang', icon: AlertTriangle },
   ]
 
   return (
@@ -24,13 +24,13 @@ export default function DashboardLanding() {
 
       <div className="max-w-5xl mx-auto px-4">
         <header className="mb-6 text-center">
-          <h2 className="text-2xl font-semibold">Start a Report</h2>
-          <p className="text-sm text-gray-600">Use the quick-create card to file a freeform report, or choose a guided report type below.</p>
+          <h2 className="text-2xl font-semibold">{t.startNewReport}</h2>
+          <p className="text-sm text-gray-600">{t.dashboard_quick_create_desc}</p>
         </header>
 
         <section className="mb-8 bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium mb-2">Create a New Report</h3>
-          <p className="text-sm text-gray-500 mb-4">The following features will be available when you start your report</p>
+          <h3 className="text-lg font-medium mb-2">{t.createNewReport}</h3>
+          <p className="text-sm text-gray-500 mb-4">{t.reportFeatures}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div className="p-4 border rounded">
@@ -39,8 +39,8 @@ export default function DashboardLanding() {
                   <FileTextIcon className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <div className="font-semibold">Text Report</div>
-                  <div className="text-sm text-gray-500">Type your report using our guided form</div>
+                  <div className="font-semibold">{t.textReport}</div>
+                  <div className="text-sm text-gray-500">{t.textReportDescription}</div>
                 </div>
               </div>
             </div>
@@ -51,8 +51,8 @@ export default function DashboardLanding() {
                   <Mic className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <div className="font-semibold">Voice Report</div>
-                  <div className="text-sm text-gray-500">Use speech-to-text to dictate your report</div>
+                  <div className="font-semibold">{t.voiceReport}</div>
+                  <div className="text-sm text-gray-500">{t.voiceReportDescription}</div>
                 </div>
               </div>
             </div>
@@ -61,7 +61,7 @@ export default function DashboardLanding() {
           {/* Start button removed - selection is via the three report type cards below */}
         </section>
 
-        <p className="text-center text-gray-600 mb-8">Select a report type to start a guided report.</p>
+  <p className="text-center text-gray-600 mb-8">{t.selectReportType}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
           {reportTypes.map((rt) => {

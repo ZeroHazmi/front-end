@@ -2,11 +2,13 @@
 
 import React, { useState } from "react"
 import { setDraft, getDraft } from '@/lib/draftStorage'
+import reportPersister from '@/lib/reportPersister'
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar, Clock } from "lucide-react"
+import { useLanguage } from '@/contexts/LanguageContext'
 import { states } from '@/types/constants'
 
 interface IncidentDetailsFormProps {
@@ -29,6 +31,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
     daerah: "",
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { t } = useLanguage()
 
   // restore per-step draft on mount
   React.useEffect(() => {
@@ -40,7 +43,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
         if (onChange) onChange(draft)
       } else {
         // if no per-step draft, try restoring from aggregate (when user returned via parent aggregate)
-        const agg = getDraft('aggregate')
+        const agg = reportPersister.getAggregate()
         if (agg) {
           const fallback = {
             tempatKejadian: agg.tempat || agg.tempatKejadian || '',
@@ -100,13 +103,13 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Basic client-side validation for required fields
-    const newErrors: Record<string, string> = {}
-    if (!formData.namaJalan || String(formData.namaJalan).trim() === '') newErrors.namaJalan = 'Sila masukkan nama jalan.'
-    if (!formData.poskod || String(formData.poskod).trim() === '') newErrors.poskod = 'Sila masukkan poskod.'
-    if (!formData.bandar || String(formData.bandar).trim() === '') newErrors.bandar = 'Sila masukkan bandar.'
-    if (!formData.negeri || String(formData.negeri).trim() === '') newErrors.negeri = 'Sila pilih negeri.'
-    if (!formData.tarikh || String(formData.tarikh).trim() === '') newErrors.tarikh = 'Sila pilih tarikh.'
-    if (!formData.masa || String(formData.masa).trim() === '') newErrors.masa = 'Sila pilih masa.'
+  const newErrors: Record<string, string> = {}
+  if (!formData.namaJalan || String(formData.namaJalan).trim() === '') newErrors.namaJalan = 'Please enter the street name.'
+  if (!formData.poskod || String(formData.poskod).trim() === '') newErrors.poskod = 'Please enter the postcode.'
+  if (!formData.bandar || String(formData.bandar).trim() === '') newErrors.bandar = 'Please enter the city.'
+  if (!formData.negeri || String(formData.negeri).trim() === '') newErrors.negeri = 'Please select a state.'
+  if (!formData.tarikh || String(formData.tarikh).trim() === '') newErrors.tarikh = 'Please select a date.'
+  if (!formData.masa || String(formData.masa).trim() === '') newErrors.masa = 'Please select a time.'
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -130,7 +133,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
   // helper to emit current address/date/time data to parent
   const emitChange = (override: any = {}) => {
     const composedAddress = `${formData.noLot ? formData.noLot + ', ' : ''}${formData.namaJalan ? formData.namaJalan + ', ' : ''}${formData.namaTaman ? formData.namaTaman + ', ' : ''}${formData.bandar ? formData.bandar + ', ' : ''}${formData.poskod ? formData.poskod + ', ' : ''}${formData.negeri ? formData.negeri : ''}`.replace(/,\s*$/, '')
-    if (onChange) onChange({
+    const emitted = {
       tempat: formData.tempatKejadian,
       address: composedAddress,
       latitude: override.latitude ?? undefined,
@@ -139,14 +142,30 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
       date: formData.tarikh || override.date || '',
       time: formData.masa || override.time || '',
       ...override,
-    })
+    }
+    if (onChange) onChange(emitted)
+    // Also update aggregate so final submission can pick up these details if map was removed
+    try { reportPersister.setAggregatePatch({
+      tempat: emitted.tempat,
+      address: emitted.address,
+      date: emitted.date,
+      time: emitted.time,
+      state: emitted.state,
+      noLot: formData.noLot,
+      namaJalan: formData.namaJalan,
+      namaTaman: formData.namaTaman,
+      poskod: formData.poskod,
+      bandar: formData.bandar,
+      negeri: formData.negeri,
+      daerah: formData.daerah,
+    }) } catch (e) {}
   }
 
   return (
     <form onSubmit={handleSubmit} className="max-w-6xl">
       {/* Map removed — users may enter the address manually */}
       <div className="mb-6">
-        <p className="text-sm text-gray-600">Sila masukkan alamat dan poskod secara manual di ruangan di bawah.</p>
+        <p className="text-sm text-gray-600">Please enter the address and postcode manually in the fields below.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-x-8 gap-y-6">
@@ -154,27 +173,27 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
         <div className="space-y-6">
           <div>
             <Label htmlFor="tempatKejadian" className="text-sm font-normal text-[#1e40af]">
-              Tempat Kejadian :
+              {t.placeName?.label || 'Place of Incident'}:
             </Label>
             <Select
               value={formData.tempatKejadian}
               onValueChange={(value) => updateField({ tempatKejadian: value })}
             >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Sila Pilih..." />
-              </SelectTrigger>
+                <SelectTrigger className="mt-1">
+                    <SelectValue placeholder={t.selectPlaceholder || 'Please select...'} />
+                  </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Makmal">Makmal</SelectItem>
-                <SelectItem value="Pejabat">Pejabat</SelectItem>
-                <SelectItem value="Rumah">Rumah</SelectItem>
-                <SelectItem value="Jalan Raya">Jalan Raya</SelectItem>
+                <SelectItem value="Makmal">Lab</SelectItem>
+                  <SelectItem value="Pejabat">Office</SelectItem>
+                  <SelectItem value="Rumah">Home</SelectItem>
+                  <SelectItem value="Jalan Raya">Road</SelectItem>
               </SelectContent>
             </Select>
             {errors.tempatKejadian && <p className="text-xs text-red-600 mt-1">{errors.tempatKejadian}</p>}
           </div>
 
           <div>
-            <Label className="text-sm font-normal text-[#1e40af]">No.Lot / Bilik / Pejabat / Rumah / Bangunan :</Label>
+            <Label className="text-sm font-normal text-[#1e40af]">{t.lotRoomBuilding?.label || 'Lot/Room/Office/Building No.'}:</Label>
             <Input
               value={formData.noLot}
               onChange={(e) => updateField({ noLot: e.target.value })}
@@ -184,7 +203,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
 
           <div>
             <Label htmlFor="namaJalan" className="text-sm font-normal text-[#1e40af]">
-              Nama Jalan <span className="text-red-500">*</span> :
+              {t.streetName?.label || 'Street Name'} <span className="text-red-500">*</span> :
             </Label>
             <Input
               id="namaJalan"
@@ -199,7 +218,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
 
           <div>
             <Label htmlFor="namaTaman" className="text-sm font-normal text-[#1e40af]">
-              Nama Taman / Tempat :
+              {t.placeName?.label || 'Park/Place Name'} :
             </Label>
             <Input
               id="namaTaman"
@@ -213,7 +232,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
 
           <div>
             <Label htmlFor="poskod" className="text-sm font-normal text-[#1e40af]">
-              Poskod <span className="text-red-500">*</span> :
+              {t.postcode || 'Postcode'} <span className="text-red-500">*</span> :
             </Label>
             <Input
               id="poskod"
@@ -228,7 +247,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
 
           <div>
             <Label htmlFor="bandar" className="text-sm font-normal text-[#1e40af]">
-              Bandar <span className="text-red-500">*</span> :
+              {t.city?.label || 'City'} <span className="text-red-500">*</span> :
             </Label>
             <Input
               id="bandar"
@@ -243,11 +262,11 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
 
           <div>
             <Label htmlFor="negeri" className="text-sm font-normal text-[#1e40af]">
-              Negeri <span className="text-red-500">*</span> :
+              {t.state?.label || 'State'} <span className="text-red-500">*</span> :
             </Label>
             <Select value={formData.negeri} onValueChange={(value) => updateField({ negeri: value })}>
               <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Sila Pilih Negeri" />
+                <SelectValue placeholder={t.selectState || 'Please select a state'} />
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(states).map(([key, label]) => (
@@ -265,7 +284,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
         <div className="space-y-6">
           <div>
             <Label className="text-sm font-normal text-[#1e40af]">
-              Tarikh <span className="text-red-500">*</span> :
+              Date <span className="text-red-500">*</span> :
             </Label>
             <div className="mt-1">
               <div className="relative">
@@ -282,7 +301,7 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
 
           <div>
             <Label className="text-sm font-normal text-[#1e40af]">
-              Masa <span className="text-red-500">*</span> :
+              Time <span className="text-red-500">*</span> :
             </Label>
             <div className="mt-1">
               <div className="relative">
@@ -302,15 +321,15 @@ export function IncidentDetailsForm({ onNext, onBack, onChange }: IncidentDetail
       </div>
 
       <div className="mt-8">
-        <p className="text-red-500 text-sm">* Mandatori</p>
+        <p className="text-red-500 text-sm">* Required</p>
       </div>
 
       <div className="flex justify-between mt-8">
         <Button type="button" onClick={onBack} variant="outline" className="px-8 py-2 bg-transparent">
-          « Kembali
+          « Back
         </Button>
         <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          Seterusnya »
+          Next »
         </Button>
       </div>
     </form>

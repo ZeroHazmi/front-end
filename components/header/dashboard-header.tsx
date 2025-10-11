@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import reportPersister from '@/lib/reportPersister'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -38,8 +39,22 @@ export function DashboardHeader() {
       try { localStorage.removeItem('session') } catch {}
     } catch {}
     // navigate to home/login
+    try { reportPersister.clearAll() } catch (e) {}
     router.push('/')
   }
+  
+  // clear drafts only when the user navigates away from any /report route
+  const prevPathRef = useRef<string | null>(null)
+  useEffect(() => {
+    const prev = prevPathRef.current || ''
+    const curr = pathname || ''
+    const prevIsReport = prev.includes('/report')
+    const currIsReport = curr.includes('/report')
+    if (prevIsReport && !currIsReport) {
+      try { reportPersister.clearAll() } catch (e) {}
+    }
+    prevPathRef.current = curr
+  }, [pathname])
   return (
     <header className="bg-[#2563eb] text-white sticky top-0 z-50 shadow">
       <div className="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
@@ -76,7 +91,7 @@ export function DashboardHeader() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:block">
             <Button onClick={() => setLanguage(language === 'en' ? 'bm' : 'en')} className="border-white text-white hover:bg-white/10">
-              {language === 'en' ? 'BM' : 'EN'}
+              {language === 'en' ? t.bmShortLabel || 'BM' : t.enShortLabel || 'EN'}
             </Button>
           </div>
           <div>

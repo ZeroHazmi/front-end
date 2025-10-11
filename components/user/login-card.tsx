@@ -37,7 +37,7 @@ export function LoginCard() {
       const response = await login(icNumber, password);
 
       if (!response) {
-        setError("Ralat log masuk.");
+        setError("Login error.");
         toast({ title: t.loginFailed, description: t.loginFailedDesc, variant: "destructive" });
         return;
       }
@@ -53,7 +53,7 @@ export function LoginCard() {
       toast({ title: t.loginSuccess, description: t.loginSuccessDesc });
     } catch (err: any) {
       console.error("Login error:", err);
-      setError("Ralat semasa log masuk. Sila cuba lagi.");
+  setError("An error occurred during login. Please try again.");
       toast({ title: t.loginFailed, description: t.loginFailedDesc, variant: "destructive" });
     } finally {
       setIsLoading(false);
@@ -99,7 +99,7 @@ export function LoginCard() {
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div className="space-y-2">
           <Label htmlFor="ic-number" className="text-sm font-medium text-gray-700">
-            No. Kad Pengenalan Baru
+            {t.icNumber || 'IC Number'}
           </Label>
           <Input
             id="ic-number"
@@ -113,7 +113,7 @@ export function LoginCard() {
 
         <div className="space-y-2">
           <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-            Kata laluan
+            {t.password || 'Password'}
           </Label>
           <div className="relative">
             <Input
@@ -134,12 +134,12 @@ export function LoginCard() {
           </div>
           <div className="flex justify-end">
             <Link href="/forgot-password" className="text-sm text-[#2563eb] hover:underline">
-              Lupa Kata laluan
+              {t.forgotPassword || 'Forgot password'}
             </Link>
           </div>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+  {error && <p className="text-sm text-red-600">{error}</p>}
 
         <Button
           type="submit"
@@ -147,13 +147,13 @@ export function LoginCard() {
           className="w-full bg-[#1a2470] hover:bg-[#0f1654] text-white py-6 text-base font-medium flex justify-center items-center"
         >
           {isLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-          Log Masuk
+          {t.signIn || 'Sign In'}
         </Button>
 
         <p className="text-center text-sm text-gray-600">
-          Pengguna kali Pertama?{" "}
+          {t.firstTimeUser || 'First time user?'}{" "}
           <Link href="/register" className="text-[#2563eb] hover:underline font-medium">
-            Daftar di sini.
+            {t.signUp || 'Sign Up'}
           </Link>
         </p>
       </form>

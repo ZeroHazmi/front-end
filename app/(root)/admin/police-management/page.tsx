@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -45,7 +45,7 @@ export default function PoliceManagementPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const fetchOfficers = async () => {
+  const fetchOfficers = useCallback(async () => {
     setLoading(true)
 
     try {
@@ -87,11 +87,11 @@ export default function PoliceManagementPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, genderFilter, sortOrder])
 
   useEffect(() => {
     fetchOfficers()
-  }, [genderFilter, sortOrder])
+  }, [genderFilter, sortOrder, fetchOfficers])
 
   const handleOfficerAdded = () => {
     setIsAddDialogOpen(false)

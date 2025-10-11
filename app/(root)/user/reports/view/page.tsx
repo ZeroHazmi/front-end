@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -54,7 +54,7 @@ export default function UserReportTable() {
     return format(parsedDate, 'yyyy-MM-dd HH:mm:ss'); // Adjust date format as necessary
   }
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       const token = await getCookie("session");
@@ -133,11 +133,11 @@ export default function UserReportTable() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, statusFilter, priorityFilter, sortOption, router]);
 
   useEffect(() => {
     fetchReports();
-  }, [searchQuery, statusFilter, priorityFilter, sortOption]);
+  }, [searchQuery, statusFilter, priorityFilter, sortOption, fetchReports]);
 
   const handleViewReport = (reportId: string) => {
     router.push(`/user/reports/view/${reportId}`)

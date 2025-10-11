@@ -21,6 +21,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const savedLanguage = localStorage.getItem('language') as Language | null;
     if (savedLanguage) {
       setLanguageState(savedLanguage);
+    } else {
+      // Ensure English is the main/default language on first load
+      setLanguageState('en');
+      try {
+        localStorage.setItem('language', 'en');
+        // best-effort: persist to cookie for server-side reads
+        setLanguageCookie('en').catch(() => {})
+      } catch (e) {}
     }
   }, []);
 

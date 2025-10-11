@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import Recorder from "@/components/Recorder"
+import reportPersister from '@/lib/reportPersister'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface IncidentDescriptionLostItemsProps {
   onNext: () => void
@@ -15,6 +17,7 @@ interface IncidentDescriptionLostItemsProps {
 }
 
 export function IncidentDescriptionLostItems({ onNext, onBack, onChange, data }: IncidentDescriptionLostItemsProps) {
+  const { t } = useLanguage()
   const [itemDescription, setItemDescription] = useState("")
   const [description, setDescription] = useState("")
 
@@ -22,6 +25,7 @@ export function IncidentDescriptionLostItems({ onNext, onBack, onChange, data }:
   const handleTranscript = (text: string) => {
     const newDesc = description ? `${description}\n${text}` : text
     setDescription(newDesc)
+    try { reportPersister.setAggregatePatch({ keterangan: newDesc }) } catch (e) {}
     if (onChange) onChange({ reportContent: newDesc, fieldValue: JSON.stringify({ item: itemDescription || "", value: "lost" }), transcript: newDesc })
   }
 
@@ -56,22 +60,22 @@ export function IncidentDescriptionLostItems({ onNext, onBack, onChange, data }:
           </div>
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-[#1e3a8a]">Keterangan Kejadian</h2>
-          <p className="text-sm text-[#3b82f6]">Terangkan apa yang berlaku.</p>
+          <h2 className="text-2xl font-bold text-[#1e3a8a]">{t.step_title_description}</h2>
+          <p className="text-sm text-[#3b82f6]">{t.step_desc_description}</p>
         </div>
       </div>
 
       {/* Item Description */}
       <div className="mb-6">
         <Label htmlFor="itemDescription" className="text-sm font-semibold text-[#1e3a8a]">
-          Barang Yang Hilang <span className="text-red-500">*</span>
+          Lost Item <span className="text-red-500">*</span>
         </Label>
         <Input
           id="itemDescription"
           value={itemDescription}
           onChange={(e) => handleItemChange(e.target.value)}
           className="mt-2"
-          placeholder="Contoh: Dompet kulit hitam, Telefon bimbit Samsung..."
+          placeholder="e.g. Black leather wallet, Samsung phone..."
           required
         />
       </div>
@@ -79,7 +83,7 @@ export function IncidentDescriptionLostItems({ onNext, onBack, onChange, data }:
       {/* Description Text Area */}
       <div className="mb-6">
         <Label htmlFor="description" className="text-sm font-semibold text-[#1e3a8a]">
-          Keterangan Kejadian <span className="text-red-500">*</span>
+          Incident Description <span className="text-red-500">*</span>
         </Label>
         <div className="relative">
           <Textarea
@@ -87,7 +91,7 @@ export function IncidentDescriptionLostItems({ onNext, onBack, onChange, data }:
             value={description}
             onChange={(e) => { setDescription(e.target.value); if (onChange) onChange({ itemDescription, reportContent: e.target.value }) }}
             className="min-h-[300px] text-sm mt-2"
-            placeholder="Terangkan dengan terperinci mengenai kehilangan barang..."
+            placeholder="Describe the loss in detail..."
             required
           />
 
@@ -104,16 +108,16 @@ export function IncidentDescriptionLostItems({ onNext, onBack, onChange, data }:
 
       {/* Mandatory Note */}
       <div className="mb-6">
-        <p className="text-red-500 text-sm">* Mandatori</p>
+        <p className="text-red-500 text-sm">{t.required}</p>
       </div>
 
       {/* Navigation Buttons */}
       <div className="flex justify-between">
         <Button type="button" onClick={onBack} className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          « Kembali
+          {t.back}
         </Button>
         <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-          Seterusnya »
+          {t.next}
         </Button>
       </div>
     </form>

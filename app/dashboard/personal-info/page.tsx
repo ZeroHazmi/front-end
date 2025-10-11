@@ -2,7 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import DashboardHeader from '@/components/header/dashboard-header'
+import { getDraft, setDraft } from '@/lib/draftStorage'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,20 +18,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Calendar } from "lucide-react"
+import { useLanguage } from '@/contexts/LanguageContext'
 
-export default function ButiranPeribadiPage() {
+export default function PersonalInfoPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     icNumber: "",
-    name: "",
     dateOfBirth: "",
     age: "",
-    gender: "",
     citizenship: "",
-    race: "",
     religion: "",
     mobileBimbit: "",
-    mobileRetype: "",
     phoneHome: "",
     phoneOffice: "",
     address1: "",
@@ -37,12 +37,21 @@ export default function ButiranPeribadiPage() {
     address3: "",
     address4: "",
     address5: "",
-    postcode: "",
-    state: "",
-    district: "",
     email: "",
-    emailRetype: "",
   })
+
+  // restore personal info draft on mount
+  useEffect(() => {
+    try {
+      const draft = getDraft('personalInfo')
+      if (draft) setFormData((prev) => ({ ...prev, ...draft }))
+    } catch (e) {}
+  }, [])
+
+  // persist personal info to session on every change
+  useEffect(() => {
+    try { setDraft('personalInfo', formData) } catch (e) {}
+  }, [formData])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,9 +66,10 @@ export default function ButiranPeribadiPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <DashboardHeader />
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Kemas kini Pengguna</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-8">{t.personalInfo_update_title}</h1>
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -67,7 +77,7 @@ export default function ButiranPeribadiPage() {
               <div className="space-y-6">
                 <div>
                   <Label htmlFor="icNumber">
-                    No. Kad Pengenalan Baru <span className="text-red-500">*</span>
+                    {t.icNumber} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="icNumber"
@@ -77,10 +87,10 @@ export default function ButiranPeribadiPage() {
                     required
                   />
                 </div>
-
+                      
                 <div>
                   <Label htmlFor="dateOfBirth">
-                    Tarikh Lahir <span className="text-red-500">*</span>
+                    {t.birthdate} <span className="text-red-500">*</span>
                   </Label>
                   <div className="flex gap-2 mt-1">
                     <div className="relative flex-1">
@@ -88,63 +98,63 @@ export default function ButiranPeribadiPage() {
                         id="dateOfBirth"
                         value={formData.dateOfBirth}
                         onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                        placeholder="DD/MM/YYYY"
+                        placeholder={t.placeholder_date_format}
                         required
                       />
                       <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     </div>
                     <Input
-                      placeholder="Umur"
+                      placeholder={t.label_age}
                       value={formData.age}
                       onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                       className="w-20"
                     />
-                    <span className="flex items-center text-sm text-gray-600">Tahun</span>
+                    <span className="flex items-center text-sm text-gray-600">{t.label_years}</span>
                   </div>
                 </div>
 
                 <div>
                   <Label htmlFor="citizenship">
-                    Warganegara <span className="text-red-500">*</span>
+                    {t.nationality} <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={formData.citizenship}
                     onValueChange={(value) => setFormData({ ...formData, citizenship: value })}
                   >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Sila Pilih..." />
+                      <SelectTrigger className="mt-1">
+                      <SelectValue placeholder={t.selectPlaceholder} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Malaysia">Malaysia</SelectItem>
-                      <SelectItem value="Lain-lain">Lain-lain</SelectItem>
+                      <SelectItem value="Malaysia">{t.country_malaysia}</SelectItem>
+                      <SelectItem value="Other">{t.other_label}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
                   <Label htmlFor="religion">
-                    Agama <span className="text-red-500">*</span>
+                    {t.religion} <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     value={formData.religion}
                     onValueChange={(value) => setFormData({ ...formData, religion: value })}
                   >
                     <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Sila Pilih..." />
+                      <SelectValue placeholder={t.selectPlaceholder} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Islam">Islam</SelectItem>
-                      <SelectItem value="Buddha">Buddha</SelectItem>
+                      <SelectItem value="Buddhism">Buddhism</SelectItem>
                       <SelectItem value="Hindu">Hindu</SelectItem>
-                      <SelectItem value="Kristian">Kristian</SelectItem>
-                      <SelectItem value="Lain-lain">Lain-lain</SelectItem>
+                      <SelectItem value="Christian">Christian</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
                   <Label htmlFor="mobileBimbit">
-                    No. Telefon Bimbit <span className="text-red-500">*</span>
+                    {t.phoneNumber} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="mobileBimbit"
@@ -156,7 +166,7 @@ export default function ButiranPeribadiPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="phoneOffice">No. Telefon Pejabat :</Label>
+                  <Label htmlFor="phoneOffice">{t.officePhoneNumber}:</Label>
                   <Input
                     id="phoneOffice"
                     value={formData.phoneOffice}
@@ -167,7 +177,7 @@ export default function ButiranPeribadiPage() {
 
                 <div>
                   <Label htmlFor="address1">
-                    Alamat <span className="text-red-500">*</span>
+                    {t.address} <span className="text-red-500">*</span>
                   </Label>
                   <div className="space-y-2 mt-1">
                     <Input
@@ -197,7 +207,7 @@ export default function ButiranPeribadiPage() {
 
                 <div>
                   <Label htmlFor="email">
-                    Emel <span className="text-red-500">*</span>
+                    {t.email} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="email"
@@ -207,75 +217,17 @@ export default function ButiranPeribadiPage() {
                     className="mt-1"
                     required
                   />
-                  <p className="text-sm text-red-500 mt-1">* Mandatori</p>
+                  <p className="text-sm text-red-500 mt-1">{t.required}</p>
                 </div>
               </div>
 
               {/* Right Column */}
               <div className="space-y-6">
-                <div>
-                  <Label htmlFor="name">
-                    Nama Pengguna <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="mt-1"
-                    required
-                  />
-                </div>
+
+                {/* Confirm mobile removed per request */}
 
                 <div>
-                  <Label htmlFor="gender">
-                    Jantina <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    value={formData.gender}
-                    onValueChange={(value) => setFormData({ ...formData, gender: value })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Sila Pilih..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Lelaki">Lelaki</SelectItem>
-                      <SelectItem value="Perempuan">Perempuan</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="race">
-                    Keturunan <span className="text-red-500">*</span>
-                  </Label>
-                  <Select value={formData.race} onValueChange={(value) => setFormData({ ...formData, race: value })}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Sila Pilih..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Melayu">Melayu</SelectItem>
-                      <SelectItem value="Cina">Cina</SelectItem>
-                      <SelectItem value="India">India</SelectItem>
-                      <SelectItem value="Lain-lain">Lain-lain</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="mobileRetype">
-                    Taip Semula No. Telefon Bimbit <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="mobileRetype"
-                    value={formData.mobileRetype}
-                    onChange={(e) => setFormData({ ...formData, mobileRetype: e.target.value })}
-                    className="mt-1"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="phoneHome">No. Telefon Rumah :</Label>
+                  <Label htmlFor="phoneHome">{t.housePhoneNumber}</Label>
                   <Input
                     id="phoneHome"
                     value={formData.phoneHome}
@@ -284,83 +236,15 @@ export default function ButiranPeribadiPage() {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="postcode">
-                    Poskod <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="postcode"
-                    value={formData.postcode}
-                    onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
-                    className="mt-1"
-                    required
-                  />
-                </div>
+                {/* Postcode, State & District removed per request */}
 
-                <div>
-                  <Label htmlFor="state">
-                    Negeri Dan Daerah <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="space-y-2 mt-1">
-                    <Select
-                      value={formData.state}
-                      onValueChange={(value) => setFormData({ ...formData, state: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sila Pilih..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="SELANGOR">SELANGOR</SelectItem>
-                        <SelectItem value="KUALA LUMPUR">KUALA LUMPUR</SelectItem>
-                        <SelectItem value="JOHOR">JOHOR</SelectItem>
-                        <SelectItem value="KEDAH">KEDAH</SelectItem>
-                        <SelectItem value="KELANTAN">KELANTAN</SelectItem>
-                        <SelectItem value="MELAKA">MELAKA</SelectItem>
-                        <SelectItem value="NEGERI SEMBILAN">NEGERI SEMBILAN</SelectItem>
-                        <SelectItem value="PAHANG">PAHANG</SelectItem>
-                        <SelectItem value="PENANG">PENANG</SelectItem>
-                        <SelectItem value="PERAK">PERAK</SelectItem>
-                        <SelectItem value="PERLIS">PERLIS</SelectItem>
-                        <SelectItem value="SABAH">SABAH</SelectItem>
-                        <SelectItem value="SARAWAK">SARAWAK</SelectItem>
-                        <SelectItem value="TERENGGANU">TERENGGANU</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select
-                      value={formData.district}
-                      onValueChange={(value) => setFormData({ ...formData, district: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sila Pilih..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="KLANG UTAMA">KLANG UTAMA</SelectItem>
-                        <SelectItem value="KLANG SELATAN">KLANG SELATAN</SelectItem>
-                        <SelectItem value="PETALING JAYA">PETALING JAYA</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="emailRetype">
-                    Taip Semula Emel <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="emailRetype"
-                    type="email"
-                    value={formData.emailRetype}
-                    onChange={(e) => setFormData({ ...formData, emailRetype: e.target.value })}
-                    className="mt-1"
-                    required
-                  />
-                </div>
+                {/* Confirm email removed per request */}
               </div>
             </div>
 
             <div className="flex justify-end mt-8">
               <Button type="submit" className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8 py-2">
-                Kemas kini
+                {t.button_update}
               </Button>
             </div>
           </form>
@@ -369,23 +253,23 @@ export default function ButiranPeribadiPage() {
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-        <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center">Pengesahan</DialogTitle>
+            <DialogTitle className="text-center">{t.confirmation_title_update}</DialogTitle>
             <DialogDescription className="text-center pt-4">
-              Adakah anda pasti ingin mengemaskini butir peribadi anda?
+              {t.confirmation_update_desc}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-3 sm:justify-center">
             <Button type="button" variant="outline" onClick={() => setShowConfirmModal(false)} className="px-8">
-              Cancel
+              {t.cancel}
             </Button>
             <Button
               type="button"
               onClick={handleConfirmUpdate}
               className="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-8"
             >
-              OK
+              {t.confirm}
             </Button>
           </DialogFooter>
         </DialogContent>
