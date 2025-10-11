@@ -7,6 +7,8 @@ import reportPersister from '@/lib/reportPersister'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { translations } from '@/translations'
+import { getStringTranslation } from '@/lib/translation'
 
 export function DashboardHeader() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -15,10 +17,14 @@ export function DashboardHeader() {
 
   const { language, setLanguage, t } = useLanguage()
 
-  const navItems = [
-    { name: t.home, href: '/dashboard' },
-    { name: t.printReport, href: '/dashboard/print-report' },
-    { name: t.personalInfo, href: '/dashboard/personal-info' },
+  // Use label keys and resolve from `t` at render time so labels update when language changes
+  // Only use translation keys which are string values (not nested objects)
+  type StringKeys<T> = { [K in keyof T]: T[K] extends string ? K : never }[keyof T]
+  type TransKey = StringKeys<typeof translations.en>
+  const navItems: { key: TransKey; href: string }[] = [
+    { key: 'home', href: '/dashboard' },
+    { key: 'printReport', href: '/dashboard/print-report' },
+    { key: 'personalInfo', href: '/dashboard/personal-info' },
   ]
 
   const normalize = (p?: string) => (p ? p.replace(/\/+$/, '') : '')
@@ -64,6 +70,7 @@ export function DashboardHeader() {
             {navItems.map((it) => {
               const href = normalize(it.href)
               const isActive = activeHref && href === activeHref
+              const label = getStringTranslation(t, it.key)
               return (
                 <Link
                   key={it.href}
@@ -71,7 +78,7 @@ export function DashboardHeader() {
                   className={`px-3 py-2 rounded text-sm ${isActive ? 'bg-white/20 font-semibold' : 'hover:bg-white/10'}`}
                   aria-current={isActive ? 'page' : undefined}
                 >
-                  <span className="text-white">{it.name}</span>
+                  <span className="text-white">{label}</span>
                 </Link>
               )
             })}
@@ -111,7 +118,7 @@ export function DashboardHeader() {
                   onClick={() => setMobileOpen(false)}
                   className="px-3 py-2 rounded text-sm hover:bg-white/10"
                 >
-                  {it.name}
+                  {getStringTranslation(t, it.key)}
                 </Link>
               ))}
             </nav>

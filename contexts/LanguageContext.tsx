@@ -3,13 +3,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { translations } from '@/translations';
 import { setLanguageCookie } from '@/app/lib/auth';
+import { TranslationsType } from '@/lib/translation'
 
 type Language = 'en' | 'bm';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: typeof translations.en;
+  t: TranslationsType;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

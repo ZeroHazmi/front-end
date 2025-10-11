@@ -103,7 +103,7 @@ const LoginAuthForm = ({ type = "sign-in" }: { type: string }) => {
                         control={form.control} 
                         name='username' 
                         label={t.username} 
-                        placeholder={t.enterUsername} 
+                        placeholder={t.enterIC} 
                         id='username-input'
                     />
 

@@ -6,7 +6,18 @@
         "prettier"
     ],
     "rules": {
-        "@typescript-eslint/no-unused-vars": "off", // Disables the rule globally
-        "@typescript-eslint/no-explicit-any": "off"
+        "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+        "no-restricted-syntax": [
+            "error",
+            {
+                "selector": "TSAsExpression[expression.name='t']",
+                "message": "Avoid casting translation object with `as any`. Use lib/translation helpers instead."
+            },
+            {
+                "selector": "MemberExpression[object.name='t'][computed=true]",
+                "message": "Avoid dynamic bracket access on `t` (e.g., t[key]). Use the typed helpers in lib/translation.ts instead."
+            }
+        ]
     }
 }

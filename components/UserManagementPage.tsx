@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -40,7 +40,7 @@ export default function UserManagementPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [loading, setLoading] = useState(false)
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const token = await getCookie("session");
       if (!token) {
@@ -86,7 +86,7 @@ export default function UserManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, genderFilter, sortOrder]);
 
   const handleDeleteUser = () => {
     if (!userToDelete) return
@@ -125,7 +125,7 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [searchQuery, genderFilter, sortOrder]);
+  }, [fetchUsers]);
 
   return (
     <div className="container mx-auto p-4">
