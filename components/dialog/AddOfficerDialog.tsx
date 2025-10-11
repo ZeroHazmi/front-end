@@ -13,6 +13,7 @@ import SelectInput from "../input/SelectInput"
 import { gender } from "@/types/constants"
 import RegisterCustomInput from "../input/RegisterCustomInput"
 import { AddPoliceSchema } from "@/lib/utils"
+import { useLanguage } from '@/contexts/LanguageContext'
 
 type AddPoliceFormValues = z.infer<ReturnType<typeof AddPoliceSchema>>
 
@@ -27,6 +28,7 @@ export default function AddOfficerDialog({
   onOpenChange,
   onOfficerAdded,
 }: AddOfficerDialogProps) {
+  const { t } = useLanguage()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<AddPoliceFormValues>({
@@ -98,7 +100,7 @@ export default function AddOfficerDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <RegisterCustomInput control={form.control} name="icNumber" label="IC Number" placeholder="Enter your IC" id="ic-input"/>
             <RegisterCustomInput control={form.control} name="name" label="Name" placeholder="Enter your name" id="name-input"/>
-            <RegisterCustomInput control={form.control} name="userName" label="Username" placeholder="Enter your username" id="username-input"/>
+            <RegisterCustomInput control={form.control} name="userName" label={t.username} placeholder={t.enterIC} id="username-input"/>
             <RegisterCustomInput control={form.control} name="password" label="Password" placeholder="Enter your password" id="password-input"/>
             <RegisterCustomInput control={form.control} name="repassword" label="Re-enter Password" placeholder="Enter your typed password" id="repassword-input"/>
             <RegisterCustomInput control={form.control} name="phoneNumber" label="Phone Number" placeholder="Enter your phone number" id="phone-input"/>

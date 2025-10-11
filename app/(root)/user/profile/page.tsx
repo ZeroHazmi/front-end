@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { CalendarIcon, Pencil } from 'lucide-react'
 import { getCookie } from '@/app/lib/auth'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface UserData {
   userName: string;
@@ -29,6 +30,7 @@ interface UserData {
 }
 
 export default function UserProfile() {
+  const { t } = useLanguage()
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState<UserData>({
@@ -132,7 +134,7 @@ export default function UserProfile() {
             <div className="flex-1 grid gap-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="userName">Username</Label>
+                  <Label htmlFor="userName">{t.username}</Label>
                   <Input
                     id="userName"
                     name="userName"

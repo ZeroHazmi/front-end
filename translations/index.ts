@@ -1,6 +1,6 @@
 export const translations = {
 	en: {
-		username: "Username",
+	username: "IC Number",
 		password: "Password",
 		signIn: "Sign In",
 		signUp: "Sign Up",
@@ -235,7 +235,7 @@ export const translations = {
 			bmShortLabel: "BM",
 	},
 	bm: {
-		username: "Nama Pengguna",
+	username: "No. Kad Pengenalan (IC)",
 		password: "Kata Laluan",
 		signIn: "Log Masuk",
 		signUp: "Daftar",

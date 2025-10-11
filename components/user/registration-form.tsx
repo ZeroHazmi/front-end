@@ -12,6 +12,7 @@ import { registerUser } from "@/actions/user"
 import {AppUser} from "@/types/index.d";
 import { states, stateDistrictsMap, gender as genderConst, races as racesConst, religion as religionConst } from "@/types/constants"
 import { useLanguage } from '@/contexts/LanguageContext'
+import { getStringTranslationGeneric } from '@/lib/translation'
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -478,7 +479,11 @@ export function RegistrationForm() {
                 <SelectContent>
                   {Object.entries(genderConst).map(([key]) => (
                     <SelectItem key={key} value={key}>
-                      {key === 'male' ? ((t as any).gender_male || 'Male') : key === 'female' ? ((t as any).gender_female || 'Female') : String((genderConst as any)[key])}
+                      {key === 'male'
+                        ? getStringTranslationGeneric(t, 'gender_male' as any) || 'Male'
+                        : key === 'female'
+                        ? getStringTranslationGeneric(t, 'gender_female' as any) || 'Female'
+                        : String((genderConst as any)[key])}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -491,9 +496,9 @@ export function RegistrationForm() {
               <Select value={formData.citizenship} onValueChange={(v) => handleInputChange("citizenship", v)}>
                 <SelectTrigger><SelectValue placeholder={t.enterNationality || 'Select...'} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="malaysian">{(t as any).nationality_Malaysian || 'Malaysian'}</SelectItem>
-                  <SelectItem value="pr">{(t as any).nationality_PermenantResident || 'Permanent Resident'}</SelectItem>
-                  <SelectItem value="foreigner">{(t as any).foreignerLabel || 'Foreigner'}</SelectItem>
+                  <SelectItem value="malaysian">{getStringTranslationGeneric(t, 'nationality_Malaysian' as any) || 'Malaysian'}</SelectItem>
+                  <SelectItem value="pr">{getStringTranslationGeneric(t, 'nationality_PermenantResident' as any) || 'Permanent Resident'}</SelectItem>
+                  <SelectItem value="foreigner">{getStringTranslationGeneric(t, 'foreignerLabel' as any) || 'Foreigner'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -504,11 +509,11 @@ export function RegistrationForm() {
               <Select value={formData.religion} onValueChange={(v) => handleInputChange("religion", v)}>
                 <SelectTrigger><SelectValue placeholder={t.enterReligion || 'Select...'} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="islam">{(t as any).religion_Islam || 'Islam'}</SelectItem>
-                  <SelectItem value="buddhism">{(t as any).religion_Buddhism || 'Buddhism'}</SelectItem>
-                  <SelectItem value="christianity">{(t as any).religion_Christianity || 'Christianity'}</SelectItem>
-                  <SelectItem value="hinduism">{(t as any).religion_Hinduism || 'Hinduism'}</SelectItem>
-                  <SelectItem value="other">{(t as any).religion_Others || 'Others'}</SelectItem>
+                  <SelectItem value="islam">{getStringTranslationGeneric(t, 'religion_Islam' as any) || 'Islam'}</SelectItem>
+                  <SelectItem value="buddhism">{getStringTranslationGeneric(t, 'religion_Buddhism' as any) || 'Buddhism'}</SelectItem>
+                  <SelectItem value="christianity">{getStringTranslationGeneric(t, 'religion_Christianity' as any) || 'Christianity'}</SelectItem>
+                  <SelectItem value="hinduism">{getStringTranslationGeneric(t, 'religion_Hinduism' as any) || 'Hinduism'}</SelectItem>
+                  <SelectItem value="other">{getStringTranslationGeneric(t, 'religion_Others' as any) || 'Others'}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -523,7 +528,11 @@ export function RegistrationForm() {
                 <SelectContent>
                   {Object.keys(racesConst).map((key) => (
                     <SelectItem key={key} value={key}>
-                      { (t as any)[`race_${key}`] || (racesConst as any)[key] }
+                      {(() => {
+                        const transKey = (`race_${key}`) as any
+                        const translated = getStringTranslationGeneric(t, transKey)
+                        return translated || (racesConst as any)[key]
+                      })()}
                     </SelectItem>
                   ))}
                 </SelectContent>

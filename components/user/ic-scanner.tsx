@@ -497,6 +497,7 @@ export function IcScanner({ onScanComplete }: IcScannerProps) {
                 <div className="bg-gray-100 p-2 rounded">
                   <div className="relative w-full flex items-center justify-center" style={{ minHeight: 200 }}>
                     {/* use native img for blob/data URLs (Next Image doesn't support blob: URLs reliably) */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={previewDataUrl} alt="IC Preview" className="object-contain max-h-[320px] w-auto" />
                   </div>
                 </div>

@@ -18,6 +18,7 @@ import { toast } from "@/hooks/use-toast"
 import { Loader2 } from 'lucide-react'
 import { gender, nationality, descendants, religion, states } from '@/types/constants'
 import { getDistricts, signUpFormSchema } from '@/lib/utils'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // Import the custom input components
 import RegisterCustomInput from '@/components/input/RegisterCustomInput'
@@ -33,6 +34,7 @@ interface AddUserDialogProps {
 }
 
 export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: AddUserDialogProps) {
+  const { t } = useLanguage()
   const [isLoading, setIsLoading] = useState(false)
   const [districts, setDistricts] = useState<string[]>([])
 
@@ -130,7 +132,7 @@ export default function AddUserDialog({ isOpen, onOpenChange, onUserAdded }: Add
             <div className="grid grid-cols-2 gap-4">
                 <RegisterCustomInput control={form.control} name='icNumber' label="IC Number" placeholder='Enter your IC' id='ic-input'/>
                 <RegisterCustomInput control={form.control} name='name' label="Name" placeholder='Enter your name' id='name-input'/>
-                <RegisterCustomInput control={form.control} name='userName' label="Username" placeholder='Enter your username' id='username-input'/>
+                <RegisterCustomInput control={form.control} name='userName' label={t.username} placeholder={t.enterIC} id='username-input'/>
                 <RegisterCustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' id='password-input'/>
                 <RegisterCustomInput control={form.control} name='repassword' label="Re-enter Password" placeholder='Enter your typed password' id='repassword-input'/>
                 <RegisterCustomInput control={form.control} name='phoneNumber' label="Phone Number" placeholder='Enter your phone number' id='phone-input'/>
